@@ -1,8 +1,7 @@
 import { getPostContent } from "@/lib/post";
 
-export default async function Page({ params }: { params: { id: number } }) {
-  const postData: any = await getPostContent(params.id);
-  console.log(postData);
+export default async function Page({ params }: { params: { id: string } }) {
+  const postData: any = await getPostContent(params.id as string);
   return (
     <div className="flex flex-col">
       <h1 className="mb-0">{postData.title}</h1>

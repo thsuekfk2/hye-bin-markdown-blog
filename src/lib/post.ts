@@ -4,11 +4,10 @@ import html from "remark-html";
 import fs from "fs";
 import matter from "gray-matter";
 
-export const filePath = path.join("src", "__posts");
+export const filePath = path.join(process.cwd(), "src", "__posts");
 
-export const getPostContent = async (id: number) => {
-  const filePath = path.join("src", "__posts", `${id}.md`);
-  const content = fs.readFileSync(filePath, "utf8");
+export const getPostContent = async (id: string) => {
+  const content = fs.readFileSync(`${filePath}/${id}.md`);
   const matterResult = matter(content);
 
   const processedContent = await remark()
@@ -38,20 +37,4 @@ export const getPostMetadata = () => {
   });
 
   return posts;
-};
-
-export const getPostData = async (id: number) => {
-  const postsDirectory = path.join("src", "/__posts");
-  const fullPath = path.join(postsDirectory, `${id}.md`);
-  const fileContents = fs.readFileSync(fullPath, "utf8");
-  const matterResult = matter(fileContents);
-  const processedContent = await remark()
-    .use(html)
-    .process(matterResult.content);
-  const contentHtml = processedContent.toString();
-
-  return {
-    contentHtml,
-    ...matterResult.data,
-  };
 };

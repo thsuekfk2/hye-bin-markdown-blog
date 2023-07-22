@@ -10,7 +10,7 @@ export default function Home() {
         {postMetadata.map((data, i) => (
           <Link
             key={i}
-            href={`/${data.slug}`}
+            href={`/post/${data.slug}`}
             className="flex items-center justify-center w-[30%] min-w-[200px] max-w-[300px] min-h-[200px]  max-h-[300px]  bg-[#444] rounded-lg hover:bg-[#5555]"
           >
             {data.title}
