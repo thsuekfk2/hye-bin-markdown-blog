@@ -24,7 +24,7 @@ export default function RootLayout({
               <Link href="/about">about</Link>
             </header>
           </div>
-          <main className="flex h-[92%] justify-center">
+          <main className="flex h-[92%] justify-center overflow-auto">
             <div className="flex w-full max-w-[850px] ml-2 mr-2">
               {children}
             </div>
