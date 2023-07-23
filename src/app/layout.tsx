@@ -19,13 +19,16 @@ export default function RootLayout({
       <body className={inter.className}>
         <div className="bg-[#222222] h-full text-[#F9FAFB]">
           <div className="flex h-[8%] justify-center">
-            <header className="flex w-full max-w-[850px] ml-2 mr-2 justify-between items-center">
+            <header className="flex w-full max-w-[800px] ml-2 mr-2 justify-between items-center">
               <Link href="/">HB</Link>
-              <Link href="/about">about</Link>
+              <div className="flex gap-6">
+                <Link href="/tag">Tags</Link>
+                <Link href="/about">about</Link>
+              </div>
             </header>
           </div>
           <main className="flex h-[92%] justify-center overflow-auto">
-            <div className="flex w-full max-w-[850px] ml-2 mr-2">
+            <div className="flex w-full max-w-[800px] ml-2 mr-2">
               {children}
             </div>
           </main>
