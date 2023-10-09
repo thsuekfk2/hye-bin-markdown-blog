@@ -1,3 +1,4 @@
+import { Calendar } from "@/components/Calendar";
 import { allLogs, Log } from "contentlayer/generated";
 import { compareDesc } from "date-fns";
 import Link from "next/link";
@@ -29,6 +30,9 @@ export default function page() {
         {logs.map((post, idx) => (
           <LogCard key={idx} {...post} />
         ))}
+      </div>
+      <div className="absolute right-0 bottom-0 m-10">
+        <Calendar />
       </div>
     </div>
   );
