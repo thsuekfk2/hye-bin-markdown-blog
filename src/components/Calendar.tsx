@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import DatePicker from "react-datepicker";
-import { forwardRef, useMemo, useRef, useState } from "react";
+import { forwardRef, useMemo, useState } from "react";
 import { ko } from "date-fns/esm/locale";
 import { format } from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
