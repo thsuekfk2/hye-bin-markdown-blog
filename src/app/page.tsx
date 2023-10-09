@@ -5,7 +5,7 @@ export default function Home() {
   const postMetadata = getPostMetadata();
   return (
     <div className="h-full w-full justify-center items-center">
-      <div className="flex justify-center pb-10">안녕하세요 :)</div>
+      <div className="flex justify-center pb-10">개발 이모저모s</div>
       <div className="flex items-center flex-wrap gap-6 justify-center">
         {postMetadata.map((data, i) => (
           <Link
