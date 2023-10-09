@@ -28,8 +28,8 @@ export default function RootLayout({
                 </div>
               </Link>
               <div className="flex gap-6">
-                <Link href="/tag">Tags</Link>
-                <Link href="/about">about</Link>
+                <Link href="/post">Post</Link>
+                <Link href="/log">Log</Link>
               </div>
             </header>
           </div>
