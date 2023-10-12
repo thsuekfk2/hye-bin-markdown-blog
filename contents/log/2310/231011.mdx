@@ -1,0 +1,327 @@
+---
+title: "Monorepo 그리고 Turborepo"
+date: 2023-10-11
+description: "Monorepo 그리고 Turborepo"
+---
+
+모노레포와 관련된 아티클을 읽어보면서 너무 재미있고 흥미롭게 읽을 수 있었다. 그러면서 나의 프로젝트를 잠시 회고해 볼 수 있었다.나는 주로 멀티 레포로만 서비스를 운영했었다. 각 프로젝트가 고유 저장소를 가지므로 독자적으로 빠르게 개발을 가능했고, 각각의 프로젝트를 관리하기엔 가벼웠다.하지만 같은 도메인의 프로젝트가 점점 들어나다 보니, 프로젝트 별로 중복되는 모듈이 많았고 관리하기에 비효율적이라는 생각이 들었다. 또 오랫동안 건드리지 않는 코드는 관리하기 어려웠으며 각 프로젝트마다의 컨벤션이 달라 빠르게 코드를 파악하고 유지보수 하기 어려웠다. 이런 문제점에서 모노레포가 나왔구나 라는 생각에 크게 와닿았다. 이번 기회에 모노레포를 만들어 프로젝트를 관리해보기로 마음 먹었다.
+
+## 모놀리식 vs 모노레포 vs 멀티레포
+
+모노레포는 모놀리식과 멀티레포의 장점을 모두 얻고자 등장하였다.
+
+![image](https://github.com/thsuekfk2/hye-bin-markdown-blog/assets/76821963/608213e1-6151-4200-8a21-7da6e1a70e08)
+[이미지 출처](https://levelup.gitconnected.com/moving-from-multiple-repositories-to-a-lerna-js-mono-repo-faa97aeee35b)
+
+## Monorepo의 장단점
+
+장점
+
+1. 내가 담당하는 프로젝트가 아니라도 개선의 여지가 있다면 자유롭게 수정할 수 있다.
+2. 다른 사람의 코드에 자주 기웃거릴 수 있다.
+3. 내가 알지 못했던 offical Document API를 통해서 문제를 더 깔끔하게 해결할 수 있다.
+4. 동료들간의 상호작용으로 기술적 비지니스적 성장 할 기회가 많이 열린다.
+5. 모든 커밋 히스토리가 한 리포지터리에 남기 때문에 히스토리를 추적하거나 전체 리포지터리의 개발 방향을 이해하는 게 쉬워진다.
+6. 배포와 빌드, 테스트와 같은 작업을 병렬로 한 번에 처리할 수 있으므로 한 번의 명령으로 여러 개의 리포지터리에서 작업을 진행할 수 있다.
+
+단점
+
+1. 개발환경을 구성하는데 투자가 필요하다.
+2. 코드 관리의 어려움 (코드 소유권 문제)
+3. 대규모 리팩토링이 쉬워지는게 장점이자 단점.
+
+## Turborepo
+
+모노레포의 한 도구 중에 Turborepo가 있다. Turborepo는 모노레포를 위한 고성능 빌드 시스템이다. Turborepo의 주요 미션은 모노레포 환경에서 개발자가 조금 더 쉽고 빠르게 개발할 수 있도록 빌드 도구를 제공하는 것으로 복잡한 설정과 스크립트에 신경 쓰는 대신 개발에 더 집중할 수 있다. Turborepo의 기본 원칙은 한 번 작업을 수행하며 수행한 계산은 이후 다시 수행하지 않아 작업 진행을 캐싱해 이미 계산된 내용은 건너 뛰어 로컬에서나 CI/CD를 할 때 개발 속도를 높여준다.
+
+## create a new monorepo
+
+전역 설치 시 모든 프로젝트에서 명령어 사용 가능 (실행하는 디렉터리를 기반으로 자동 작업 공간 선택을 활성화)
+
+```bash
+yarn global add turbo
+```
+
+지연 저장 시 , `turbo`저장소 루트에 dev 종속성을 추가
+
+```bash
+yarn add turbo --dev --ignore-workspace-root-check
+```
+
+새로운 모노레포 생성
+
+```bash
+npx create-turbo@latest
+```
+
+## Running
+
+```bash
+turbo dev
+turbo dev --filter docs //Running dev on only one workspace at a time
+```
+
+## 구조 파악하기
+
+`create-turbo` 로 생성된 폴더 안에 여러개의 새 파일이 생성된다. 구조는 다음과 같다.
+
+```bash
+my-turborepo/
+  ├── apps/
+  │   ├── docs/          # "docs" 애플리케이션
+  │   │   ├── controllers/
+  │   │   ├── views/
+  │   │   └── ...
+  │   ├── web/           # "web" 애플리케이션
+  │   │   ├── controllers/
+  │   │   ├── views/
+  │   │   └── ...
+  ├── packages/          # 공유 패키지들을 포함한 디렉토리
+  │   ├── ui/
+  │   │   ├── src/
+  │   │   ├── ...
+  │   ├── eslint-config-custom/
+  │   │   ├── ...
+  │   ├── tsconfig/
+  │   │   ├── ...
+  └── ...
+```
+
+### packages/ui 의존
+
+`./apps/web/package.json` 패키지의 이름이 `"name": "web"`
+
+`./apps/docs/package.json`  패키지의 이름이 `"name": "docs"`
+
+`./packages/ui/package.json` 패키지 이름이 `"name": "ui"`
+
+./apps/web/package.json
+
+```json
+"dependencies": {
+    "next": "^13.4.19",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "ui": "*"
+  }
+```
+
+./apps/docs/package.json
+
+```json
+"dependencies": {
+    "next": "^13.4.19",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "ui": "*"
+  },
+```
+
+로컬 `ui`패키지 에 의존한다는 것을 의미
+
+### packages/ui 에서 내보내기
+
+packages/ui/package.json
+
+```json
+{
+  "main": "./index.tsx",
+  "types": "./index.tsx"
+}
+```
+
+ui/index.tsx
+
+```json
+// component exports
+export { Card } from "./card";
+```
+
+### packages/ui 에서 가져오기
+
+./apps/docs/app/page.tsx
+
+```jsx
+import { Button, Header } from "ui";
+//       ^^^^^^^^^^^^^^         ^^
+
+export default function Page() {
+  return (
+    <>
+      <Header text="Docs">
+      <Button />
+    <>
+  );
+}
+```
+
+### tsconfig 내보내기
+
+[참고 공식 사이트](https://turbo.build/repo/docs/handbook/linting/typescript)
+
+packages/tsconfig/package.json
+
+```json
+{
+  "name": "tsconfig",
+  "files": ["base.json", "nextjs.json", "react-library.json"]
+}
+```
+
+### tsconfig 가져오기
+
+packages/ui/package.json
+
+```json
+{
+  "devDependencies": {
+    "tsconfig": "*"
+  }
+}
+```
+
+packages/ui/tsconfig.json
+
+```json
+{
+  "extends": "tsconfig/react-library.json"
+}
+```
+
+### eslint-config-custom 내보내기
+
+[참고 공식 사이트](https://turbo.build/repo/docs/handbook/linting/eslint)
+
+각각의 커스텀한 esLint를 만들어 준다.
+
+packages/eslint-config-custom/library.js
+
+```json
+module.exports = {
+  extends: [
+    "@vercel/style-guide/eslint/node",
+    "@vercel/style-guide/eslint/typescript",
+  ].map(require.resolve),
+  parserOptions: {
+    project,
+  },
+  globals: {
+    React: true,
+    JSX: true,
+  },
+  settings: {
+    "import/resolver": {
+      typescript: {
+        project,
+      },
+    },
+  },
+  ignorePatterns: ["node_modules/", "dist/"],
+};
+```
+
+packages/eslint-config-custom/next.js
+
+```json
+module.exports = {
+  extends: [
+    "@vercel/style-guide/eslint/node",
+    "@vercel/style-guide/eslint/browser",
+    "@vercel/style-guide/eslint/typescript",
+    "@vercel/style-guide/eslint/react",
+    "@vercel/style-guide/eslint/next",
+    "eslint-config-turbo",
+  ].map(require.resolve),
+  parserOptions: {
+    project,
+  },
+  globals: {
+    React: true,
+    JSX: true,
+  },
+  settings: {
+    "import/resolver": {
+      typescript: {
+        project,
+      },
+    },
+  },
+  ignorePatterns: ["node_modules/", "dist/"],
+  // add rules configurations here
+  rules: {
+    "import/no-default-export": "off",
+  },
+};
+```
+
+packages/eslint-config-custom/react-internal.js
+
+```json
+module.exports = {
+  extends: [
+    "@vercel/style-guide/eslint/browser",
+    "@vercel/style-guide/eslint/typescript",
+    "@vercel/style-guide/eslint/react",
+  ].map(require.resolve),
+  parserOptions: {
+    project,
+  },
+  globals: {
+    JSX: true,
+  },
+  settings: {
+    "import/resolver": {
+      typescript: {
+        project,
+      },
+    },
+  },
+  ignorePatterns: ["node_modules/", "dist/", ".eslintrc.js"],
+
+  rules: {
+    // add specific rules configurations here
+  },
+};
+```
+
+### eslint-config-custom 가져오기
+
+ESLint가 구성 파일을 찾는 방법은 가장 가까운 .eslintrc.js를 찾고 현재 디렉터리에서 하나를 찾을 수 없으면 하나를 찾을 때까지 위의 디렉터리를 찾는다. `eslint-config-*` \*에서 사용한 이름을 통해 `extends: ['custom']` 다음과 같이 ESLint가 로컬 작업 공간을 찾을 수 있다.
+
+./packages/ui/package.json
+
+```json
+"devDependencies": {
+    "eslint-config-custom": "*",
+  }
+```
+
+./packages/ui/.eslintrc.js
+
+```json
+module.exports = {
+  extends: ["custom/react-internal"],
+};
+```
+
+./apps/web/package.json
+
+```json
+"devDependencies": {
+    "eslint-config-custom": "*",
+  }
+```
+
+./apps/web/.eslintrc.js
+
+```json
+module.exports = {
+  extends: ["custom/next"],
+};
+```
+
+## Reference
+
+[https://erwinousy.medium.com/turborepo에-대한-간략한-소개-adf78ddb4787](https://erwinousy.medium.com/turborepo에-대한-간략한-소개-adf78ddb4787)
+[https://engineering.linecorp.com/ko/blog/monorepo-with-turborepo](https://engineering.linecorp.com/ko/blog/monorepo-with-turborepo)
+[https://turbo.build/repo/docs/getting-started/create-new](https://turbo.build/repo/docs/getting-started/create-new)
