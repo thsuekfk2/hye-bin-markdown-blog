@@ -9,6 +9,8 @@ export default function Home() {
           width={850}
           height={300}
           alt="Picture of the author"
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg==" // 추가
         />
         <h2>주니어 프론트엔드 개발자 이혜빈입니다.</h2>
         <a target="_blank" href="https://github.com/thsuekfk2">
