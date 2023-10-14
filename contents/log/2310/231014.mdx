@@ -1,0 +1,64 @@
+---
+title: "라이브러리 개발 종속성(devDependencies)으로 이동시키면서…"
+date: 2023-10-14
+description: "라이브러리 개발 종속성(devDependencies)으로 이동시키면서…"
+---
+
+간단하게 dependencies, devDependencies 을 정리하면 “devDependencies 이건 개발용, dependencies 이건 실제 서비스용” 으로 생각하면 된다.
+
+- dependencies : `express` 패키지처럼 실제 코드에도 포함되며 앱 구동을 위해 필요한 의존성 파일들
+- devDependencies : `concurrently` 패키지처럼 실제 코드에 포함되지 않으며 개발 단계에만 필요한 의존성 파일들
+
+최근에 만든 [라이브러리](https://www.npmjs.com/package/typing-text-animation)의 dependencies에 있는 라이브러리를 devDependencies로 옮기는 작업을 진행했다. 옮기고 나서 기존에 있는 프로젝트에 install 했더 이런 에러가 떴다.
+
+```bash
+Warning: Invalid hook call.
+Hooks can only be called inside of the body of a function component.
+This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.
+```
+
+이 에러는 Hook을 함수 컴포넌트의 본문 외부에 호출했을 때 봤던 에러였는데 🤔 라이브러리 설치 후 뜨는게 의문이었다.
+
+에러는 해석해보면 다음과 같다.
+
+### 1. **React와 React DOM의 버전이 일치하지 않을 수 있습니다.**
+
+```bash
+npm ls react
+```
+
+다음 명령어를 터미널에 쳐서 버전을 확인해보았다. 라이브러리는 react@18.2.0을 요구하고있었다. (기존 프로젝트는 리액트 17버전이었음)
+
+### 2. Hooks 규칙을 위반했을 수 있습니다.
+
+hook에서는 꼭 지켜야하는 규칙이 있다. 자세한 내용은 공식홈페이지를 참고하자. [공식홈페이지](https://legacy.reactjs.org/docs/hooks-rules.html)
+
+✅ 함수 컴포넌트 본문의 최상위 레벨에서 호출하세요.
+
+✅ 사용자 정의 Hook 본체의 최상위 레벨에서 호출하세요.
+
+### 3. 같은 앱에 React가 한 개 이상있을 수 있습니다.
+
+```bash
+npm ls react
+```
+
+react 버전을 확인해 보니 중첩된 느낌은 없었다. 확실한건 이 프로젝트는 17버전의 리액트를 사용하는것!
+
+```json
+"devDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "@types/node": "^16.18.57",
+    "@types/react": "^18.2.24",
+    "@types/react-dom": "^18.2.8",
+    "typescript": "^4.9.5"
+},
+```
+
+package.json의 devDependencies에 있는 react와 react-dom을 peerDependencies로 옮겼다. 수정하니 해결되었다.😄
