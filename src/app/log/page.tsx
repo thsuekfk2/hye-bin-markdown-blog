@@ -1,18 +1,7 @@
-import { allLogs, Log } from "contentlayer/generated";
+import { Card } from "@/components/Card";
+import { allLogs } from "contentlayer/generated";
 import { compareDesc } from "date-fns";
-import Link from "next/link";
 import React from "react";
-
-function LogCard(post: Log) {
-  return (
-    <Link
-      href={`log/${post._raw.sourceFileName.split(".")[0]}`}
-      className="flex items-center justify-center w-[30%] min-w-[200px] max-w-[300px] min-h-[200px]  max-h-[300px]  bg-[#444] rounded-lg hover:bg-[#5555]"
-    >
-      {post.title}
-    </Link>
-  );
-}
 
 export default function page() {
   const logs = allLogs.sort((a, b) =>
@@ -20,10 +9,19 @@ export default function page() {
   );
 
   return (
-    <div className="flex items-center flex-wrap gap-6 justify-center">
-      {logs.map((post, idx) => (
-        <LogCard key={idx} {...post} />
-      ))}
+    <div>
+      <div className="flex flex-col justify-center pb-10 text-center">
+        <div>개발 로그</div>
+        <div className="text-xs">하루하루 공부한 내용을 기록합니다.</div>
+      </div>
+      <div className="flex items-center flex-wrap gap-6 justify-center mb-[80px]">
+        {logs.map((post, idx) => (
+          <Card
+            href={`log/${post._raw.sourceFileName.split(".")[0]}`}
+            title={post.title}
+          />
+        ))}
+      </div>
     </div>
   );
 }

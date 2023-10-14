@@ -1,19 +1,7 @@
-import { Calendar } from "@/components/Calendar";
-import { allPosts, Post } from "contentlayer/generated";
+import { Card } from "@/components/Card";
+import { allPosts } from "contentlayer/generated";
 import { compareDesc } from "date-fns";
-import Link from "next/link";
 import React from "react";
-
-function PostCard(post: Post) {
-  return (
-    <Link
-      href={`post/${post._raw.sourceFileName.split(".")[0]}`}
-      className="flex items-center justify-center w-[30%] min-w-[200px] max-w-[300px] min-h-[200px]  max-h-[300px]  bg-[#444] rounded-lg hover:bg-[#5555]"
-    >
-      {post.title}
-    </Link>
-  );
-}
 
 export default function page() {
   const logs = allPosts.sort((a, b) =>
@@ -28,7 +16,10 @@ export default function page() {
       </div>
       <div className="flex items-center flex-wrap gap-6 justify-center">
         {logs.map((post, idx) => (
-          <PostCard key={idx} {...post} />
+          <Card
+            href={`post/${post._raw.sourceFileName.split(".")[0]}`}
+            title={post.title}
+          />
         ))}
       </div>
     </div>
