@@ -9,7 +9,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 export const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const minDate = useMemo(() => new Date("2023-10-01"), []);
+  const minDate = useMemo(() => new Date("2023-10-09"), []);
   const today = useMemo(() => new Date(), []);
 
   const ExampleCustomInput = forwardRef(({ value, onClick }: any, ref: any) => (
@@ -52,30 +52,54 @@ export const Calendar = () => {
         nextMonthButtonDisabled,
       }) => {
         return (
-          <div>
-            <div
-              onClick={decreaseMonth}
-              className={`${
-                prevMonthButtonDisabled ? "hidden" : "visible"
-              } cursor-pointer`}
-            >
-              이전
+          <div className="flex justify-between items-center">
+            <button onClick={decreaseMonth}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="#ccc"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 19.5L8.25 12l7.5-7.5"
+                />
+              </svg>
+            </button>
+            <div className="text-sm font-bold mb-3">
+              {format(date, "yyyy년 MM월")}
             </div>
-            <div> {format(date, "yyyy년 MM월")}</div>
-            <div
-              onClick={increaseMonth}
-              className={`${
-                nextMonthButtonDisabled ? "hidden" : "visible"
-              } cursor-pointer`}
-            >
-              다음
-            </div>
+            <button onClick={increaseMonth}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="#ccc"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                />
+              </svg>
+            </button>
           </div>
         );
       }}
       renderDayContents={(day, date: Date) => {
         let formatDate = format(date, "yyMMdd");
-        return <Link href={`/log/${formatDate}`}>{day}</Link>;
+        return (
+          <div className="w-full h-full flex">
+            <Link className="w-full h-full" href={`/log/${formatDate}`}>
+              {day}
+            </Link>
+          </div>
+        );
       }}
     />
   );
