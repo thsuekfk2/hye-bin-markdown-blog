@@ -1,0 +1,276 @@
+---
+title: "Calendar 날짜 선택 로직 추가 및 코드 리팩토링"
+date: 2023-10-16
+description: "Calendar 날짜 선택 로직 추가 및 코드 리팩토링"
+---
+
+최근에 react-datepicker 라이브러리를 커스텀 하는 재미에 빠졌다.
+오늘은 로그를 쓰지 못한 날 날짜 선택 비활성화 기능을 추가하고 기존 Calendar 컴포넌트 리팩토링 작업을 했다.
+
+## 달력 날짜 선택 로직
+
+react-datepicker 라이브러리의 filterDate를 사용하였다.
+이 기능은 사용자가 지정한 규칙에 따라 특정 날짜를 선택할 수 있으며 true, false 반환값을 가지기 때문에
+느낌표 두개(!!) 연산자로 확실한 논리결과를 리턴했다.
+
+필터 로직은 다음과 같이 구현하였다.
+
+```jsx
+const isLogAvailable = (date: Date) => {
+  const formatDate = format(date, "yyMMdd");
+  const isFindLog = allLogs.find(
+    (log: Log) => formatDate === format(new Date(log.date), "yyMMdd")
+  );
+  return !!isFindLog;
+};
+```
+
+## 😁 재미있는 리팩토링 하기
+
+기존 코드를 봤을 때 중복된 코드가 많았고, 내부 로직 함수 분리가 안되어 있어 가독성이 떨어졌었다.
+그리고 any 타입을 무분별하게 사용하여 타입에러를 다 숨겨놓는 수준이었다. 😵‍💫
+또 svg 아이콘이 이곳저곳.. 도저히 참을 수 없어 리팩토링 작업을 시작했다.
+
+1. 내부 로직 함수 분리
+2. 중복된 필터링 로직 분리
+3. any 타입 지양
+4. 기존 SVG 아이콘 분리
+
+## 부끄러운 리팩토링 전 코드
+
+<details>
+<summary>😡</summary>
+
+```jsx
+"use client";
+
+import Link from "next/link";
+import DatePicker from "react-datepicker";
+import { forwardRef, useMemo, useState } from "react";
+import { ko } from "date-fns/esm/locale";
+import { format } from "date-fns";
+import { allLogs } from "contentlayer/generated";
+import "react-datepicker/dist/react-datepicker.css";
+
+export const Calendar = () => {
+  const [selectedDate, setSelectedDate] =
+    (useState < Date) | (null > new Date());
+  const minDate = useMemo(() => new Date("2023-10-09"), []);
+  const today = useMemo(() => new Date(), []);
+
+  const ExampleCustomInput = forwardRef(({ value, onClick }: any, ref: any) => (
+    <button className="" onClick={onClick} ref={ref}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="w-6 h-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z"
+        />
+      </svg>
+    </button>
+  ));
+
+  ExampleCustomInput.displayName = "ExampleCustomInput";
+
+  return (
+    <DatePicker
+      locale={ko}
+      className="flex w-10 h-10 rounded-full"
+      dateFormat="yyyy.MM.dd"
+      shouldCloseOnSelect
+      minDate={minDate}
+      maxDate={today}
+      filterDate={(date) => {
+        const formatDate = format(date, "yyMMdd");
+        const isFindLog = allLogs.find(
+          (log: any) => formatDate === format(new Date(log.date), "yyMMdd")
+        );
+        return !!isFindLog;
+      }}
+      selected={selectedDate}
+      onChange={(date) => setSelectedDate(date)}
+      customInput={<ExampleCustomInput />}
+      renderCustomHeader={({ date, decreaseMonth, increaseMonth }) => {
+        return (
+          <div className="flex items-center justify-between">
+            <button onClick={decreaseMonth}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="#ccc"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 19.5L8.25 12l7.5-7.5"
+                />
+              </svg>
+            </button>
+            <div className="mb-3 text-sm font-bold">
+              {format(date, "yyyy년 MM월")}
+            </div>
+            <button onClick={increaseMonth}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="#ccc"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                />
+              </svg>
+            </button>
+          </div>
+        );
+      }}
+      renderDayContents={(day, date: Date) => {
+        const formatDate = format(date, "yyMMdd");
+        const isFindLog = allLogs.find(
+          (log: any) => formatDate === format(new Date(log.date), "yyMMdd")
+        );
+        if (!isFindLog) {
+          return (
+            <div className="flex w-full h-full">
+              <div className="w-full h-full">{day}</div>
+            </div>
+          );
+        }
+        return (
+          <div className="flex w-full h-full">
+            <Link className="w-full h-full" href={`/log/${formatDate}`}>
+              {day}
+            </Link>
+          </div>
+        );
+      }}
+    />
+  );
+};
+```
+
+</details>
+
+## 리팩토링 완료 한 코드
+
+```jsx
+"use client";
+
+import Link from "next/link";
+import DatePicker from "react-datepicker";
+import { Ref, forwardRef, useMemo, useState } from "react";
+import { ko } from "date-fns/esm/locale";
+import { format } from "date-fns";
+import { Log, allLogs } from "contentlayer/generated";
+import "react-datepicker/dist/react-datepicker.css";
+import { CalendarIcon } from "./Icons/CalendarIcon";
+import { ArrowLeftIcon, ArrowRightIcon } from "./Icons/ArrowIcons";
+
+export const Calendar = () => {
+  const [selectedDate, setSelectedDate] =
+    (useState < Date) | (null > new Date());
+  const minDate = useMemo(() => new Date("2023-10-09"), []);
+  const today = useMemo(() => new Date(), []);
+
+  const isLogAvailable = (date: Date) => {
+    const formatDate = format(date, "yyMMdd");
+    const isFindLog = allLogs.find(
+      (log: Log) => formatDate === format(new Date(log.date), "yyMMdd")
+    );
+    return !!isFindLog;
+  };
+
+  const CustomInput = forwardRef(
+    (
+      {
+        onClick,
+        ...rest
+      }: {
+        onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void,
+      },
+      ref: Ref<HTMLButtonElement>
+    ) => (
+      <button className="" onClick={onClick} ref={ref} {...rest}>
+        <CalendarIcon />
+      </button>
+    )
+  );
+
+  CustomInput.displayName = "CustomInput";
+
+  const renderCustomHeader = ({
+    date,
+    decreaseMonth,
+    increaseMonth,
+  }: {
+    date: Date,
+    decreaseMonth: () => void,
+    increaseMonth: () => void,
+  }) => {
+    return (
+      <div className="flex items-center justify-between">
+        <button onClick={decreaseMonth}>
+          <ArrowLeftIcon />
+        </button>
+        <div className="mb-3 text-sm font-bold">
+          {format(date, "yyyy년 MM월")}
+        </div>
+        <button onClick={increaseMonth}>
+          <ArrowRightIcon />
+        </button>
+      </div>
+    );
+  };
+  const renderDayContents = (day: number, date: Date) => {
+    const formatDate = format(date, "yyMMdd");
+    const isFindLog = isLogAvailable(date);
+    if (!isFindLog) {
+      return (
+        <div className="flex w-full h-full">
+          <div className="w-full h-full">{day}</div>
+        </div>
+      );
+    }
+    return (
+      <div className="flex w-full h-full">
+        <Link className="w-full h-full" href={`/log/${formatDate}`}>
+          {day}
+        </Link>
+      </div>
+    );
+  };
+
+  return (
+    <DatePicker
+      locale={ko}
+      className="flex w-10 h-10 rounded-full"
+      dateFormat="yyyy.MM.dd"
+      shouldCloseOnSelect
+      minDate={minDate}
+      maxDate={today}
+      filterDate={(date) => isLogAvailable(date)}
+      selected={selectedDate}
+      onChange={(date) => setSelectedDate(date)}
+      customInput={<CustomInput />}
+      renderCustomHeader={renderCustomHeader}
+      renderDayContents={renderDayContents}
+    />
+  );
+};
+```
+
+리팩토링을 통해 코드를 향상시키고 가독성을 한 단계 더 높일 수 있었다. 리팩토링을 미루지 말고 바로 하는 습관을 길러야겠다. 🚀
