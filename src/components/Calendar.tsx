@@ -5,7 +5,7 @@ import DatePicker from "react-datepicker";
 import { Ref, forwardRef, useMemo, useState } from "react";
 import { ko } from "date-fns/esm/locale";
 import { format } from "date-fns";
-import { Log, allLogs } from "contentlayer/generated";
+import { allLogs } from "contentlayer/generated";
 import "react-datepicker/dist/react-datepicker.css";
 import { CalendarIcon } from "./Icons/CalendarIcon";
 import { ArrowLeftIcon, ArrowRightIcon } from "./Icons/ArrowIcons";
@@ -15,13 +15,13 @@ export const Calendar = () => {
   const minDate = useMemo(() => new Date("2023-10-09"), []);
   const today = useMemo(() => new Date(), []);
 
-  const isLogAvailable = (date: Date) => {
-    const formatDate = format(date, "yyMMdd");
-    const isFindLog = allLogs.find(
-      (log: Log) => formatDate === format(new Date(log.date), "yyMMdd")
-    );
-    return !!isFindLog;
-  };
+  // const isLogAvailable = (date: Date) => {
+  //   const formatDate = format(date, "yyMMdd");
+  //   const isFindLog = allLogs.find(
+  //     (log) => formatDate === format(new Date(log.date), "yyMMdd")
+  //   );
+  //   return !!isFindLog;
+  // };
 
   const CustomInput = forwardRef(
     (
@@ -66,14 +66,15 @@ export const Calendar = () => {
   };
   const renderDayContents = (day: number, date: Date) => {
     const formatDate = format(date, "yyMMdd");
-    const isFindLog = isLogAvailable(date);
-    if (!isFindLog) {
-      return (
-        <div className="flex w-full h-full">
-          <div className="w-full h-full">{day}</div>
-        </div>
-      );
-    }
+    // const isFindLog = isLogAvailable(date);
+
+    // if (!isFindLog) {
+    //   return (
+    //     <div className="flex w-full h-full">
+    //       <div className="w-full h-full">{day}</div>
+    //     </div>
+    //   );
+    // }
     return (
       <div className="flex w-full h-full">
         <Link className="w-full h-full" href={`/log/${formatDate}`}>
@@ -91,7 +92,7 @@ export const Calendar = () => {
       shouldCloseOnSelect
       minDate={minDate}
       maxDate={today}
-      filterDate={(date) => isLogAvailable(date)}
+      // filterDate={(date) => {isLogAvailable(date)}}
       selected={selectedDate}
       onChange={(date) => setSelectedDate(date)}
       customInput={<CustomInput />}
