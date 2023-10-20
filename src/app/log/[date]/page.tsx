@@ -1,14 +1,14 @@
-import { allLogs } from "contentlayer/generated";
+import { Log, allLogs } from "contentlayer/generated";
 import { getMDXComponent } from "next-contentlayer/hooks";
 import { format, parseISO } from "date-fns";
 
 export const generateStaticParams = async () => {
-  return allLogs.map((post: any) => ({ slug: post._raw.flattenedPath }));
+  return allLogs.map((post: Log) => ({ slug: post._raw.flattenedPath }));
 };
 
-export const generateMetadata = ({ params }: any) => {
+export const generateMetadata = ({ params }: { params: { date: string } }) => {
   const post = allLogs.find(
-    (post: any) => post._raw.flattenedPath === params.date
+    (post: Log) => post._raw.flattenedPath === params.date
   );
   return { title: post?.title, description: post?.description };
 };

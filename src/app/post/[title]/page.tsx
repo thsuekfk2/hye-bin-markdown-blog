@@ -1,14 +1,14 @@
-import { allPosts } from "contentlayer/generated";
+import { Post, allPosts } from "contentlayer/generated";
 import { getMDXComponent } from "next-contentlayer/hooks";
 import { format, parseISO } from "date-fns";
 
 export const generateStaticParams = async () => {
-  return allPosts.map((post: any) => ({ slug: post._raw.flattenedPath }));
+  return allPosts.map((post: Post) => ({ slug: post._raw.flattenedPath }));
 };
 
-export const generateMetadata = ({ params }: any) => {
+export const generateMetadata = ({ params }: { params: { title: string } }) => {
   const post = allPosts.find(
-    (post: any) => post._raw.flattenedPath === params.title
+    (post: Post) => post._raw.flattenedPath === params.title
   );
 
   return { title: post?.title, description: post?.description };
