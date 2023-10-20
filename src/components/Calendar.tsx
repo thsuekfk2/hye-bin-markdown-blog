@@ -15,13 +15,13 @@ export const Calendar = () => {
   const minDate = useMemo(() => new Date("2023-10-09"), []);
   const today = useMemo(() => new Date(), []);
 
-  // const isLogAvailable = (date: Date) => {
-  //   const formatDate = format(date, "yyMMdd");
-  //   const isFindLog = allLogs.find(
-  //     (log) => formatDate === format(new Date(log.date), "yyMMdd")
-  //   );
-  //   return !!isFindLog;
-  // };
+  const isLogAvailable = (date: Date) => {
+    const formatDate = format(date, "yyMMdd");
+    const isFindLog = allLogs.find(
+      (log) => formatDate === format(new Date(log.date), "yyMMdd")
+    );
+    return !!isFindLog;
+  };
 
   const CustomInput = forwardRef(
     (
@@ -66,15 +66,15 @@ export const Calendar = () => {
   };
   const renderDayContents = (day: number, date: Date) => {
     const formatDate = format(date, "yyMMdd");
-    // const isFindLog = isLogAvailable(date);
+    const isFindLog = isLogAvailable(date);
 
-    // if (!isFindLog) {
-    //   return (
-    //     <div className="flex w-full h-full">
-    //       <div className="w-full h-full">{day}</div>
-    //     </div>
-    //   );
-    // }
+    if (!isFindLog) {
+      return (
+        <div className="flex w-full h-full">
+          <div className="w-full h-full">{day}</div>
+        </div>
+      );
+    }
     return (
       <div className="flex w-full h-full">
         <Link className="w-full h-full" href={`/log/${formatDate}`}>
@@ -92,7 +92,7 @@ export const Calendar = () => {
       shouldCloseOnSelect
       minDate={minDate}
       maxDate={today}
-      // filterDate={(date) => {isLogAvailable(date)}}
+      filterDate={(date) => isLogAvailable(date)}
       selected={selectedDate}
       onChange={(date) => setSelectedDate(date)}
       customInput={<CustomInput />}
