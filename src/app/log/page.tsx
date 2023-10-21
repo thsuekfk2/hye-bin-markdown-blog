@@ -1,4 +1,4 @@
-import { Card } from "@/components/Card";
+import { ListItem } from "@/components/ListItem";
 import { allLogs } from "contentlayer/generated";
 import { compareDesc } from "date-fns";
 import React from "react";
@@ -14,10 +14,10 @@ export default function page() {
         <div>개발 로그</div>
         <div className="text-xs">하루하루 공부한 내용을 기록합니다.</div>
       </div>
-      <div className="flex items-center flex-wrap gap-6 justify-center mb-[80px]">
+      <div className="flex items-center flex-wrap justify-center mb-[80px]">
         {logs.map((post, idx) => (
-          <Card
-            href={`log/${post._raw.sourceFileName.split(".")[0]}`}
+          <ListItem
+            date={`${post._raw.sourceFileName.split(".")[0]}`}
             title={post.title}
           />
         ))}
