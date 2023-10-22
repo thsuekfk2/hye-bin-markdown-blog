@@ -1,0 +1,29 @@
+---
+title: "도메인 등록하기"
+date: 2023-10-21
+description: "도메인 등록하기"
+---
+
+드디어 내 블로그 주소를 바꿀 수 있게 되었다 ! 🚀
+
+[GoDaddy](https://kr.godaddy.com/offers/godaddy?isc=disc965842&currencyType=KRW&countryview=1&cdtl=c_19742125129.g_149375661071.k_kwd-88659201.a_649551443714.d_c.ctv_g&bnb=b&gad=1&gclid=CjwKCAjw7c2pBhAZEiwA88pOF_kY8LUOILOhlkFleLeG4N9ABIZkOJpmylwQMW-pD3TKetke8jHSORoCiLIQAvD_BwE) 에서 도메인 구입 후 네임 서버 관리를 기존에 배포했던 Vecel에 맡겼다. 나는 Vercel에서 제공하는 부가적인 기능을 받고 싶었기 때문이다. 👀
+
+## 도메인 등록하기
+
+도메인 등록은 어렵지 않았다. 제일 싼 도메인을 파는 곳을 찾아 돌아다녀보자. 내가 찾아본 곳은 아래 사이트들이다. 그중 내가 원하는 도메인이 가장 싼곳은 GoDaddy였기 때문에 여길 골랐다. 딱히 이유는 없었다.
+
+- [GoDaddy](https://kr.godaddy.com/offers/domains/domain-generator?isc=krdomgon1&countryview=1&currencyType=KRW)
+- [가비아](https://domain.gabia.com/)
+- [카페24](https://www.google.com/aclk?sa=l&ai=DChcSEwjDhp3P_YaCAxWMx0wCHagzBkcYABAAGgJ0bQ&ase=2&gclid=CjwKCAjw7c2pBhAZEiwA88pOF0UwZEIqYiwhyairpcj02t2M9BMKJiFlOnec0mFThoWjjami3sxm2RoC3A4QAvD_BwE&sig=AOD64_3P2599U2B0CyeaXUSFLtR7x46B3g&adurl=&q=)
+
+## 네임 서버 관리 Vercel로 변경
+
+vercel에서 배포된 내 프로젝트 - 설정 - Domains 에 들어간다. 그리고 새로 등록한 도메인을 추가 한 후 vercel에서 제공하는 DNS 두개를 복사한다.
+
+GoDaddy - 내 계정 - DNS 관리에 들어간다. 그리고 네임 서버를 변경을 눌러 vercel에서 가져온 네임서버로 수정해준다. 이때 네임서버가 등록되는 시간이 30분 정도 걸렸던 것 같다.
+
+그리고 다시 vercel 에서 빌드 후 배포하면 내가 구매한 도메인으로 바뀐 것을 확인할 수 있다! 😁
+
+## Reference
+
+[조코딩-도메인이란?](https://www.youtube.com/watch?v=_jJSzoV1uSg&t=373s)
