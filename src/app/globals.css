@@ -17,6 +17,9 @@ body {
 * {
   box-sizing: border-box;
 }
+code {
+  font-size: 14px;
+}
 
 pre {
   padding: 15px 20px;
