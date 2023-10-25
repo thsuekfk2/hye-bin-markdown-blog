@@ -2,18 +2,33 @@
 
 import Link from "next/link";
 import DatePicker from "react-datepicker";
-import { Ref, forwardRef, useMemo, useState } from "react";
+import { Ref, forwardRef, useEffect, useMemo, useState } from "react";
 import { ko } from "date-fns/esm/locale";
 import { format } from "date-fns";
 import { allLogs } from "contentlayer/generated";
 import "react-datepicker/dist/react-datepicker.css";
 import { CalendarIcon } from "./Icons/CalendarIcon";
 import { ArrowLeftIcon, ArrowRightIcon } from "./Icons/ArrowIcons";
+import { useParams } from "next/navigation";
 
 export const Calendar = () => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const { date } = useParams() as { date?: string }; //231023
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const minDate = useMemo(() => new Date("2023-10-09"), []);
   const today = useMemo(() => new Date(), []);
+
+  useEffect(() => {
+    if (date) {
+      setSelectedDate(parseDate(date));
+    } else {
+      setSelectedDate(null);
+    }
+  }, [date]);
+
+  const parseDate = (dateString: string) => {
+    const [year, month, day] = dateString.match(/\d{2}/g)!.map(Number);
+    return new Date(2000 + year, month - 1, day);
+  };
 
   const isLogAvailable = (date: Date) => {
     const formatDate = format(date, "yyMMdd");
@@ -87,7 +102,7 @@ export const Calendar = () => {
   return (
     <DatePicker
       locale={ko}
-      className="flex w-10 h-10 rounded-full"
+      className="flex rounded-full"
       dateFormat="yyyy.MM.dd"
       shouldCloseOnSelect
       minDate={minDate}
