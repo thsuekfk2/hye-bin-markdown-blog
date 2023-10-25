@@ -1,0 +1,67 @@
+---
+title: "캘리더 default date 설정"
+date: 2023-10-24
+description: "캘리더 default date 설정"
+---
+
+## ✨ 내가 원하는 기능
+
+1. `/log`페이지에서는 캘린더에서 특정 날짜를 자동으로 선택하지 않아야 한다
+2. 대신 해당 날짜의 로그를 확인할 때, 그 날짜가 선택되어야 한다.
+3. 또, 캘린더에서 날짜를 변경하면 변경된 날짜가 선택되어야 한다.
+
+## 기능을 구현한 코드 🧐
+
+```jsx
+const { date } = useParams() as { date?: string }; //231023
+const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+useEffect(() => {
+//url에 date가 있을경우와 없을 경우 파악
+// 현재 경로가 /log/231023 인 경우
+    if (date) {
+      setSelectedDate(parseDateStringToDate(date));
+    } else {
+// 현재 경로가 /log 페이지 인 경우
+      setSelectedDate(null);
+    }
+  }, [date]);
+
+```
+
+```tsx
+// @/utils/date.ts
+
+//231023 -> new date 객체로 리턴받음
+export const parseDateStringToDate = (dateString: string) => {
+  const [year, month, day] = dateString.match(/\d{2}/g)!.map(Number);
+  return new Date(2000 + year, month - 1, day);
+};
+```
+
+### useParams 사용
+
+useParams는 URL에서 경로 매개변수를 추출하는 데 사용된다. 다음은 Next.js 공식홈페이지 useParams을 사용한 예제 코드이다.
+
+```jsx
+"use client";
+
+import { useParams } from "next/navigation";
+
+export default function ExampleClientComponent() {
+  const params = useParams();
+
+  // Route -> /shop/[tag]/[item]
+  // URL -> /shop/shoes/nike-air-max-97
+  // `params` -> { tag: 'shoes', item: 'nike-air-max-97' }
+  console.log(params);
+
+  return <></>;
+}
+```
+
+완료 🚀
+
+## Reference
+
+https://nextjs.org/docs/app/api-reference/functions/use-params
