@@ -17,8 +17,15 @@ body {
 * {
   box-sizing: border-box;
 }
+
 code {
-  font-size: 14px;
+  font-size: 13px;
+}
+
+code span {
+  font-size: 13px;
+  display: inline-block;
+  text-wrap: wrap !important;
 }
 
 pre {
@@ -30,6 +37,7 @@ pre {
   margin: 40px 0;
   border-width: 1px;
 }
+
 article p {
   font-size: 16px;
   line-height: 1.8rem;
