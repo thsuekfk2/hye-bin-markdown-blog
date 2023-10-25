@@ -1,0 +1,118 @@
+---
+title: "번들 사이즈 최적화 방법"
+date: 2023-10-25
+description: "번들 사이즈 최적화 방법"
+---
+
+## 번들사이즈가 중요해진 배경
+
+웹 개발의 초기 단계에서는 정적이고 한정적인 웹 페이지가 주였다. 그러나 JavaScript의 등장으로 웹 애플리케이션은 훨씬 동적이고 상호작용성을 갖추게 되면서 사용자들은 더욱 인터랙티브한 UI를 경험할 수 있게 되었다.
+
+그러나 웹 애플리케이션의 복잡성이 증가하면서 파일 수도 급증했지만, 브라우저가 동시에 처리할 수 있는 HTTP 요청의 수에 제한이 있어 초기 로딩 속도가 저하되는 문제가 발생했다. 이러한 문제를 극복하고자 웹팩과 같은 번들러가 나왔다.
+
+## 번들러란?
+
+번들러는 여러 파일, 스타일, 이미지, 스크립트 등을 하나의 큰 파일로 묶어주는 도구이다. 이렇게 번들링된 파일은 클라이언트 측에서 한 번에 다운로드되어 초기 로딩 속도를 최적화할 수 있다.
+
+하지만 번들의 사이즈가 커질수록 이또한 초기 로딩 문제가 발생하기 때문에 번들 사이즈 최적화 해야 한다.
+
+## 번들 사이즈 최적화 방법
+
+### 코드 스플리팅(Code Splitting)
+
+큰 코드 덩어리를 여러개의 청크 단위로 쪼개는 것을 의미한다.
+
+1. **React.lazy를 활용해 페이지를 분리하기**
+2. **중복된 청크 제거**
+
+   webpack.config 설정의 splitChunks의 chunks을 all로 해준다.
+
+   ```jsx
+   //webpack.config.js
+
+   optimization: {
+     splitChunks: {
+   	  chunks: 'all',
+   },
+   ```
+
+   splitChunks의 minsize 조정해준다.
+
+   ```jsx
+   //webpack.config.js
+
+   optimization: {
+     splitChunks: {
+   	  minSize: '100',
+   },
+   ```
+
+### 2. 트리쉐이킹(Tree Shaking)
+
+트리쉐이킹은 나무를 흔들어서 죽은 나무 잎사귀를 떨어뜨리는 것처럼 빌드 과정에서 사용하지 않는 코드를 제거하는 과정을 의미한다.
+
+일반적으로 웹팩은 ES Modules (ESM) 형태로 작성된 코드의 경우, 프로덕션 모드에서 자동적으로 트리 쉐이킹을 수행한다. 그러나 웹팩이 판단하기에 "사이드 이펙트"가 있는 코드의 경우, 트리 쉐이킹을 진행하지 않는다.
+
+이런 경우, package.json 파일에서 _sideEffects_ 설정을 통해 사이드 이펙트를 정의할 수 있다. "사이드 이펙트가 없는 코드"는 `false`로 설정하고, 사이드 이펙트가 있는 경우 해당 경로를 설정한다.
+
+```jsx
+//package.json
+
+"sideEffects": [
+    "*.css",   // CSS 파일은 사이드 이펙트가 없음
+    "./src/utils.js"  // 특정 파일은 사이드 이펙트가 없음
+ ],
+```
+
+또한, `sideEffects`를 `false`로 설정해도 제거되지 않는 경우, 해당 코드를 Re-export 해주는 방법을 사용할 수 있다.
+
+<details>
+<summary>Re-export란 뭘까?</summary>
+
+Re-export는 다른 모듈에서 정의된 변수, 함수 또는 객체를 현재 모듈에서 다시 내보내는 것을 의미한다. 아래 예시를 보면 이해가 쉽다. main.js에서도 add, subtract 함수를 사용할 수 있다.
+
+```jsx
+// 모듈 파일 math.js
+export function add(a, b) {
+  return a + b;
+}
+
+export function subtract(a, b) {
+  return a + b;
+}
+```
+
+```jsx
+// 모듈 파일 main.js
+export { add, subtract } from "./math";
+```
+
+</details>
+
+특히 개발 모드와 프로덕션 모드를 구분하는 변수인 `isDevelopment`와 같은 조건문을 사용하는 경우, 주의가 필요하다. 이는 트리 쉐이킹이 컴파일 단계에서 이뤄지는 반면, `isDevelopment`와 같은 런타임 변수는 런타임 환경에서 평가되므로 컴파일 단계에서 최적화가 어려울 수 있다. 이는 변수를 사용하는 대신 조건문을 바로 입력하여 처리하는 것이 좋다.
+
+```jsx
+import { someFunction } from "./utils";
+
+const isDevelopment = process.env.NODE_ENV === "development";
+
+// 수정 전
+if (isDevelopment) {
+  const result = someFunction();
+}
+
+//수정 후
+if (process.env.NODE_ENV === "development") {
+  const result = someFunction();
+}
+```
+
+## 생각해보기 🤔
+
+일반적인 `react`앱과 달리 `nextjs`앱은 기본적으로 코드스플리팅을 지원해 페이지별로 필요한 스크립트만 번들링하게 된다고 한다.
+
+하지만 불필요한 스크립트가 같이 번들링되는 일이 있어 따로 최적화할 수 있다면 하는게 좋다! bundle-analyzer로 번들 파악하며 내 블로그 번들링 최적화 작업을 해봐야겠다 🚀
+
+## reference
+
+https://www.youtube.com/watch?v=ut10rvh1vug
