@@ -10,6 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { CalendarIcon } from "./Icons/CalendarIcon";
 import { ArrowLeftIcon, ArrowRightIcon } from "./Icons/ArrowIcons";
 import { useParams } from "next/navigation";
+import { parseDateStringToDate } from "@/utils/date";
 
 export const Calendar = () => {
   const { date } = useParams() as { date?: string }; //231023
@@ -19,16 +20,11 @@ export const Calendar = () => {
 
   useEffect(() => {
     if (date) {
-      setSelectedDate(parseDate(date));
+      setSelectedDate(parseDateStringToDate(date));
     } else {
       setSelectedDate(null);
     }
   }, [date]);
-
-  const parseDate = (dateString: string) => {
-    const [year, month, day] = dateString.match(/\d{2}/g)!.map(Number);
-    return new Date(2000 + year, month - 1, day);
-  };
 
   const isLogAvailable = (date: Date) => {
     const formatDate = format(date, "yyMMdd");
