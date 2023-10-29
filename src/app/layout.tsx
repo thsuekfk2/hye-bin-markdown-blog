@@ -24,12 +24,24 @@ export default function RootLayout({
               <Link href="/">
                 <div className="flex items-center gap-2">
                   <Image src="/cat.png" alt="" width={20} height={20} />
-                  hyebin
+                  <span className="hover:underline transition-all delay-75">
+                    hyebin
+                  </span>
                 </div>
               </Link>
               <div className="flex gap-6">
-                <Link href="/post">Post</Link>
-                <Link href="/log">Log</Link>
+                <Link
+                  href="/post"
+                  className="flex justify-center hover:bg-[#444] hover:rounded-full w-[50px] transition-all delay-75"
+                >
+                  Post
+                </Link>
+                <Link
+                  href="/log"
+                  className="flex justify-center hover:bg-[#444] hover:rounded-full w-[50px] transition-all delay-75"
+                >
+                  Log
+                </Link>
               </div>
             </header>
           </div>
