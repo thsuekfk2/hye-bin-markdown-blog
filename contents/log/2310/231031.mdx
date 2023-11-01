@@ -1,0 +1,73 @@
+---
+title: "Giscus 댓글 기능 추가"
+date: 2023-10-31
+description: "Giscus 댓글 기능 추가"
+---
+
+개발 블로그들을 보다가 깃허브로 로그인 시 댓글을 달 수 있는 기능이 있었다! 찾아보니 쉽게 적용할 수 있는 오픈소스였다 😁 그래서 바로 적용해 보려고 한다.
+
+## **utterances vs Giscus**
+
+[Utterances](https://utteranc.es/)와 [Giscus](https://giscus.app/ko)는 둘 다 GitHub 페이지에 댓글 시스템을 추가하는 데 사용되는 오픈 소스 도구이다.
+
+나는 다양한 테마와 독립적인 데이터 관리를 해주는 Giscus를 선택했다.
+
+## **Giscus 설치**
+
+1. public 한 레포를 준비한다.
+
+2. Github 계정에 **[giscus](https://github.com/apps/giscus)** 앱을 설치한다.
+
+3. Settings에서 **[discussions](<https://bepyan.github.io/blog/nextjs-blog/(https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/enabling-or-disabling-github-discussions-for-a-repository).>)** 기능을 활성화 합니다.
+
+4. [Giscus App 페이지](https://giscus.app/) 로 이동해서 내 마음에 맞는 댓글 시스템을 구성해본다.
+
+5. 설정이 다 마무리 되면 임베딩 시킬 수 있는 JavaScript 코드를 생성해주는데 해당 코드를 복사해서 본인의 블로그에 붙여넣는다.
+
+## **Giscus 컴포넌트 구현**
+
+```jsx
+"use client";
+
+import React, { useRef } from "react";
+import { useEffect } from "react";
+
+export const Giscus = (): JSX.Element => {
+  const ref = useRef<HTMLDivElement>(null);
+  const theme = "dark";
+
+  const repo = process.env.NEXT_PUBLIC_COMMENTS_REPO!;
+  const repoId = process.env.NEXT_PUBLIC_COMMENTS_REPO_ID!;
+  const categoryId = process.env.NEXT_PUBLIC_COMMENTS_CATEGORY_ID!;
+
+  useEffect(() => {
+    if (!ref.current || ref.current.hasChildNodes()) return;
+    const scriptElem = document.createElement("script");
+    scriptElem.src = "https://giscus.app/client.js";
+    scriptElem.async = true;
+    scriptElem.crossOrigin = "anonymous";
+    scriptElem.setAttribute("data-repo", repo);
+    scriptElem.setAttribute("data-repo-id", repoId);
+    scriptElem.setAttribute("data-category", "General");
+    scriptElem.setAttribute("data-category-id", categoryId);
+    scriptElem.setAttribute("data-mapping", "pathname");
+    scriptElem.setAttribute("data-strict", "0");
+    scriptElem.setAttribute("data-reactions-enabled", "1");
+    scriptElem.setAttribute("data-emit-metadata", "1");
+    scriptElem.setAttribute("data-input-position", "bottom");
+    scriptElem.setAttribute("data-theme", theme);
+    scriptElem.setAttribute("data-lang", "ko");
+    scriptElem.setAttribute("data-loading", "lazy");
+    scriptElem.setAttribute("crossorigin", "anonymous");
+    ref.current.appendChild(scriptElem);
+  }, []);
+
+  return <section className="mt-[100px] mb-[80px]" ref={ref} />;
+};
+```
+
+## reference
+
+[https://jojoldu.tistory.com/704](https://jojoldu.tistory.com/704)
+
+[https://bepyan.github.io/blog/nextjs-blog/6-comments#giscus-연동](https://bepyan.github.io/blog/nextjs-blog/6-comments#giscus-%EC%97%B0%EB%8F%99)
