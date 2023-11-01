@@ -7,9 +7,9 @@ export const Giscus = (): JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
   const theme = "dark";
 
-  const repo = process.env.COMMENTS_REPO!;
-  const repoId = process.env.COMMENTS_REPO_ID!;
-  const categoryId = process.env.COMMENTS_CATEGORY_ID!;
+  const repo = process.env.NEXT_PUBLIC_COMMENTS_REPO!;
+  const repoId = process.env.NEXT_PUBLIC_COMMENTS_REPO_ID!;
+  const categoryId = process.env.NEXT_PUBLIC_COMMENTS_CATEGORY_ID!;
 
   useEffect(() => {
     if (!ref.current || ref.current.hasChildNodes()) return;
