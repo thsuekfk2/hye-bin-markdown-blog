@@ -29,7 +29,7 @@ export default function RootLayout({
                   </span>
                 </div>
               </Link>
-              <div className="flex gap-6">
+              <div className="flex gap-6 text-sm">
                 <Link
                   href="/post"
                   className="flex justify-center hover:bg-[#444] hover:rounded-full w-[50px] transition-all delay-75"
@@ -38,7 +38,7 @@ export default function RootLayout({
                 </Link>
                 <Link
                   href="/log"
-                  className="flex justify-center hover:bg-[#444] hover:rounded-full w-[50px] transition-all delay-75"
+                  className="flex justify-center hover:bg-[#444] hover:rounded-full w-[50px] transition-all delay-75 "
                 >
                   Log
                 </Link>
