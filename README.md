@@ -1,10 +1,8 @@
-# hye-bin-markdown-blog
+# hye-bin-markdown-blog 🚀
 
-해당 레포지토리는 next.js로 markdown 블로그를 만들었습니다
-
-## 목표 ✨
-
-> Next.js로 마크다운으로 작성한 블로그를 정적 페이지(SSG)로 작성하기
+- 해당 레포지토리는 next.js 13버전입니다.
+- Contentlayer를 사용하여 정적 블로그 구축하였습니다.
+- Giscus로 댓글 기능을 구현하였습니다.
 
 ## 프로젝트 실행 방법 ⚒️
 
