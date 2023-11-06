@@ -2,6 +2,7 @@ import { Post, allPosts } from "contentlayer/generated";
 import { getMDXComponent } from "next-contentlayer/hooks";
 import { format, parseISO } from "date-fns";
 import { Giscus } from "@/components/Giscus";
+import { Toc } from "@/components/Toc";
 
 export const generateStaticParams = async () => {
   return allPosts.map((post: Post) => ({ slug: post._raw.flattenedPath }));
@@ -37,7 +38,10 @@ export default async function Page({ params }: { params: { title: string } }) {
           </div>
         </div>
         <article>
-          <MDXContent />
+          <div className="relative">
+            <Toc />
+            <MDXContent />
+          </div>
         </article>
         <Giscus />
       </div>
