@@ -18,6 +18,11 @@ body {
   box-sizing: border-box;
 }
 
+li {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
 code {
   font-size: 13px;
 }
