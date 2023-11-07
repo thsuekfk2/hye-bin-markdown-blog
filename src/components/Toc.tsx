@@ -1,24 +1,24 @@
 "use client";
 
 import { getIntersectionObserver } from "@/utils/observer";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export const Toc = () => {
-  const router = useRouter();
   const [currentId, setCurrentId] = useState<string>("");
   const [headingEls, setHeadingEls] = useState<Element[]>([]);
 
   useEffect(() => {
     const observer = getIntersectionObserver(setCurrentId);
-    const headingElements = Array.from(document.querySelectorAll("h2, h3"));
+    const headings = document.querySelectorAll("h2, h3");
+    const headingElements = Array.from(headings);
     setHeadingEls(headingElements);
+
     headingElements.map((header) => {
       const id = header.textContent!;
       header.id = id;
       observer.observe(header);
     });
-  }, [router]);
+  }, []);
 
   return (
     <>
