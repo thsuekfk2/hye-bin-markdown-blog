@@ -10,10 +10,18 @@ export const generateStaticParams = async () => {
 
 export const generateMetadata = ({ params }: { params: { title: string } }) => {
   const post = allPosts.find(
-    (post: Post) => post._raw.flattenedPath === params.title
+    (post: Post) => post._raw.sourceFileName === params.title + ".mdx"
   );
 
-  return { title: post?.title, description: post?.description };
+  return { title: post?.title, description: post?.description,
+    openGraph: {
+      title: post?.description,
+      description: post?.description || '이혜빈의 개발블로그',
+      type: 'website',
+      locale: 'ko',
+      url: `https://hyebin.info/post/${params.title}`
+    },
+  };
 };
 
 export default async function Page({ params }: { params: { title: string } }) {
