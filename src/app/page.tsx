@@ -17,7 +17,6 @@ export default function Home() {
         <h2>주니어 프론트엔드 개발자 이혜빈입니다.</h2>
         <div className="flex flex-col justify-center items-center">
           <div className="flex items-center">
-            <span className="text-xs mr-2">이건 제 깃허브구요 </span>
             <Link
               target="_blank"
               href="https://github.com/thsuekfk2"
@@ -36,16 +35,15 @@ export default function Home() {
               </svg>
             </Link>
           </div>
-          <div className="flex mt-5">
+          {/* <div className="flex mt-5">
             <Link
               target="_blank"
               href="https://hye-bin-home-ground.vercel.app"
               className="flex justify-center w-[60px] h-[24px] transition-all delay-75 hover:line-through text-xs"
             >
-              Portfolio
+              P
             </Link>
-            <span className="text-xs">는 준비중입니다 👀</span>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
