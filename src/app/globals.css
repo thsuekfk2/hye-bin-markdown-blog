@@ -41,6 +41,8 @@ pre {
   font-size: 0.9rem;
   margin: 40px 0;
   border-width: 1px;
+  max-width: 90vw;
+  margin: 0 auto;
 }
 
 article p {
