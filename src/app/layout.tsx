@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
+import { Analytics } from "@/components/Analytics";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,10 +22,11 @@ export default function RootLayout({
         <div className="bg-[#222222] h-full text-[#F9FAFB]">
           <div className="flex h-[8%] justify-center">
             <header className="flex w-full max-w-[800px] ml-2 mr-2 justify-between items-center">
+              <Analytics />
               <Link href="/">
                 <div className="flex items-center gap-2">
                   <Image src="/cat.png" alt="" width={20} height={20} />
-                  <span className="hover:underline transition-all delay-75">
+                  <span className="transition-all delay-75 hover:underline">
                     hyebin
                   </span>
                 </div>
