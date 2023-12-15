@@ -48,9 +48,7 @@ export default function RootLayout({
             </header>
           </div>
           <main className="flex h-[92%] justify-center overflow-auto">
-            <div className="flex w-full max-w-[800px] ml-2 mr-2">
-              {children}
-            </div>
+            <div className="flex w-full max-w-[800px]">{children}</div>
           </main>
         </div>
       </body>
