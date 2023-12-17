@@ -9,7 +9,7 @@ export const Toc = () => {
 
   useEffect(() => {
     const observer = getIntersectionObserver(setCurrentId);
-    const headings = document.querySelectorAll("h2, h3");
+    const headings = document.querySelectorAll("h1, h2, h3");
     const headingElements = Array.from(headings);
     setHeadingEls(headingElements);
 
@@ -25,7 +25,7 @@ export const Toc = () => {
       <div className="absolute ml-5 left-full">
         <div className="fixed hidden text-xs xl:flex xl:flex-col max-w-[220px] gap-3 text-[#999]">
           {headingEls.map((header, i) =>
-            header.nodeName === "H2" ? (
+            header.nodeName === "H2" || header.nodeName === "H1" ? (
               <div
                 className={`text-[12px] ${
                   currentId === header.textContent &&
