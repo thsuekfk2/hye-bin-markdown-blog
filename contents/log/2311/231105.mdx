@@ -15,31 +15,29 @@ description: "소프트웨어는 녹이 슨다"
 ## 폴리필 ?
 
 - 이전 버전의 브라우저에서 새로운 기능을 지원하기 위해 필요한 코드 조각이나 라이브러리이다.
+- 예를들어 자바스크립의 forEach 함수를 사용하고 싶은데 forEach 함수가 없는 환경이다. 하지만 폴리필을 작성하면 사용할 수 있다!
+- `core-js`, `regenerator-runtime` 도 폴리필의 일종이다. 라이브러리를 보면 내부 코드가 어떻게 구현되어 있는지 찾아 볼 수 있다.
+- 코어 js는 개인 개발자가 만든 라이브러리인데 왕을 먹었다고 한다 ㅋㅋ
 
-  - 예를들어 자바스크립의 forEach 함수를 사용하고 싶은데 forEach 함수가 없는 환경이다. 하지만 폴리필을 작성하면 사용할 수 있다!
+```jsx
+//"forEach" 폴리필 작성
+if (!Array.prototype.forEach) {
+  Array.prototype.forEach = function (callback, thisArg) {
+    if (this == null) {
+      throw new TypeError("this is null or not defined");
+    }
+    for (var i = 0; i < this.length; i++) {
+      callback.call(thisArg, this[i], i, this);
+    }
+  };
+}
 
-  ```jsx
-  //"forEach" 폴리필 작성
-  if (!Array.prototype.forEach) {
-    Array.prototype.forEach = function (callback, thisArg) {
-      if (this == null) {
-        throw new TypeError("this is null or not defined");
-      }
-      for (var i = 0; i < this.length; i++) {
-        callback.call(thisArg, this[i], i, this);
-      }
-    };
-  }
-
-  // 이제 "forEach" 메서드 사용 가능
-  var numbers = [1, 2, 3];
-  numbers.forEach(function (number) {
-    console.log(number);
-  });
-  ```
-
-  - • `core-js`, `regenerator-runtime` 도 폴리필의 일종이다. 라이브러리를 보면 내부 코드가 어떻게 구현되어 있는지 찾아 볼 수 있다.
-    - 코어 js는 개인 개발자가 만든 라이브러리인데 왕을 먹었다고 한다 ㅋㅋ
+// 이제 "forEach" 메서드 사용 가능
+var numbers = [1, 2, 3];
+numbers.forEach(function (number) {
+  console.log(number);
+});
+```
 
 ## 폴리필이 되는 이유는 몽키?패치?
 
