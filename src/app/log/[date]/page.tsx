@@ -3,6 +3,7 @@ import { getMDXComponent } from "next-contentlayer/hooks";
 import { format, parseISO } from "date-fns";
 import { Giscus } from "@/components/Giscus";
 import { Toc } from "@/components/Toc";
+import { Pagination } from "@/components/Pagination";
 
 export const generateStaticParams = async () => {
   return allLogs.map((post: Log) => ({ slug: post._raw.flattenedPath }));
@@ -12,22 +13,25 @@ export const generateMetadata = ({ params }: { params: { date: string } }) => {
   const post = allLogs.find(
     (post: Log) => post._raw.sourceFileName === params.date + ".mdx"
   );
-  
-  return { title: post?.title, description: post?.description,
+
+  return {
+    title: post?.title,
+    description: post?.description,
     openGraph: {
       title: post?.description,
-      description: post?.description || '이혜빈의 개발블로그',
-      type: 'website',
-      locale: 'ko',
-      url: `https://hyebin.info/log/${params.date}`
+      description: post?.description || "이혜빈의 개발블로그",
+      type: "website",
+      locale: "ko",
+      url: `https://hyebin.info/log/${params.date}`,
     },
   };
 };
 
 export default async function Page({ params }: { params: { date: string } }) {
-  const post = allLogs.find(
-    (post) => post._raw.sourceFileName === params.date + ".mdx"
+  const postIndex = allLogs.findIndex(
+    (post: Log) => post._raw.sourceFileName === params.date + ".mdx"
   );
+  const post = postIndex !== -1 ? allLogs[postIndex] : null;
 
   let MDXContent;
 
@@ -51,6 +55,16 @@ export default async function Page({ params }: { params: { date: string } }) {
             <MDXContent />
           </div>
         </article>
+        <Pagination
+          posts={allLogs}
+          prevPage={`${
+            allLogs[postIndex - 1]?._raw.sourceFileName.split(".")[0]
+          }`}
+          nextPage={`${
+            allLogs[postIndex + 1]?._raw.sourceFileName.split(".")[0]
+          }`}
+          postIndex={postIndex}
+        />
         <Giscus />
       </div>
     </div>

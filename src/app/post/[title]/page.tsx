@@ -3,6 +3,7 @@ import { getMDXComponent } from "next-contentlayer/hooks";
 import { format, parseISO } from "date-fns";
 import { Giscus } from "@/components/Giscus";
 import { Toc } from "@/components/Toc";
+import { Pagination } from "@/components/Pagination";
 
 export const generateStaticParams = async () => {
   return allPosts.map((post: Post) => ({ slug: post._raw.flattenedPath }));
@@ -13,13 +14,15 @@ export const generateMetadata = ({ params }: { params: { title: string } }) => {
     (post: Post) => post._raw.sourceFileName === params.title + ".mdx"
   );
 
-  return { title: post?.title, description: post?.description,
+  return {
+    title: post?.title,
+    description: post?.description,
     openGraph: {
       title: post?.description,
-      description: post?.description || '이혜빈의 개발블로그',
-      type: 'website',
-      locale: 'ko',
-      url: `https://hyebin.info/post/${params.title}`
+      description: post?.description || "이혜빈의 개발블로그",
+      type: "website",
+      locale: "ko",
+      url: `https://hyebin.info/post/${params.title}`,
     },
   };
 };
@@ -36,6 +39,9 @@ export default async function Page({ params }: { params: { title: string } }) {
     MDXContent = getMDXComponent(post!.body.code);
   }
 
+  const postName = Number(post._raw.sourceFileName.split(".")[0]);
+  const postIndex = postName - 1;
+
   return (
     <div className="flex flex-col w-full">
       <div>
@@ -51,6 +57,12 @@ export default async function Page({ params }: { params: { title: string } }) {
             <MDXContent />
           </div>
         </article>
+        <Pagination
+          posts={allPosts}
+          prevPage={`${postName - 1}`}
+          nextPage={`${postName + 1}`}
+          postIndex={postIndex}
+        />
         <Giscus />
       </div>
     </div>
