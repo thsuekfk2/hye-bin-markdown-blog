@@ -33,6 +33,18 @@ code span {
   text-wrap: wrap !important;
 }
 
+p img {
+  margin: 0 auto;
+}
+
+p code,
+li code {
+  background-color: #e9e9e9;
+  color: black;
+  padding: 3px;
+  border-radius: 6px;
+}
+
 pre {
   padding: 15px 20px;
   border-radius: 10px;
