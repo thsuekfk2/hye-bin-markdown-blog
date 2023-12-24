@@ -18,7 +18,7 @@ export const generateMetadata = ({ params }: { params: { date: string } }) => {
     title: post?.title,
     description: post?.description,
     openGraph: {
-      title: post?.description,
+      title: post?.title,
       description: post?.description || "이혜빈의 개발블로그",
       type: "website",
       locale: "ko",
