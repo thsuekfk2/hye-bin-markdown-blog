@@ -14,7 +14,7 @@ export default function page() {
         <div>기록</div>
         <div className="text-xs">소중한 경험을 기록합니다.</div>
       </div>
-      <div className="flex flex-wrap items-center justify-center gap-6">
+      <div className="flex flex-wrap items-center justify-center gap-6 pb-[5%]">
         {posts.map((post) => (
           <Card
             href={`post/${post._raw.sourceFileName.split(".")[0]}`}
