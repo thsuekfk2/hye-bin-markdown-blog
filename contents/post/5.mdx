@@ -1,0 +1,197 @@
+---
+title: "리액트로 chrome extention 만들기 (setting)"
+date: 2024-02-04
+description: "chrome extention을 만들어 보자!"
+thumbnail: "/post/5/cover.png"
+---
+
+## 개발 동기
+
+회사에서 일렉트론으로 응용프로그램을 말아서 크롬 탭을 제어하거나 화면을 제어했다. 하지만 유지보수와 업데이트 과정이 매우 힘들었다. 또, 테스트가 쉽지 않았으며, 노트북 기종, 업데이트 환경 등.. 설치 자체가 안되는 이슈도 많았다.
+
+좀 더 가볍고 크롬 기반의 하드웨어를 제어하는 프로그램은 없을까 고민하다 chrome extention으로 탭을 제어하는 방법이 있다는 것을 알게되었다. 설치도 가볍고, 업데이트도 쉽게 가능 하기 때문에 이번 기회에 react와 typescript를 이용하여 chrome extension을 만들어 보았다.
+
+## Setting
+
+### vite 설치하기
+
+```bash
+npm create vite@latest exe_app -- --template react-ts
+```
+
+### [CRXJS](https://crxjs.dev/) 라이브러리 설치하기
+
+CRXJS는 Chrome 확장 프로그램을 개발할 때 사용되는 라이브러리 중 하나다.
+
+1. HMR기능으로 다시 빌드하지 않고도 익스텐션을 로드만 하면 변경사항이 바로 적용된다.
+2. CRXJS + Vite 플러그인을 활용하면 간단하고 쉽게 Chrome 확장 프로그램 개발이 가능하다.
+
+```bash
+npm i @crxjs/vite-plugin@beta -D
+```
+
+CRXJS 라이브러리를 적용시켜준다.
+
+```jsx
+// vite.config.js
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { crx } from "@crxjs/vite-plugin";
+import manifest from "./manifest.json";
+
+export default defineConfig({
+  plugins: [
+    react(),
+    crx({ manifest }),
+    (server: {
+      port: 3000,
+    }),
+  ],
+});
+```
+
+## mainfest 설정
+
+chrome extention의 핵심이라고 할 수 있는 파일인 `manifest.json` 은 브라우저에 이 앱에 대한 정보를 알려주는 파일이다. 이 앱이 크롬 익스텐션이라고 브라우저에 명시를 해줘야, extension 프로젝트를 만들 수 있다.
+
+Chrome Extension App의 규격에 맞게 manifest.json 파일을 수정해보자. 아래 필드는 필수적으로 넣어줘야 하는 값들로, 하나라도 없으면 extension 앱으로 만들 수 없다.
+
+- manifest_version: manifest 버전으로 2023.05 기준으로 v3이 가장 최근 버전이다. 현재는 스토어에 올리려면 무조건 3버전으로만 가능하다
+- version: 앱의 버전을 뜻한다.
+- name: 사용자에게 표시되는 chrome extension의 이름을 뜻 한다
+- action > default_popup: 진입점(entry point)를 설정한다
+
+```json
+{
+  "manifest_version": 3,
+  "version": "1.0.0",
+  "short_name": "React App",
+  "name": "Create React App",
+  "action": {
+    "default_popup": "index.html"
+  }
+}
+```
+
+## 아이콘 설정
+
+manifest.json의 action 필드 설정을 추가하면 아이콘을 설정할 수 있다.
+
+- default_icon: chrome extension아이콘 설정
+- default_title: extension에 마우스를 올렸을 때, 나오는 툴팁
+- default_popup: entry point
+
+```json
+{
+  "action": {
+    "default_icon": {
+      "16": "images/icon16.png",
+      "24": "images/icon24.png",
+      "32": "images/icon32.png"
+    },
+    "default_title": "Click Me",
+    "default_popup": "index.html"
+  }
+}
+```
+
+## Chrome extention 컴포넌트
+
+extension에는 세가지 메인 컴포넌트가 있다.
+
+- Popup : Popup은 extension icon을 누르면 뜨는 콘텐츠이다. popup 형태의 chrome extension은 너비 800px 높이 600px을 최대로 가지게 된다. 만약 이 너비/높이보다 큰 경우, 스크롤이 생긴다.
+- Content : Content script는 특정 페이지에서 실행될 script를 설정한다.
+- Background: Background script는 브라우저에서 분리된 인스턴스로 실행되는 javascript 코드이다. 거의 이벤트를 listening하고, 브라우저를 다루기 위해서 사용된다.
+
+따라서 우리가 필요할 파일은 popup.html에 들어갈 popup.js(보통의 react 프로젝트에서의 index.js), background.js, content.js 이다.
+
+나는 다음과 같은 구조로 만들었다. pages 안에 background, content, popup으로 컴포넌트를 나누었다.
+
+![gif](/post/5/dir.png)
+
+## Extension Manifest
+
+CRXJS를 이용하면 매니페스트를 Vite 구성으로 가져오기 때문에 JSON, JavaScript 또는 TypeScript를 사용할 수 있다.
+
+나는 manifest.json을 manifest.config.ts로 다음과 같이 만들었다.
+
+```jsx
+import { defineManifest } from "@crxjs/vite-plugin";
+
+import packageJson from "./package.json";
+const { version } = packageJson;
+
+const [major, minor, patch, label = "0"] = version
+  .replace(/[^\d.-]+/g, "")
+  .split(/[.-]/);
+
+export default defineManifest(async (env) => ({
+  manifest_version: 3,
+  name: env.mode === "staging" ? "[INTERNAL] Tools - EXE" : "Tools - EXE",
+  description: "응용프로그램 EXE App",
+  version:
+    label === "0"
+      ? `${major}.${minor}.${patch}`
+      : `${major}.${minor}.${patch}.${label}`,
+  version_name: version,
+  action: {
+    default_title: "popup",
+    default_popup: "src/pages/popup/index.html",
+  },
+  icons: {
+    16: "image1.png",
+    48: "image2.png",
+    128: "image3.png",
+  },
+  background: {
+    service_worker: "src/pages/background/index.ts",
+    type: "module",
+  },
+  content_scripts: [
+    {
+      matches: ["http://localhost:3000/*"],
+      js: ["src/pages/content/main.tsx"],
+    },
+  ],
+  web_accessible_resources: [
+    {
+      resources: ["assets/js/*.js", "assets/css/*.css"],
+      matches: ["*://*/*"],
+    },
+  ],
+  permissions: ["storage", "scripting", "activeTab"],
+}));
+```
+
+그리고 vite.config.ts 도 수정해주었다.
+
+```jsx
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+import { crx } from "@crxjs/vite-plugin";
+import manifest from "./manifest.config";
+
+export default defineConfig({
+  plugins: [react(), crx({ manifest })],
+  server: {
+    port: 3000,
+  },
+});
+```
+
+## chrome extension 등록
+
+manifest 설정이 완료되었으면, react 프로젝트를 빌드한다. 빌드된 산출물을 로컬 chrome 브라우저에 extension을 추가해 주어야 한다.
+
+1. [chrome://extensions/](https://www.notion.so/chrome-extention-setting-52c0201962a44edbb51aa90916929229?pvs=21) 으로 들어가 우측 상단에 "개발자 모드"를 활성화 해준다.
+2. "압축해제된 확장 프로그램을 로드합니다." 를 클릭하여 빌드 dist 폴더를 선택한다.
+3. 추가된 크롬 extention을 확인하고, 핀 고정을 한다. 그리고 클릭하면 default_pop에 설정한 index.html 이 보인다.
+
+다음 포스팅은 기능 위주로 써봐야겠다 🚀
+
+## 참고
+
+- [https://crxjs.dev/](https://crxjs.dev/)
+- [https://bluemiv.tistory.com/7](https://bluemiv.tistory.com/7)
+- [https://ryuing.tistory.com/73](https://ryuing.tistory.com/73)
+- [https://dev.to/cookiemonsterdev/chrome-extension-using-vite-react-3bhj](https://dev.to/cookiemonsterdev/chrome-extension-using-vite-react-3bhj)
