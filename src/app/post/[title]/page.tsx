@@ -51,7 +51,7 @@ export default async function Page({ params }: { params: { title: string } }) {
   const postIndex = postName - 1;
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full  ml-3 mr-3">
       <div>
         <div className="text-center font-bold mb-[50px] mt-[40px]">
           <div className="text-[36px]">{post.title}</div>
