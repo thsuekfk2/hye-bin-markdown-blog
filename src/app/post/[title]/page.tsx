@@ -25,7 +25,6 @@ export const generateMetadata = ({ params }: { params: { title: string } }) => {
       url: `https://hyebin.info/post/${params.title}`,
       images: [
         {
-          type: "image/png",
           width: 1200,
           height: 630,
           url: post?.thumbnail,
