@@ -1,0 +1,243 @@
+---
+title: "[Udemy] JavaScript 완벽 가이드 : 초급 + 고급 마스터 과정 강의 후기"
+date: 2024-04-14
+description: "유데미에서 JavaScript 완벽 가이드 : 초급 + 고급 마스터 과정 강의를 듣고 후기 납깁니다. "
+---
+
+![png](/log/2404/유데미.png)
+
+강의 링크 :  [https://www.udemy.com/course/javascript-zw/](https://www.udemy.com/course/javascript-zw/)
+
+## 강의를 선택한 이유
+
+회사에서 Vanilla JS를 이용한 프로젝트를 유지보수 하고있는 중이다. 가끔 코드를 보면서 JavaScript에 대한 기본 지식은 알고 있지만, 어떤 원리로 동작이 되는지 작동 방식이 궁금할 때가 있었다. 너무 기초적 강의였다면 선택하지 않았을 텐데, “고급 마스터” 라는 단어가 끌렸던 것 같다. 😅
+
+그리고 마지막 업데이트날짜가 2023년 12월 인 걸 보니, 지속 적으로 최신 기술을 업데이트 하는 것을 알 수 있었다. 무엇보다 유데미는 평생 수강할 수 있다는 점이 큰 메리트 인 것 같다.
+
+## 강의 커리큘럼
+
+- 모든 기본 사항: 변수, 상수, 함수, 스크립트 로드 방법 등
+- 배열 & 객체: 매우 중요한 이 자료구조 이해
+- 제어 구조: 조건문과 반복문에서 코드를 실행하는 방법 이해
+- 내부 작동 방법 알아보기: JavaScript 엔진이 내부에서 작동하는 방식과 이것이 미치는 영향
+- 핵심 개념 심층 분석: JavaScript 기능, 다양한 구문에 대한 특별한 사항
+- DOM으로 작업하기: JavaScript로 웹페이지를 동적으로 조작하는 방법(심층 분석과 다양한 사용 사례를 포함)
+- JavaScript의 이벤트: 다양한 이벤트(예: 드래그 앤 드롭)를 리스닝하고 적절한 코드를 실행하는 방법
+- 클래스 & 객체 지향 프로그래밍: 클래스, 프로토타입, 'this' 키워드, 생성자 함수 등으로 작업하는 방법 알아보기
+- 비동기와 동기 프로그래밍: 코드를 올바르게 실행하기 위한 콜백, 프로미스, async/await 및 기타 중요한 도구와 언어 기능
+- Http 요청: JavaScript로 Http 요청을 보내는 방법
+- 도구, 최적화와 브라우저 지원: 코드 분할, 작은 코드 생성 및 스크립트가 모든 브라우저에서 작동하는지 확인
+- 라이브러리와 프레임워크: Axios와 같은 라이브러리나 React.js와 같은 프레임워크 - 그들이 중요한 이유와 사용 방법
+- Node.js: 대부분의 강의에서는 (구문은 동일하기 때문에) 브라우저 측에 초점을 맞추지만 Node.js 전용 섹션에서 해당 JS 호스트 환경에 대한 모든 것을 배운다.
+- 보안 & 성능 최적화
+- 자동 테스트
+
+## 강의 구성
+
+강의는 총 36개 섹션으로, 616개의 강의가 있다. 총 길이: 51시간 48분으로 굉장히 길다. 강의를 다 듣는것 보다는 모르는 내용을 골라 듣는 것을 추천한다. 대부분 강의는 10분을 넘지 않아서 집중하기 좋았던 것 같다.
+
+이 강의에서 좋았던 점은 퀴즈와 과제, 많은 연습 문제와 데모 프로젝트가 있다는 것이다. 단순한 이론 강의 였다면 지루했을 텐데, 중간 중간 배운 내용을 점검 해보는 시간이 있어서 재미있게 들을 수 있었다.
+
+나는 퀴즈를 먼저 풀어보고, 퀴즈에서 틀린 내용이나 헷갈렸던 부분을 위주로 강의를 봤다. 퀴즈를 풀면 알고있는 내용과 검토해야 하는 내용을 정리해서 보여주는데 내가 어떤 점을 알고있고, 부족한지 한눈에 파악하기 좋았다.
+
+## 배운 내용 정리
+
+- JavaScript가 `약형의 동적 언어` ?
+
+```jsx
+// 예시 코드
+var x = 10; // x는 숫자
+x = "Hello"; // x는 이제 문자열
+x = true; // x는 이제 불리언
+```
+
+- C++과 같은 컴파일 언어는 코드가 빌드되고 실행되기 전에 미리 컴파일되어 기계어로 번역된다. 이는 코드를 실행하는 동안에는 런타임에 코드 변경이 불가능하다는 것을 의미한다. 즉, 한 번 컴파일되면 코드가 실행 중에 변경되지 않는다.
+- 반면에 자바스크립트는 코드를 실행하기 전에 컴파일하는 대신, 코드가 런타임에 해석되고 실행된다. 이는 코드를 실행하는 동안에도 코드가 변경될 수 있음을 의미한다.
+- 자바스크립트는 동적으로 타입이 결정되는 언어이기 때문에 변수의 데이터 타입을 런타임에 변경할 수 있다. 처음에는 문자열을 저장했다가 나중에는 숫자를 저장할 수 있는 것
+
+- `섀도우 변수`?
+  - 전역 변수로도 존재하는 지역 변수(즉, 함수에서 생성된)가 "섀도우 변수"
+- XSS(크로스 사이트 스크립팅 공격) : 해로운 JavaScript 코드를 애플리케이션에 삽입하고 실행
+
+## 실습 : 웹 컴포넌트 따라 만들기
+
+index.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Web Components</title>
+    <script src="modal.js"></script>
+  </head>
+  <body>
+    <uc-modal>
+      <h1 slot="title">The Modal Title</h1>
+      <p>This is our first web component!</p>
+    </uc-modal>
+    <script>
+      const modal = document.querySelector("uc-modal");
+      setTimeout(() => {
+        modal.open();
+      }, 3000);
+    </script>
+  </body>
+</html>
+```
+
+modal.js
+
+```jsx
+class Modal extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.isOpen = false;
+    this.shadowRoot.innerHTML = `
+          <style>
+              #backdrop {
+                  position: fixed;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100vh;
+                  background: rgba(0,0,0,0.75);
+                  z-index: 10;
+                  opacity: 0;
+                  pointer-events: none;
+              }
+  
+              :host([opened]) #backdrop,
+              :host([opened]) #modal {
+                  opacity: 1;
+                  pointer-events: all;
+              }
+  
+              :host([opened]) #modal {
+                  top: 15vh;
+              }
+  
+              #modal {
+                  position: fixed;
+                  top: 10vh;
+                  left: 25%;
+                  width: 50%;
+                  z-index: 100;
+                  background: white;
+                  border-radius: 3px;
+                  box-shadow: 0 2px 8px rgba(0,0,0,0.26);
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: space-between;
+                  opacity: 0;
+                  pointer-events: none;
+                  transition: all 0.3s ease-out;
+              }
+  
+              header {
+                  padding: 1rem;
+                  border-bottom: 1px solid #ccc;
+              }
+  
+              ::slotted(h1) {
+                  font-size: 1.25rem;
+                  margin: 0;
+              }
+  
+              #main {
+                  padding: 1rem;
+              }
+  
+              #actions {
+                  border-top: 1px solid #ccc;
+                  padding: 1rem;
+                  display: flex;
+                  justify-content: flex-end;
+              }
+  
+              #actions button {
+                  margin: 0 0.25rem;
+              }
+          </style>
+          <div id="backdrop"></div>
+          <div id="modal">
+              <header>
+                  <slot name="title">Please Confirm Payment</slot>
+              </header>
+              <section id="main">
+                  <slot></slot>
+              </section>
+              <section id="actions">
+                  <button id="cancel-btn">Cancel</button>
+                  <button id="confirm-btn">Okay</button>
+              </section>
+          </div>
+      `;
+    const slots = this.shadowRoot.querySelectorAll("slot");
+    slots[1].addEventListener("slotchange", (event) => {
+      console.dir(slots[1].assignedNodes());
+    });
+    const backdrop = this.shadowRoot.querySelector("#backdrop");
+    const cancelButton = this.shadowRoot.querySelector("#cancel-btn");
+    const confirmButton = this.shadowRoot.querySelector("#confirm-btn");
+    backdrop.addEventListener("click", this._cancel.bind(this));
+    cancelButton.addEventListener("click", this._cancel.bind(this));
+    confirmButton.addEventListener("click", this._confirm.bind(this));
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (this.hasAttribute("opened")) {
+      this.isOpen = true;
+    } else {
+      this.isOpen = false;
+    }
+  }
+
+  static get observedAttributes() {
+    return ["opened"];
+  }
+
+  open() {
+    this.setAttribute("opened", "");
+    this.isOpen = true;
+  }
+
+  hide() {
+    if (this.hasAttribute("opened")) {
+      this.removeAttribute("opened");
+    }
+    this.isOpen = false;
+  }
+
+  _cancel(event) {
+    this.hide();
+    const cancelEvent = new Event("cancel", {
+      bubbles: true,
+      composed: true,
+    });
+    event.target.dispatchEvent(cancelEvent);
+  }
+
+  _confirm() {
+    this.hide();
+    const confirmEvent = new Event("confirm");
+    this.dispatchEvent(confirmEvent);
+  }
+}
+
+customElements.define("uc-modal", Modal);
+```
+
+웹 컴포넌트 모달 결과
+![png](/log/2404/웹컴포넌트실습.png)
+
+## 강의 후기
+
+언뜻 내용은 알고 있었지만, 깊게 알지 못했던 지식을 다시 복습할 수 있어서 좋았다. 특히 유데미를 자주 애용하는 이유는 자막도 잘 나와있을 뿐만 아니라 대본기능이 있어, 대본을 보면서 빠르게 내용을 확인할 수 있다는 점이다. 또한 대본의 문장을 클릭하면 해당 영상으로 바로 이동하는 편리함이 있다.
+
+강의가 섹션도 많고 길지만, 하나하나의 섹션이 이어져 있지 않고 독립적이라 필요한 부분만 볼 수 있었다. 남은 강의들도 하나씩 들어볼 예정이다. 😁
+
+해당 콘텐츠는 유데미로부터 강의 쿠폰을 제공받아 작성되었습니다.
