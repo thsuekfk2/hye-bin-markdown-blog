@@ -2,6 +2,9 @@ import { defineDocumentType, makeSource } from "contentlayer/source-files";
 import { format } from "date-fns";
 
 import rehypePrettyCode from "rehype-pretty-code";
+import remarkBreaks from "remark-breaks";
+//@ts-ignore
+import rehypeFigure from "rehype-figure";
 
 export const Post = defineDocumentType(() => ({
   name: "Post",
@@ -63,7 +66,11 @@ const rehypeoptions = {
 export default makeSource({
   contentDirPath: "contents",
   documentTypes: [Log, Post],
+
   mdx: {
-    rehypePlugins: [[rehypePrettyCode, rehypeoptions]],
+    rehypePlugins: [
+      [rehypePrettyCode, remarkBreaks, rehypeoptions],
+      [rehypeFigure, { className: "image-figure" }],
+    ],
   },
 });

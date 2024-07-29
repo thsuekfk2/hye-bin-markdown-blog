@@ -57,8 +57,14 @@ pre {
   margin: 0 auto;
 }
 
-article {
-  word-break: break-all;
+figure {
+  width: 100%;
+  margin: 0;
+}
+figcaption {
+  font-size: small;
+  text-align: center;
+  opacity: 0.5;
 }
 
 article p {
