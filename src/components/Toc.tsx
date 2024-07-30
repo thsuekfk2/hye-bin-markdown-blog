@@ -23,7 +23,7 @@ export const Toc = () => {
   return (
     <>
       <div className="absolute ml-5 left-full">
-        <div className="fixed hidden text-xs xl:flex xl:flex-col max-w-[220px] gap-3 text-[#999]">
+        <div className="fixed hidden text-xs xl:flex xl:flex-col max-w-[220px] gap-3 text-[#999] top-[120px]">
           {headingEls.map((header, i) =>
             header.nodeName === "H2" || header.nodeName === "H1" ? (
               <div
