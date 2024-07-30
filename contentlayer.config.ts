@@ -3,8 +3,8 @@ import { format } from "date-fns";
 
 import rehypePrettyCode from "rehype-pretty-code";
 import remarkBreaks from "remark-breaks";
-//@ts-ignore
 import rehypeFigure from "rehype-figure";
+import callouts from "remark-callouts";
 
 export const Post = defineDocumentType(() => ({
   name: "Post",
@@ -68,8 +68,9 @@ export default makeSource({
   documentTypes: [Log, Post],
 
   mdx: {
+    remarkPlugins: [remarkBreaks, callouts],
     rehypePlugins: [
-      [rehypePrettyCode, remarkBreaks, rehypeoptions],
+      [rehypePrettyCode, rehypeoptions],
       [rehypeFigure, { className: "image-figure" }],
     ],
   },

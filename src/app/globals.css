@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @import url("../styles/calendar.css");
+@import "remark-callouts/styles.css";
 
 html,
 body {
@@ -18,9 +19,45 @@ body {
   box-sizing: border-box;
 }
 
+li::marker {
+  font-size: 15px;
+  color: #e9e9e9;
+}
+
+blockquote {
+  color: #222222;
+}
+
+.blockquote {
+  border-left: 4px solid #e9e9e9;
+  background: none;
+  margin: 0;
+  color: white;
+  opacity: 0.6;
+  padding: 0 0 0 30px;
+}
+
+p a {
+  color: #818cf8;
+  font-weight: 300;
+}
+
+ul a {
+  color: #818cf8;
+  font-weight: 300;
+}
+
+ol {
+  padding-left: 0;
+}
+ul {
+  padding-left: 0;
+}
+
 li {
   font-size: 16px;
-  margin-bottom: 20px;
+  margin: 14px 14px;
+  line-height: 1.8rem;
 }
 
 code {
@@ -58,19 +95,21 @@ pre {
 }
 
 figure {
-  width: 100%;
-  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
 }
 figcaption {
   font-size: small;
   text-align: center;
   opacity: 0.5;
+  margin-top: 13px;
 }
 
 article p {
   font-size: 16px;
   line-height: 1.8rem;
-  margin-top: 24px;
 }
 
 article h1 {
@@ -88,16 +127,9 @@ a {
   color: inherit;
   text-decoration: none;
 }
-
-a:hover {
-  text-decoration: none;
-}
-
 img {
   max-width: 100%;
-  display: block;
 }
-
 button,
 input,
 optgroup,
