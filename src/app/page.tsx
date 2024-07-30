@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="h-full w-full justify-center items-center text-center">
+    <div className="items-center justify-center w-full h-full text-center">
       <div className="flex flex-col">
         <Image
           src="/jump.gif"
@@ -14,8 +14,8 @@ export default function Home() {
           placeholder="blur"
           blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg==" // 추가
         />
-        <h2>주니어 프론트엔드 개발자 이혜빈입니다.</h2>
-        <div className="flex flex-col justify-center items-center">
+        <h2>프론트엔드 개발자 이혜빈입니다 :)</h2>
+        <div className="flex flex-col items-center justify-center">
           <div className="flex items-center">
             <Link
               target="_blank"
