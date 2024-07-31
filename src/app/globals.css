@@ -48,11 +48,19 @@ ol li::marker {
   font-weight: 300;
 }
 
-ol {
+ul {
   padding-left: 0;
 }
 
-ul {
+ul li {
+  padding-left: 15px;
+}
+
+ul li::marker {
+  color: #6b6b6b;
+}
+
+ol {
   padding-left: 0;
 }
 
