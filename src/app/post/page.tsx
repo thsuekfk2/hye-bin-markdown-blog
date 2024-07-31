@@ -1,11 +1,28 @@
+"use client";
+
 import { Card } from "@/components/Card";
+import { Pagination } from "@/components/Pagination";
 import { allPosts } from "contentlayer/generated";
 import { compareDesc } from "date-fns";
-import React from "react";
+import { useSearchParams } from "next/navigation";
 
 export default function page() {
-  const posts = allPosts.sort((a, b) =>
-    compareDesc(new Date(a.date), new Date(b.date))
+  const LOGS_PER_PAGE = 4;
+
+  const searchParams = useSearchParams();
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+
+  const getSortedPosts = () => {
+    return allPosts.sort((a, b) =>
+      compareDesc(new Date(a.date), new Date(b.date))
+    );
+  };
+
+  const sortedLogs = getSortedPosts();
+  const pageCount = Math.ceil(sortedLogs.length / LOGS_PER_PAGE);
+  const currentLogs = sortedLogs.slice(
+    (currentPage - 1) * LOGS_PER_PAGE,
+    currentPage * LOGS_PER_PAGE
   );
 
   return (
@@ -14,15 +31,23 @@ export default function page() {
         <div>기록</div>
         <div className="text-xs">소중한 경험을 기록합니다.</div>
       </div>
-      <div className="flex flex-wrap items-center justify-center gap-6 pb-[5%]">
-        {posts.map((post) => (
-          <Card
-            href={`post/${post._raw.sourceFileName.split(".")[0]}`}
-            thumbnail={post.thumbnail ?? ""}
-            description={post.description}
-            title={post.title}
-          />
-        ))}
+      <div className="flex flex-col justify-between h-[70vh] max-h-[800px]">
+        <div className="flex flex-wrap justify-center gap-6 min-h-[500px]">
+          {currentLogs.map((post, key) => (
+            <Card
+              key={key}
+              href={`post/${post._raw.sourceFileName.split(".")[0]}`}
+              thumbnail={post.thumbnail ?? ""}
+              description={post.description}
+              title={post.title}
+            />
+          ))}
+        </div>
+        <Pagination
+          route="post"
+          pageCount={pageCount}
+          currentPage={currentPage}
+        />
       </div>
     </div>
   );

@@ -14,14 +14,14 @@ export const Card = ({
   title: string;
 }) => {
   return (
-    <div className="flex flex-col w-[80%] h-[300px] sm:w-[350px] mt-[2%] mb-[2%]">
+    <div className="flex flex-col w-[80%] sm:w-[300px]">
       <Link
         href={href}
-        className="flex flex-col text-transparent hover:text-white text-xs"
+        className="flex flex-col text-xs text-transparent hover:text-white"
       >
         <div className="relative cursor-pointer">
-          <div className="z-1 absolute cursor-pointer hover:bg-black  w-full h-full opacity-40 transition-all"></div>
-          <div className="z-2 absolute transition duration-300 bottom-2 left-2">
+          <div className="absolute w-full h-full transition-all cursor-pointer z-1 hover:bg-black opacity-40"></div>
+          <div className="absolute transition duration-300 z-2 bottom-2 left-2">
             {description}
           </div>
           <Image
@@ -31,11 +31,11 @@ export const Card = ({
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg==" // 추가
             src={thumbnail}
-            className="rounded-md h-[250px] object-cover w-full lg:h-[300px]"
+            className="rounded-md h-[200px] object-cover w-full"
           />
         </div>
       </Link>
-      <span className="font-thin text-sm">{title}</span>
+      <span className="text-sm font-thin">{title}</span>
     </div>
   );
 };

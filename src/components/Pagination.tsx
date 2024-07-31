@@ -1,36 +1,30 @@
-import { Log, Post } from "contentlayer/generated";
 import Link from "next/link";
-import React from "react";
+
+interface PaginationProps {
+  route: string;
+  pageCount: number;
+  currentPage: number;
+}
 
 export const Pagination = ({
-  posts,
-  prevPage,
-  nextPage,
-  postIndex,
-}: {
-  posts: Array<Log | Post>;
-  prevPage: string;
-  nextPage: string;
-  postIndex: number;
-}) => {
+  route,
+  pageCount,
+  currentPage,
+}: PaginationProps) => {
   return (
-    <div className="flex flex-col justify-between gap-8 my-16 md:flex-row">
-      <div>
-        {posts[postIndex - 1]?.title ? (
-          <Link href={prevPage}>
-            <p>이전 글</p>
-            <p className="font-bold">{posts[postIndex - 1]?.title}</p>
-          </Link>
-        ) : null}
-      </div>
-      <div className="text-right">
-        {posts.length - 1 !== postIndex && (
-          <Link href={nextPage}>
-            <p>다음 글</p>
-            <p className="font-bold">{posts[postIndex + 1]?.title}</p>
-          </Link>
-        )}
-      </div>
+    <div className="gap-[10px] flex justify-center min-h-[80px] items-center">
+      {Array.from({ length: pageCount }).map((_, i) => (
+        <Link key={i} href={i === 0 ? `/${route}` : `/${route}?page=${i + 1}`}>
+          <div
+            className={`w-[30px] h-[30px] flex items-center justify-center rounded-full font-bold ${
+              i + 1 === currentPage &&
+              "border-solid border-stone-50 text-gray-white"
+            } hover:bg-gray-50 hover:text-gray-900 text-xs`}
+          >
+            {i + 1}
+          </div>
+        </Link>
+      ))}
     </div>
   );
 };

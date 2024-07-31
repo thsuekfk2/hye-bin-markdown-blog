@@ -3,7 +3,7 @@ import { getMDXComponent } from "next-contentlayer/hooks";
 import { format, parseISO } from "date-fns";
 import { Giscus } from "@/components/Giscus";
 import { Toc } from "@/components/Toc";
-import { Pagination } from "@/components/Pagination";
+import { PrevNextPagination } from "@/components/PrevNextPagination";
 
 export const generateStaticParams = async () => {
   return allLogs.map((post: Log) => ({ slug: post._raw.flattenedPath }));
@@ -55,7 +55,7 @@ export default async function Page({ params }: { params: { date: string } }) {
             <MDXContent />
           </div>
         </article>
-        <Pagination
+        <PrevNextPagination
           posts={allLogs}
           prevPage={`${
             allLogs[postIndex - 1]?._raw.sourceFileName.split(".")[0]

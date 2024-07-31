@@ -3,7 +3,7 @@ import { getMDXComponent } from "next-contentlayer/hooks";
 import { format, parseISO } from "date-fns";
 import { Giscus } from "@/components/Giscus";
 import { Toc } from "@/components/Toc";
-import { Pagination } from "@/components/Pagination";
+import { PrevNextPagination } from "@/components/PrevNextPagination";
 
 export const generateStaticParams = async () => {
   return allPosts.map((post: Post) => ({ slug: post._raw.flattenedPath }));
@@ -50,7 +50,7 @@ export default async function Page({ params }: { params: { title: string } }) {
   const postIndex = postName - 1;
 
   return (
-    <div className="flex flex-col w-full  ml-3 mr-3">
+    <div className="flex flex-col w-full ml-3 mr-3">
       <div>
         <div className="text-center font-bold mb-[50px] mt-[40px]">
           <div className="text-[36px]">{post.title}</div>
@@ -64,7 +64,7 @@ export default async function Page({ params }: { params: { title: string } }) {
             <MDXContent />
           </div>
         </article>
-        <Pagination
+        <PrevNextPagination
           posts={allPosts}
           prevPage={`${postName - 1}`}
           nextPage={`${postName + 1}`}
