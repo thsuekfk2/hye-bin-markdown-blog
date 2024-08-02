@@ -12,14 +12,14 @@ export const Pagination = ({
   currentPage,
 }: PaginationProps) => {
   return (
-    <div className="gap-[10px] flex justify-center min-h-[80px] items-center">
+    <div className="flex min-h-[80px] items-center justify-center gap-[10px]">
       {Array.from({ length: pageCount }).map((_, i) => (
         <Link key={i} href={i === 0 ? `/${route}` : `/${route}?page=${i + 1}`}>
           <div
-            className={`w-[30px] h-[30px] flex items-center justify-center rounded-full font-bold ${
+            className={`flex h-[30px] w-[30px] items-center justify-center rounded-full font-bold ${
               i + 1 === currentPage &&
-              "border-solid border-stone-50 text-gray-white"
-            } hover:bg-gray-50 hover:text-gray-900 text-xs`}
+              "text-gray-white border-solid border-stone-50"
+            } text-xs hover:bg-gray-50 hover:text-gray-900`}
           >
             {i + 1}
           </div>

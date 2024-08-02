@@ -19,9 +19,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="bg-[#222222] h-full text-[#F9FAFB]">
+        <div className="h-full bg-[#222222] text-[#F9FAFB]">
           <div className="flex h-[8%] justify-center">
-            <header className="flex w-full max-w-[800px] ml-2 mr-2 justify-between items-center">
+            <header className="ml-2 mr-2 flex w-full max-w-[800px] items-center justify-between">
               <Analytics />
               <Link href="/">
                 <div className="flex items-center gap-2">
@@ -34,13 +34,13 @@ export default function RootLayout({
               <div className="flex gap-6 text-sm">
                 <Link
                   href="/post"
-                  className="flex justify-center hover:bg-[#444] hover:rounded-full w-[50px] transition-all delay-75"
+                  className="flex w-[50px] justify-center transition-all delay-75 hover:rounded-full hover:bg-[#444]"
                 >
                   Post
                 </Link>
                 <Link
                   href="/log"
-                  className="flex justify-center hover:bg-[#444] hover:rounded-full w-[50px] transition-all delay-75 "
+                  className="flex w-[50px] justify-center transition-all delay-75 hover:rounded-full hover:bg-[#444]"
                 >
                   Log
                 </Link>

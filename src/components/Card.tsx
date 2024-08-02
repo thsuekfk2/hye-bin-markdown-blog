@@ -14,14 +14,14 @@ export const Card = ({
   title: string;
 }) => {
   return (
-    <div className="flex flex-col w-[80%] sm:w-[300px]">
+    <div className="flex w-[80%] flex-col sm:w-[300px]">
       <Link
         href={href}
         className="flex flex-col text-xs text-transparent hover:text-white"
       >
         <div className="relative cursor-pointer">
-          <div className="absolute w-full h-full transition-all cursor-pointer z-1 hover:bg-black opacity-40"></div>
-          <div className="absolute transition duration-300 z-2 bottom-2 left-2">
+          <div className="z-1 absolute h-full w-full cursor-pointer opacity-40 transition-all hover:bg-black"></div>
+          <div className="z-2 absolute bottom-2 left-2 transition duration-300">
             {description}
           </div>
           <Image
@@ -31,7 +31,7 @@ export const Card = ({
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg==" // 추가
             src={thumbnail}
-            className="rounded-md h-[200px] object-cover w-full"
+            className="h-[200px] w-full rounded-md object-cover"
           />
         </div>
       </Link>

@@ -14,7 +14,7 @@ export const PrevNextPagination = ({
   postIndex: number;
 }) => {
   return (
-    <div className="flex flex-col justify-between gap-8 my-16 md:flex-row">
+    <div className="my-16 flex flex-col justify-between gap-8 md:flex-row">
       <div>
         {posts[postIndex - 1]?.title ? (
           <Link href={prevPage}>

@@ -5,7 +5,7 @@ export const ListItem = ({ date, title }: { date: string; title: string }) => {
   return (
     <Link
       href={`log/${date}`}
-      className="justify-between font-normal text-xs flex items-center w-[100%]  h-[20px] rounded-lg transition duration-300 hover:font-bold p-5 break-words"
+      className="flex h-[20px] w-[100%] items-center justify-between break-words rounded-lg p-5 text-xs font-normal transition duration-300 hover:font-bold"
     >
       <div className="hover:underline">{title}.</div>
       <div className="text-[#3c3c3c]">{date}</div>

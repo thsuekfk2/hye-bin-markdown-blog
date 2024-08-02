@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="items-center justify-center w-full h-full text-center">
+    <div className="h-full w-full items-center justify-center text-center">
       <div className="flex flex-col">
         <Image
           src="/jump.gif"

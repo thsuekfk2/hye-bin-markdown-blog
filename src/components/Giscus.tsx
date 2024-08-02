@@ -33,5 +33,5 @@ export const Giscus = (): JSX.Element => {
     ref.current.appendChild(scriptElem);
   }, []);
 
-  return <section className="mt-[100px] mb-[80px]" ref={ref} />;
+  return <section className="mb-[80px] mt-[100px]" ref={ref} />;
 };

@@ -14,7 +14,7 @@ export default function LogsPage() {
 
   const getSortedLogs = () => {
     return allLogs.sort((a, b) =>
-      compareDesc(new Date(a.date), new Date(b.date))
+      compareDesc(new Date(a.date), new Date(b.date)),
     );
   };
 
@@ -22,7 +22,7 @@ export default function LogsPage() {
   const pageCount = Math.ceil(sortedLogs.length / LOGS_PER_PAGE);
   const currentLogs = sortedLogs.slice(
     (currentPage - 1) * LOGS_PER_PAGE,
-    currentPage * LOGS_PER_PAGE
+    currentPage * LOGS_PER_PAGE,
   );
 
   return (
@@ -31,8 +31,8 @@ export default function LogsPage() {
         <div>개발 로그</div>
         <div className="text-xs">하루하루 공부한 내용을 기록합니다.</div>
       </header>
-      <div className="flex flex-col justify-between h-[70vh] w-full max-h-[800px]">
-        <div className="flex flex-col w-full min-h-[500px]">
+      <div className="flex h-[70vh] max-h-[800px] w-full flex-col justify-between">
+        <div className="flex min-h-[500px] w-full flex-col">
           {currentLogs.map((post, idx) => (
             <ListItem
               key={idx}

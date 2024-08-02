@@ -11,7 +11,7 @@ export const generateStaticParams = async () => {
 
 export const generateMetadata = ({ params }: { params: { title: string } }) => {
   const post = allPosts.find(
-    (post: Post) => post._raw.sourceFileName === params.title + ".mdx"
+    (post: Post) => post._raw.sourceFileName === params.title + ".mdx",
   );
 
   return {
@@ -36,7 +36,7 @@ export const generateMetadata = ({ params }: { params: { title: string } }) => {
 
 export default async function Page({ params }: { params: { title: string } }) {
   const post = allPosts.find(
-    (post) => post._raw.sourceFileName === params.title + ".mdx"
+    (post) => post._raw.sourceFileName === params.title + ".mdx",
   );
   let MDXContent;
 
@@ -50,9 +50,9 @@ export default async function Page({ params }: { params: { title: string } }) {
   const postIndex = postName - 1;
 
   return (
-    <div className="flex flex-col w-full ml-3 mr-3">
+    <div className="ml-3 mr-3 flex w-full flex-col">
       <div>
-        <div className="text-center font-bold mb-[50px] mt-[40px]">
+        <div className="mb-[50px] mt-[40px] text-center font-bold">
           <div className="text-[36px]">{post.title}</div>
           <div className="text-sm">
             {format(parseISO(post.date), "LLLL d, yyyy")}

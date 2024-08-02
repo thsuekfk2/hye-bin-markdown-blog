@@ -29,7 +29,7 @@ export const Calendar = () => {
   const isLogAvailable = (date: Date) => {
     const formatDate = format(date, "yyMMdd");
     const isFindLog = allLogs.find(
-      (log) => formatDate === format(new Date(log.date), "yyMMdd")
+      (log) => formatDate === format(new Date(log.date), "yyMMdd"),
     );
     return !!isFindLog;
   };
@@ -42,12 +42,12 @@ export const Calendar = () => {
       }: {
         onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
       },
-      ref: Ref<HTMLButtonElement>
+      ref: Ref<HTMLButtonElement>,
     ) => (
       <button className="" onClick={onClick} ref={ref} {...rest}>
         <CalendarIcon />
       </button>
-    )
+    ),
   );
 
   CustomInput.displayName = "CustomInput";
@@ -81,14 +81,14 @@ export const Calendar = () => {
 
     if (!isFindLog) {
       return (
-        <div className="flex w-full h-full">
-          <div className="w-full h-full">{day}</div>
+        <div className="flex h-full w-full">
+          <div className="h-full w-full">{day}</div>
         </div>
       );
     }
     return (
-      <div className="flex w-full h-full">
-        <Link className="w-full h-full" href={`/log/${formatDate}`}>
+      <div className="flex h-full w-full">
+        <Link className="h-full w-full" href={`/log/${formatDate}`}>
           {day}
         </Link>
       </div>
