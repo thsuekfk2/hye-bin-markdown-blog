@@ -29,7 +29,6 @@ export default function page() {
     <div className="h-full w-full items-center justify-center">
       <div className="flex flex-col justify-center pb-10 text-center">
         <div>기록</div>
-        <div className="text-xs">소중한 경험을 기록합니다.</div>
       </div>
       <div className="flex h-[70vh] max-h-[800px] flex-col justify-between">
         <div className="flex min-h-[500px] flex-wrap justify-center gap-6">

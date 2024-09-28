@@ -42,7 +42,7 @@ export default function RootLayout({
                   href="/log"
                   className="flex w-[50px] justify-center transition-all delay-75 hover:rounded-full hover:bg-[#444]"
                 >
-                  Log
+                  TIL
                 </Link>
               </div>
             </header>

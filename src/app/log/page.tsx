@@ -28,8 +28,8 @@ export default function LogsPage() {
   return (
     <div className="h-full">
       <header className="flex flex-col justify-center pb-10 text-center">
-        <div>개발 로그</div>
-        <div className="text-xs">하루하루 공부한 내용을 기록합니다.</div>
+        <div>TIL</div>
+        <div className="text-xs">* Today I Learned.</div>
       </header>
       <div className="flex h-[70vh] max-h-[800px] w-full flex-col justify-between">
         <div className="flex min-h-[500px] w-full flex-col">
