@@ -22,7 +22,7 @@ export const generateMetadata = ({ params }: { params: { date: string } }) => {
       description: post?.description || "이혜빈의 개발블로그",
       type: "website",
       locale: "ko",
-      url: `https://hyebin.info/log/${params.date}`,
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/log/${params.date}`,
     },
   };
 };
