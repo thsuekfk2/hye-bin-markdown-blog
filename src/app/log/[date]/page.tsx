@@ -14,15 +14,33 @@ export const generateMetadata = ({ params }: { params: { date: string } }) => {
     (post: Log) => post._raw.sourceFileName === params.date + ".mdx",
   );
 
+  const defaultDescription = "이혜빈의 개발블로그";
+  const description = post?.description || defaultDescription;
+  const title = post?.title || "블로그 제목";
+  const imageUrl = post?.thumbnail ?? "jump.gif";
+
   return {
-    title: post?.title,
-    description: post?.description,
+    title: title,
+    description: description,
     openGraph: {
-      title: post?.title,
-      description: post?.description || "이혜빈의 개발블로그",
+      title: title,
+      description: description,
       type: "website",
       locale: "ko",
       url: `${process.env.NEXT_PUBLIC_BASE_URL}/log/${params.date}`,
+      images: [
+        {
+          width: 1200,
+          height: 630,
+          url: imageUrl,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: title,
+      description: description,
+      image: imageUrl,
     },
   };
 };

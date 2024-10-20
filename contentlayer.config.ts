@@ -42,6 +42,7 @@ const Log = defineDocumentType(() => ({
       required: true,
     },
     tags: { type: "list", of: { type: "string" } },
+    thumbnail: { type: "string", required: false },
   },
   computedFields: {},
 }));
