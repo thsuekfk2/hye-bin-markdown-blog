@@ -5,6 +5,7 @@ import rehypePrettyCode from "rehype-pretty-code";
 import remarkBreaks from "remark-breaks";
 import rehypeFigure from "rehype-figure";
 import callouts from "remark-callouts";
+import remarkGfm from "remark-gfm";
 
 export const Post = defineDocumentType(() => ({
   name: "Post",
@@ -69,7 +70,7 @@ export default makeSource({
   documentTypes: [Log, Post],
 
   mdx: {
-    remarkPlugins: [remarkBreaks, callouts],
+    remarkPlugins: [remarkBreaks, callouts, remarkGfm],
     rehypePlugins: [
       [rehypePrettyCode, rehypeoptions],
       [rehypeFigure, { className: "image-figure" }],
