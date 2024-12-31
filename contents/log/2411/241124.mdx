@@ -48,8 +48,9 @@ export const NonVirtualizedList = ({
 };
 
 const ListItem = ({ index }: { index: number }) => {
+  const height = `${itemHeight}px`
   return (
-    <li style={{ height: `${itemHeight}px` }} className="text-center">
+    <li style={{ height: height }} className="text-center">
       List Item Index - {index}
     </li>
   );
@@ -110,17 +111,20 @@ export const VirtualizedList = ({
     return items;
   };
 
+const windowHeight = `${windowHeight}px`
+const itemHeight = `${numberOfItems * itemHeight}px`
+
   return (
     <div
       className="overflow-y-scroll w-full border-2 border-black relative"
-      style={{ height: `${windowHeight}px` }}
+      style={{ height: windowHeight }}
       onScroll={(e) => {
         setScrollTop(e.currentTarget.scrollTop);
       }}
     >
       <div
         style={{
-          height: `${numberOfItems * itemHeight}px`,
+          height: itemHeight,
         }}
       >
         {generateRows()}
@@ -130,11 +134,13 @@ export const VirtualizedList = ({
 };
 
 const ListItem = ({ index }: { index: number }) => {
+  const itemHeight = `${itemHeight}px`
+  const itemTop =  `${itemHeight * index}px`
   return (
     <div
       style={{
-        height: `${itemHeight}px`,
-        top: `${itemHeight * index}px`,
+        height: itemHeight,
+        top: itemTop,
         backgroundColor: index % 2 === 0 ? '#f0f0f0' : '#ffffff',
       }}
       className="text-center w-full absolute"
@@ -177,22 +183,25 @@ export const VirtualizedListOptimized = ({
     return items;
   };
 
+const windowHeight = `${windowHeight}px`
+const itemHeight = `${numberOfItems * itemHeight}px`
+const transform = `translateY(${startIndex * itemHeight}px)`
   return (
     <div
       className="overflow-y-scroll w-full border-2 border-black"
-      style={{ height: `${windowHeight}px` }}
+      style={{ height: windowHeight }}
       onScroll={(e) => {
         setScrollTop(e.currentTarget.scrollTop);
       }}
     >
       <div
         style={{
-          height: `${numberOfItems * itemHeight}px`,
+          height: itemHeight,
         }}
       >
         <div
           style={{
-            transform: `translateY(${startIndex * itemHeight}px)`,
+            transform: transform ,
           }}
         >
           {generateRows()}
@@ -203,10 +212,11 @@ export const VirtualizedListOptimized = ({
 };
 
 const ListItem = ({ index }: { index: number }) => {
+  const itemHeight = `${itemHeight}px`
   return (
     <div
       style={{
-        height: `${itemHeight}px`,
+        height: itemHeight,
         backgroundColor: index % 2 === 0 ? '#f0f0f0' : '#ffffff',
       }}
       className="text-center w-full"
