@@ -1,0 +1,283 @@
+---
+title: "리액트 19 새로운 훅 정리"
+date: 2025-02-02
+thumbnail: "/log/2502/1.webp"
+description: "리액트 19가 12월 초에 업데이트가 되었습니다. 리액트 19가 나옴과 동시에 얼마나 코드가 많이 바뀔까 걱정을 했는데, 다행히 이번 리액트 19의 컨셉은 코드를 최대한 덜치자 주의더라구요. 귀찮게 치고 있었던 코드를 오히려 간단하게 한줄로 끝내버릴수 있다는 것! 이런 유용한 마법의 훅들을 미리 알고, 정리해 보려합니다."
+---
+
+리액트 19가 12월 초에 업데이트가 되었습니다. 리액트 19가 나옴과 동시에 얼마나 코드가 많이 바뀔까 걱정을 했는데, 다행히 이번 리액트 19의 컨셉은 코드를 최대한 덜치자 주의더라구요. 귀찮게 치고 있었던 코드를 오히려 간단하게 한줄로 끝내버릴수 있다는 것! 이런 유용한 마법의 훅들을 미리 알고, 정리해 보려합니다.
+
+## useTransition
+
+리액트 18버전부터 존재했던 `useTransition` 훅은 리액트 19버전에서 업그레이드되었습니다. 이 훅은 상태 업데이트를 **부드럽게 처리**할 수 있게 도와주며, 상태 업데이트를 "덜 급한 일"로 처리하여 더 부드러운 UI를 제공하는 기능을 합니다.
+
+### 왜 필요할까?
+
+예를 들어, 검색창이 있다고 해봅시다.
+
+- 사용자가 글자를 입력하면, 검색 결과도 동시에 바뀌어야 합니다.
+- 하지만 검색 결과를 필터링하는 데 시간이 걸리면, 글자 입력이 버벅거릴 수 있습니다.
+
+이럴 때 `useTransition`을 쓰면,
+
+✅ **입력 필드는 즉시 반응**하고
+
+✅ **검색 결과 필터링은 살짝 느려도 괜찮게** 만들어 줄 수 있게 됩니다.
+
+### useTransition 기본 사용법
+
+```tsx
+import { useTransition, useState } from "react";
+
+function Search() {
+  const [isPending, startTransition] = useTransition();
+  const [text, setText] = useState("");
+  const [filteredItems, setFilteredItems] = useState(items);
+
+  const handleChange = (e) => {
+    setText(e.target.value); // 🔥 1. 입력 필드는 즉시 반영 (긴급한 업데이트)
+
+    startTransition(() => {
+      setFilteredItems(items.filter((item) => item.includes(e.target.value)));
+      // ⏳ 2. 검색 결과는 살짝 늦게 업데이트 (덜급한 업데이트로 UI를 막지 않음)
+    });
+  };
+
+  return (
+    <div>
+      <input value={text} onChange={handleChange} />
+      {isPending && <p>로딩 중...</p>}
+      {/* ⏳ isPending으로 로딩상태 관리 가능*/}
+      <ul>
+        {filteredItems.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+### **비동기 처리에도 우선순위를 적용할 수 있다**
+
+리액트 19에서는 `startTransition`을 **비동기 작업에도 적용할 수 있게** 되었습니다. 여러 네트워크 요청이 있을 때 **더 중요한 요청을 먼저 실행**하고, 덜 중요한 요청은 나중에 실행하도록 우선순위를 조정할 수 있습니다. 또한, **비동기 함수의 로딩 상태까지 자동으로 관리할 수 있어** 별도로 로딩 상태를 관리할 필요가 없습니다! 🚀
+
+```tsx
+function UpdateName({}) {
+  const [name, setName] = useState("");
+  const [error, setError] = useState(null);
+  const [isPending, startTransition] = useTransition();
+
+  const handleSubmit = () => {
+    startTransition(async () => {
+      const error = await updateName(name);
+      if (error) {
+        setError(error);
+        return;
+      }
+      redirect("/path");
+    });
+  };
+
+  return (
+    <div>
+      <input value={name} onChange={(event) => setName(event.target.value)} />
+      <button onClick={handleSubmit} disabled={isPending}>
+        Update
+      </button>
+      {error && <p>{error}</p>}
+    </div>
+  );
+}
+```
+
+## useActionState
+
+`useActionState`는 비동기 함수의 상태를 관리하는 훅입니다. 기존에 여러 상태(에러, 로딩 상태 등)를 개별적으로 관리해야 했던 부분을 한 번에 묶어 관리할 수 있게 해 줍니다. **리액트 쿼리**와 비슷한 방식으로, 비동기 작업의 상태를 쉽게 추적할 수 있습니다.
+
+### Action이란?
+
+이 훅을 알기 전에 Action이 뭔지 알아봅시다. 리액트 공식 문서에서 액션을 다음과 같이 설명합니다.
+
+> [!info] 💡 Action이란
+> 비동기 함수를 액션이라고 부른다. 즉, Action State는 비동기 처리에 관련된 모든 state를 말한다
+
+### useActionState 기본 사용법
+
+```tsx
+function ChangeName({ name, setName }) {
+  const [error, submitAction, isPending] = useActionState(
+    async (previousState, formData) => {
+      const error = await updateName(formData.get("name"));
+      if (error) {
+        return error;
+      }
+      redirect("/path");
+      return null;
+    },
+    null,
+  );
+
+  return (
+    <form action={submitAction}>
+      <input type="text" name="name" />
+      <button type="submit" disabled={isPending}>
+        Update
+      </button>
+      {error && <p>{error}</p>}
+    </form>
+  );
+}
+```
+
+## useOptimistic
+
+`useOptimistic` 훅은 **낙관적 업데이트를 쉽게 구현**할 수 있도록 해줍니다.
+
+### 낙관적 업데이트란?
+
+> [!info] 💡 낙관적 업데이트란
+> 사용자가 데이터를 변경하려고 할 때, **실제 변경이 완료되기 전에 UI를 먼저 업데이트**하는 방식입니다.
+
+낙관적 업데이트를 구현하기 위해서는 **로딩 상태 관리**, **낙관적 업데이트 실패 시 롤백** 등을 구현해야 했습니다. 이제 `useOptimistic` 훅을 사용하면 이 모든 과정을 훨씬 간단하게 처리할 수 있게 되었습니다!
+
+### useOptimistic 기본 사용법
+
+```tsx
+function ChangeName({ currentName, onUpdateName }) {
+  const [optimisticName, setOptimisticName] = useOptimistic(currentName);
+
+  const submitAction = async (formData) => {
+    const newName = formData.get("name");
+
+    // 낙관적 업데이트: 입력한 새 이름을 UI에서 즉시 반영
+    setOptimisticName(newName);
+
+    const updatedName = await updateName(newName);
+
+    // 이름 업데이트가 성공하면 부모 컴포넌트에 변경된 이름 전달;
+    onUpdateName(updatedName);
+  };
+
+  return (
+    <form action={submitAction}>
+      <p>Your name is: {optimisticName}</p>
+      <p>
+        <label>Change Name:</label>
+        <input
+          type="text"
+          name="name"
+          disabled={currentName !== optimisticName}
+        />
+      </p>
+    </form>
+  );
+}
+```
+
+## useFormStatus
+
+`useFormStatus`는 마지막 폼 제출의 상태 정보를 제공하는 훅입니다.
+
+```tsx
+const { pending, data, method, action } = useFormStatus();
+```
+
+### useFormStatus 기본 사용법
+
+```tsx
+import { useFormStatus } from "react-dom";
+import { submitForm } from "./actions.js";
+
+function Submit() {
+  const { pending } = useFormStatus();
+  return (
+    <button type="submit" disabled={pending}>
+      {pending ? "Submitting..." : "Submit"}
+    </button>
+  );
+}
+
+function Form({ action }) {
+  return (
+    <form action={action}>
+      <Submit />
+    </form>
+  );
+}
+
+export default function App() {
+  return <Form action={submitForm} />;
+}
+```
+
+### useFormStatus 주의 사항
+
+- `useFormStatus` 훅은 `<form>` 내부에 렌더링한 컴포넌트에서 호출해야 합니다.
+- `useFormStatus`는 오직 상위 `<form>`에 대한 상태 정보만 반환합니다. 동일한 컴포넌트나 자식 컴포넌트에서 렌더링한 `<form>`의 상태 정보는 반환하지 않습니다.
+
+## use
+
+리액트 19의 `use` 훅은 비동기 작업을 처리하고, **context** 값을 쉽게 읽을 수 있게 해주는 다목적 훅입니다.
+
+### 기능 1: promise 핸들링
+
+비동기 함수는 다른 파일에서 작성하고, 그 결과를 **`use` 훅**으로 추적합니다. 이렇게 하면 비동기 작업을 처리하는 과정에서 로딩 상태는 `Suspense`로, 에러는 `ErrorBoundary`로 자동으로 처리할 수 있습니다. 즉, **비동기 작업의 상태 관리**를 훅과 컴포넌트를 통해 간편하게 처리할 수 있습니다.
+
+```tsx
+"use client";
+
+import { use, Suspense } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+
+const fetchMessage = async () => {
+  const response = await fetch("https://api.example.com/message");
+  if (!response.ok) {
+    throw new Error("Failed to fetch the message");
+  }
+  const data = await response.json();
+  return data.message;
+};
+
+export function MessageContainer() {
+  const messagePromise = fetchMessage();
+
+  return (
+    <ErrorBoundary fallback={<p>⚠️Something went wrong</p>}>
+      <Suspense fallback={<p>⌛Downloading message...</p>}>
+        <Message messagePromise={messagePromise} />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
+function Message({ messagePromise }) {
+  const content = use(messagePromise); // promise 결과를 처리
+  return <p>Here is the message: {content}</p>;
+}
+```
+
+### 기능 2: context값 처리
+
+useContext를 사용하지 않고 use로 컨텍스트를 읽어 올 수 있습니다.
+
+추가로 `use`는 `if` 와 같은 조건문과 반복문 내부에서 호출할 수 있습니다.
+
+```tsx
+function HorizontalRule({ show }) {
+  if (show) {
+    const theme = use(ThemeContext);
+    return <hr className={theme} />;
+  }
+  return false;
+}
+```
+
+### use 주의 사항
+
+- use API는 컴포넌트나 Hook 내부에서 호출되어야 합니다.
+- [서버 컴포넌트](https://ko.react.dev/reference/rsc/use-server)에서 데이터를 가져올 때는 use보다 async 및 await을 사용합니다.
+  → 만약 서버 컴포넌트 내에서 use를 사용했을 경우 데이터가 오지 않아 로딩을 보여주기 때문에 seo에 좋지 않습니다.
+  → use는 유저에게 친근하게 로딩 중 ui를 보여주는 클라이언트 컴포넌트에 효과적입니다.
+- **클라이언트에서 Promise 생성할 경우** 매 렌더링마다 새로 생성되어 불필요한 요청이 반복될 수 있습니다. 따라서, **서버에서 Promise 생성하여** 한 번만 API를 호출하고, 클라이언트로 데이터를 안정적으로 전달할 수 있습니다
+  → props로 전달하는거 귀찮긴 한데 효율을 위해서 props로 전달하자..!
