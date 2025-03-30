@@ -1,0 +1,824 @@
+---
+title: "좋은 코드란 무엇인가"
+date: 2025-03-30
+thumbnail: "/log/2503/2.webp"
+description: "토스에서 '변경하기 쉬운 프론트엔드 코드를 위한 지침서'를 만들었다. 좋은 코드란 무엇인가에 대한 생각은 개발자에게 빠질수 없는 고민거리라고 생각한다. 차근차근 읽어보면서 공감했던 부분과 내가 놓치고 있었던 새로운 부분을 정리해보려고 한다."
+---
+
+토스에서 '변경하기 쉬운 프론트엔드 코드를 위한 지침서'를 만들었다. “좋은 코드란 무엇인가”는 개발자라면 누구나 한 번쯤 깊이 고민하게 되는 주제다. 차근차근 읽어보면서 공감했던 부분과 내가 놓치고 있었던 새로운 부분을 정리해보려고 한다. 들어가기에 앞서 변경하기 쉬운 코드란 무엇일까? 새로운 요구사항을 구현할 때 코드를 수정하고 배포하기가 편한 코드가 변경하기 쉬운 코드이다. 이러한 코드는 4가지 기준으로 판단할 수 있다.
+
+# 좋은 코드의 4가지 기준
+
+- 가독성 - 읽기 쉬운 코드
+- 예측 가능성 - 동작을 예측할 수 있는지
+- 응집도 - 수정되어야 할 코드가 같이 수정되는지
+- 결합도 - 코드를 수정했을 때 영향 범위
+
+이 4가지를 한번에 충족하기는 어렵다. 함수나 변수가 같이 수정되려면 (응집도를 높이려면) 가독성이 떨어질 수 있다. 중복 코드를 허용할 경우 결합도를 낮출 수 있지만 응집도가 떨어진다. 현재 코드를 보면서 장기적으로 코드의 수정을 쉽게 하기 위해 어떤 가치를 우선으로 둬야하는지 고민해 볼 필요가 있다.
+
+# 1. 가독성
+
+## 맥락 줄이기
+
+### 같이 실행되지 않는 코드를 분리하기.
+
+코드를 읽는 사람은 해당 분기에서만 읽을 수 있도록 고려하기
+
+```jsx
+function SubmitButton() {
+  const isViewer = useRole() === "viewer";
+
+  return isViewer ? <ViewerSubmitButton /> : <AdminSubmitButton />;
+}
+
+function ViewerSubmitButton() {
+  return <TextButton disabled>Submit</TextButton>;
+}
+
+function AdminSubmitButton() {
+  useEffect(() => {
+    showAnimation();
+  }, []);
+
+  return <Button type="submit">Submit</Button>;
+}
+```
+
+내 생각 💡 굳이 실행되지 않아도 되는 로직을 분리시켜, 사이드 이펙트를 최소화 할 수 있는 것 같다. 실행 효율성도 좋은 것 같다.
+
+### 구현 상세 추상화하기
+
+사용자가 '로그인을 확인하고 이동하는 로직'을 하나의 컴포넌트로 넣기 보다는 Wrapper 컴포넌트를 사용해서 감싸자
+
+```jsx
+function App() {
+  return (
+    <AuthGuard>
+      <LoginStartPage />
+    </AuthGuard>
+  );
+}
+
+function AuthGuard({ children }) {
+  const status = useCheckLoginStatus();
+
+  useEffect(() => {
+    if (status === "LOGGED_IN") {
+      location.href = "/home";
+    }
+  }, [status]);
+
+  return status !== "LOGGED_IN" ? children : null;
+}
+
+function LoginStartPage() {
+  /* ... 로그인 관련 로직 ... */
+
+  return <>{/* ... 로그인 관련 컴포넌트 ... */}</>;
+}
+```
+
+내 생각 💡 useEffect 안에 여러 가지 조건을 복잡하게 넣었던 나의 코드가 불현듯 떠올랐다. 앞으로는 AuthGuard처럼 감싸는 패턴을 더 써야겠다고 다짐했다.
+
+### 로직 종류에 따라 합쳐진 함수 쪼개기
+
+좋은 성능을 위해서는 특정한 상태 값이 업데이트 되었을 때 최소한의 리렌더링이 되도록 설계해야한다.
+
+훅 하나에 담당영역을 넓히지 말고 담당 책임을 분리하자. (이때 명확한 이름 필수) 훅을 수정했을 때 영향이 갈 범위를 좁혀서 예상하지 못한 변경이 생기는 것을 막자.
+
+## 복잡한 조건에 이름 붙이기
+
+### 복잡한 조건식이 얽혀있을 경우 코드, 조건에 명시적 이름을 붙이기
+
+단, 로직이 매우 간단하거나 단순한 로직, 또 한번만 사용 되면서 로직이 복잡 하지 않을 경우는 이름을 따로 붙이지 않아도 된다.
+
+```jsx
+const matchedProducts = products.filter((product) => {
+  return product.categories.some((category) => {
+    const isSameCategory = category.id === targetCategory.id;
+    const isPriceInRange = product.prices.some(
+      (price) => price >= minPrice && price <= maxPrice,
+    );
+
+    return isSameCategory && isPriceInRange;
+  });
+});
+```
+
+### 매직 넘버에 이름 붙이기
+
+매직 넘버란 ? 정확한 뜻을 밝히지 않고 소스 코드 안에 직접 숫자를 넣는 것을 말한다.
+
+하나의 코드를 여러 명의 개발자가 함께 수정하기 때문에 한번에 파악이 가능하도록 정확한 상수를 선언하자.
+
+상수를 사용할 경우, 상수만 바꾸면 수정되어야 할 코드가 모두 수정되기 때문에 응집도를 높일 수 있다.
+
+```jsx
+const ANIMATION_DELAY_MS = 300;
+
+async function onLikeClick() {
+  await postLike(url);
+  await delay(ANIMATION_DELAY_MS);
+  await refetchPostLike();
+}
+```
+
+## 위에서 아래로 읽히게 하기
+
+### 시점 이동 줄이기
+
+코드를 파악하는데 위아래 왔다갔다 하면 맥락 파악이 어려워진다.
+
+- 조건을 펼쳐서 그대로 드러내기 (위에서 아래로만 읽으면 한눈에 권한 파악)
+
+```jsx
+function Page() {
+  const user = useUser();
+
+  switch (user.role) {
+    case "admin":
+      return (
+        <div>
+          <Button disabled={false}>Invite</Button>
+          <Button disabled={false}>View</Button>
+        </div>
+      );
+    case "viewer":
+      return (
+        <div>
+          <Button disabled={true}>Invite</Button>
+          <Button disabled={false}>View</Button>
+        </div>
+      );
+    default:
+      return null;
+  }
+}
+```
+
+- 조건을 한눈에 볼 수 있는 객체 만들기
+
+```jsx
+function Page() {
+  const user = useUser();
+  const policy = {
+    admin: { canInvite: true, canView: true },
+    viewer: { canInvite: false, canView: true },
+  }[user.role];
+
+  return (
+    <div>
+      <Button disabled={!policy.canInvite}>Invite</Button>
+      <Button disabled={!policy.canView}>View</Button>
+    </div>
+  );
+}
+```
+
+내 생각 💡 객체를 이용해서 조건을 주는 방법은 생각지도 못했는데 가독성에 좋은 것 같다.
+
+### 삼한 연산자 단순하게 하기
+
+삼항 연산자를 복잡하게 사용하면 구조가 명확하게 보이지 않아 코드를 읽기 어렵다.
+
+if문을 풀어서 사용하여 명확하고 간단하게 조건을 나타내자
+
+```jsx
+const status = (() => {
+  if (A조건 && B조건) return "BOTH";
+  if (A조건) return "A";
+  if (B조건) return "B";
+  return "NONE";
+})();
+```
+
+내 생각 💡 입사하자마자 과거 코드를 구경하다 삼항 연산자의 지옥 루프 코드를 본 적이 있다. 나는 절대 이렇게 안 써야지 싶지만, 귀찮아서 써버리게 되는 것 같다. 삼항 연산자의 중복.. 꼭 지양하자
+
+# 2. 예측 가능성
+
+예측 가능성이란 동작을 예측할 수 있는지를 말한다. 예측 가능성을 높여 미래의 나와 동료들을 당황하게 만들지 말자
+
+### 이름 겹치지 않게 관리하기
+
+같은 이름을 가지는 함수나 변수는 동일한 동작을 해야 한다.
+
+**안 좋은 예시**
+
+```jsx
+// 이 서비스는 `http`라는 라이브러리를 쓰고 있어요
+import { http as httpLibrary } from "@some-library/http";
+
+export const http = {
+  async get(url: string) {
+    const token = await fetchToken();
+
+    return httpLibrary.get(url, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  }
+};
+```
+
+토큰을 가져오는 추가 작업이 수행되지만 라이브러리가 하는 단순한 요청으로 착각할 수 있다.
+
+**좋은 예시**
+
+```jsx
+// 이 서비스는 `http`라는 라이브러리를 쓰고 있어요
+import { http as httpLibrary } from "@some-library/http";
+
+// 라이브러리 함수명과 구분되도록 명칭을 변경했어요.
+export const httpService = {
+  async getWithAuth(url: string) {
+    const token = await fetchToken();
+
+    // 토큰을 헤더에 추가하는 등 인증 로직을 추가해요.
+    return httpLibrary.get(url, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  }
+};
+```
+
+따라서 직관적인 명칭 (service)으로 변경하여 함수의 이름을 봤을 때, 서비스에서 정의한 함수라는 것을 바로 알 수 있게 한다.
+
+내 생각 💡 라이브러리를 사용하여 커스텀 하거나 로직을 추가할 경우, httpService처럼 분리된 이름을 사용하는 습관을 가져야겠다.
+
+### 같은 종류의 함수는 반환 타입 통일하기
+
+함수나 Hook이 서로 다른 반환 타입을 가지면 일관성이 떨어져 헷갈린다. 반환 타입을 갖게 하자.
+
+특히 Discriminated Union을 활용하면 더욱 안전하다.
+
+- Discriminated Union 이란?
+
+하나의 공통 속성(kind, type, ok 등)을 가진 여러 타입을 그 속성에 따라 자동으로 타입을 좁혀 안전하게 다루는 타
+
+```tsx
+type Result = { ok: true } | { ok: false; reason: string };
+```
+
+ok가 true인 경우 reason이 존재하지 않고, false인 경우만 reason이 있다.
+
+```jsx
+if (isAgeValid.ok) {
+  isAgeValid.reason; // ❌ 타입 에러!
+}
+```
+
+이럴 경우 컴파일러가 ok 값에 따라 다른 속성 접근 시 타입을 자동으로 좁혀준다. 즉, 잘못된 속성 접근을 차단하고 안전한 코드가 가능하게 된다.
+
+이건 마치 if(사람. 성별 === 남자)라고 쓰면 남자 타입으로 좁혀지는 것과 같다. else는 자동으로 여자로 좁혀짐
+
+if (조건)문 안에서 타입이 자동으로 좁혀지는 것은 TS의 강력한 기능이다. 적극적으로 활용하자.
+
+```jsx
+type ValidationCheckReturnType = { ok: true } | { ok: false; reason: string };
+
+function checkIsAgeValid(age: number): ValidationCheckReturnType {
+  if (!Number.isInteger(age)) {
+    return {
+      ok: false,
+      reason: "나이는 정수여야 해요."
+    };
+  }
+  // ...
+}
+
+const isAgeValid = checkIsAgeValid(1.1);
+
+if (isAgeValid.ok) {
+  isAgeValid.reason; // 타입 에러: { ok: true } 타입에는 reason 속성이 없어요
+} else {
+  isAgeValid.reason; // ok가 false일 때만 reason 속성에 접근할 수 있어요
+}
+```
+
+컴파일러를 통해 불필요한 접근 예방이 가능하다.
+
+### 숨은 로직 드러내기
+
+함수나 컴포넌트 이름, 파라미터, 반환 값에 드러나지 않는 숨은 로직이 있다면 동작을 예측하는데 어려워진다.
+
+함수 이름을 보고 예상할 수 있는 것만 반환하게 하자. (만약 함수에 추가적인 로깅도 하고 있다면 함수 내부보다는 호출 쪽에서 로깅을 하자 )
+
+**전**
+
+```jsx
+async function fetchBalance(): Promise<number> {
+  const balance = await http.get<number>("...");
+
+  logging.log("balance_fetched");
+
+  return balance;
+}
+```
+
+**후**
+
+```jsx
+<Button
+  onClick={async () => {
+    const balance = await fetchBalance();
+    logging.log("balance_fetched");
+
+    await syncBalance(balance);
+  }}
+>
+  계좌 잔액 갱신하기
+</Button>
+```
+
+내 생각 💡 사실 이 부분이 잘 이해가 안 갔다. 함수 내부 로깅도 자연스럽다고 생각했는데, 토스에서는 함수의 단일 책임 원칙을 중요하게 생각하는 것 같다. 클린 코드에서 주석은 쓰레기이다! 이것과 같은 맥락 일지도
+
+# 3. 응집도
+
+응집도란 **수정되어야 할 코드가 같이 수정되는지** 를 말한다.
+
+### 함께 수정되는 파일을 같은 디렉토리에 두기
+
+프로젝트 코드를 작성하면 여러 파일로 나눠서 관리하게 되는데, 쉽게 만들고 찾고 삭제할 수 있도록 디렉토리 구조를 관리하는것이 중요하다.
+
+/code
+
+└─ src
+
+├─ components
+
+├─ constants
+
+├─ containers
+
+├─ contexts
+
+├─ remotes
+
+├─ hooks
+
+├─ utils
+
+└─ ...
+
+보통 이런식으로 나누게 된다. 하지만 종료별로 나눌 경우 어떤 코드를 참조하는지 쉽게 파악하기 어렵다. 특정 컴포넌트를 사용하지 않아 삭제해야 할 경우에도 연관된 코드가 같이 삭제되지 못해서 남아있는 경우가 생길 수 있다. 프로젝트가 커짐에 따라 의존 관계가 복잡해지고 디렉토리 안에 많은 파일이 생기게 된다.
+
+└─ src
+
+│ // 전체 프로젝트에서 사용되는 코드
+
+├─ components
+
+├─ containers
+
+├─ hooks
+
+├─ utils
+
+├─ ...
+
+│
+
+└─ domains
+
+│ // Domain1에서만 사용되는 코드
+
+├─ Domain1
+
+│ ├─ components
+
+│ ├─ containers
+
+│ ├─ hooks
+
+│ ├─ utils
+
+│ └─ ...
+
+│
+
+│ // Domain2에서만 사용되는 코드
+
+└─ Domain2
+
+├─ components
+
+├─ containers
+
+├─ hooks
+
+├─ utils
+
+└─ ...
+
+이런식으로 함께 수정되는 코드를 하나의 디렉토리(도메인) 안에 두면 의존 관계를 쉽게 파악할 수 있다.
+
+그리고 직관적인 import문으로 잘못된 파일을 참조할 경우 확인이 가능하다.
+
+내 생각 💡 나는 도메인 단위로 구조를 나눈 적이 없었다. 도메인 별로 디렉터리 구조를 분리하는 방법은 FSD 아키텍처의 Slice 개념에서 사용하는 방법이라는 댓글을 봤다. 이 부분은 다음 글쓰기 주제로 써도 될 것 같다! 다음 프로젝트부터는 무조건 도메인 단위로 구조를 잡아서 응집성을 높혀봐야겠다. 함께 수정될 가능성이 높은 코드를 모아두면 삭제·추적이 훨씬 쉬워질 것 같다.
+
+### 매직 넘버 없애기
+
+매직 넘버란 정확한 뜻을 밝히지 않고 소스 코드 안에 직접 숫자값을 넣는 것을 말한다.
+
+예를들어 5000초를 그대로 사용하는 것이다, 상태를 404 값으로 바로 사용하는 것들이다.
+
+```jsx
+const ANIMATION_DELAY_MS = 300;
+
+async function onLikeClick() {
+  await postLike(url);
+  await delay(ANIMATION_DELAY_MS);
+  await refetchPostLike();
+}
+```
+
+이런식으로 숫자의 맥락을 정확하게 표시하기 위해 상수를 선언하자.
+
+응집도 뿐만 아니라 가독성에도 좋다.
+
+내 생각 💡 자잘한 숫자도 귀찮더라도 반드시 상수로 분리하자. 미래의 나에게는 꼭 필요한 단서가 될 것이다.
+
+### 폼의 응집도 생각하기
+
+개발을 하다보면 폼으로 값을 입력받는 경우가 많은데 폼을 관리할때 응집도를 생각해보면서 개발하자.
+
+- 필드 단위 응집
+
+필드 단위 응집은 개별 입력 요소를 독립적으로 관리하여, 각 필드가 고유의 검증 로직을 가지기 때문에 유지보수가 쉽다. 또한 각 필드가 독립적 이러서 다른 필드에 영향을 주지 않는다.
+
+```jsx
+import { useForm } from "react-hook-form";
+
+export function Form() {
+  const {
+    register,
+    formState: { errors },
+    handleSubmit
+  } = useForm({
+    defaultValues: {
+      name: "",
+      email: ""
+    }
+  });
+
+  const onSubmit = handleSubmit((formData) => {
+    // 폼 데이터 제출 로직
+    console.log("Form submitted:", formData);
+  });
+
+  return (
+    <form onSubmit={onSubmit}>
+      <div>
+        <input
+          {...register("name", {
+            validate: (value) =>
+              isEmptyStringOrNil(value) ? "이름을 입력해주세요." : ""
+          })}
+          placeholder="이름"
+        />
+        {errors.name && <p>{errors.name.message}</p>}
+      </div>
+
+      <div>
+        <input
+          {...register("email", {
+            validate: (value) => {
+              if (isEmptyStringOrNil(value)) {
+                return "이메일을 입력해주세요.";
+              }
+
+              if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
+                return "유효한 이메일 주소를 입력해주세요.";
+              }
+
+              return "";
+            }
+          })}
+          placeholder="이메일"
+        />
+        {errors.email && <p>{errors.email.message}</p>}
+      </div>
+
+      <button type="submit">제출</button>
+    </form>
+  );
+}
+
+function isNil(value: unknown): value is null | undefined {
+  return value == null;
+}
+
+type NullableString = string | null | undefined;
+
+function isEmptyStringOrNil(value: NullableString): boolean {
+  return isNil(value) || value.trim() === "";
+}
+```
+
+- 폼 전체 단위 응집도
+
+모든 필드의 검증 로직이 폼에 종속되어 있는 것을 말한다. 전체적인 흐름을 고려하여 설계되며, 변경단위 또한 폼 단위로 발생한다. 폼 전체 응집도가 높아지고 검증 관리가 편하며, 전체 흐름을 파악하기 쉽다. 하지만 필드간 결합도가 높아져 재사용성이 떨어진다.
+
+```jsx
+import * as z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const schema = z.object({
+  name: z.string().min(1, "이름을 입력해주세요."),
+  email: z
+    .string()
+    .min(1, "이메일을 입력해주세요.")
+    .email("유효한 이메일 주소를 입력해주세요."),
+});
+
+export function Form() {
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+  } = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+    },
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = handleSubmit((formData) => {
+    // 폼 데이터 제출 로직
+    console.log("Form submitted:", formData);
+  });
+
+  return (
+    <form onSubmit={onSubmit}>
+      <div>
+        <input {...register("name")} placeholder="이름" />
+        {errors.name && <p>{errors.name.message}</p>}
+      </div>
+
+      <div>
+        <input {...register("email")} placeholder="이메일" />
+        {errors.email && <p>{errors.email.message}</p>}
+      </div>
+
+      <button type="submit">제출</button>
+    </form>
+  );
+}
+```
+
+필드 단위 vs 폼 전체 단위
+
+필드 단위 : 독립적인 검증이 필요할 때, 재사용이 필요할 때
+
+폼 전체 단위 : 단일 기능을 나타낼 때 (모든 필드가 밀접하게 하게 관련 되어 하나의 비즈니스 로직을 이룰 때), 단계별 입력이 필요할 때, 필드간 의존성(참조)가 있을 때
+
+폼 설계 시 ‘이게 독립적인지, 전체 흐름에 종속되는지’를 먼저 고민하고 폼을 짜야겠다.
+
+필드 단위 예시 (개별 검증 함수 포함)와 폼 전체 단위 예시 (Zod 스키마 활용)를 코드로 잘 보여준 것 같다.
+
+추가로 리액트 react-hook-form과 zod의 조합은 최고라고 한다. 프로젝트에 잘 활용해보자.
+
+- react-hook-form은 **폼 상태 관리 (입력 필드 값, 제출 처리, 유효성 검사 상태(errors), 폼 리셋 등 ‘폼의 동작’을 담당)**
+- zod는 **데이터 스키마 정의 및 검증**
+
+# 4. 결합도
+
+마지막 좋은코드 마지막 주제, 결합도를 정리해보여 시리즈를 마무리해보려고 한다.
+
+결합도란 **코드를 수정했을 때 영향 범위**이다.
+
+내가 가장 어려워하는 파트이기도 하다.
+
+### 책임을 하나씩 관리하기
+
+```jsx
+import moment, { Moment } from "moment";
+import { useMemo } from "react";
+import {
+  ArrayParam,
+  DateParam,
+  NumberParam,
+  useQueryParams
+} from "use-query-params";
+
+const defaultDateFrom = moment().subtract(3, "month");
+const defaultDateTo = moment();
+
+export function usePageState() {
+  const [query, setQuery] = useQueryParams({
+    cardId: NumberParam,
+    statementId: NumberParam,
+    dateFrom: DateParam,
+    dateTo: DateParam,
+    statusList: ArrayParam
+  });
+
+  return useMemo(
+    () => ({
+      values: {
+        cardId: query.cardId ?? undefined,
+        statementId: query.statementId ?? undefined,
+        dateFrom:
+          query.dateFrom == null ? defaultDateFrom : moment(query.dateFrom),
+        dateTo: query.dateTo == null ? defaultDateTo : moment(query.dateTo),
+        statusList: query.statusList as StatementStatusType[] | undefined
+      },
+      controls: {
+        setCardId: (cardId: number) => setQuery({ cardId }, "replaceIn"),
+        setStatementId: (statementId: number) =>
+          setQuery({ statementId }, "replaceIn"),
+        setDateFrom: (date?: Moment) =>
+          setQuery({ dateFrom: date?.toDate() }, "replaceIn"),
+        setDateTo: (date?: Moment) =>
+          setQuery({ dateTo: date?.toDate() }, "replaceIn"),
+        setStatusList: (statusList?: StatementStatusType[]) =>
+          setQuery({ statusList }, "replaceIn")
+      }
+    }),
+    [query, setQuery]
+  );
+}
+```
+
+이 Hook은 페이지에 필요한 모든 쿼리 매개변수를 관리하며 광범위한 책임을 가지고 있다.
+
+이로 인해 다른 컴포넌트나 페이지가 훅에 의존할 수 있고, 수정 범위가 크게 늘어난다. 즉 유지관리가 어려워진다.
+
+```jsx
+import { useQueryParam } from "use-query-params";
+
+export function useCardIdQueryParam() {
+  const [cardId, _setCardId] = useQueryParam("cardId", NumberParam);
+
+  const setCardId = useCallback((cardId: number) => {
+    _setCardId({ cardId }, "replaceIn");
+  }, []);
+
+  return [cardId ?? undefined, setCardId] as const;
+}
+```
+
+각가의 쿼리 파라미터별로 별도의 Hook으로 관리하자
+
+책임을 분리하여 수정 범위를 좁히면 예상하지 못한 영향을 줄일 수 있다.
+
+내 생각 💡 안 좋은 예시를 보면서 나도 저렇게 썼던 코드가 있어서 찔렸다.. ㅎㅎ 앞으로 커스텀 훅을 작성할 때는 '하나의 책임'에 집중해서 수정 범위를 최소화해야겠다.
+
+### 중복 코드 허용하기
+
+중복코드를 하나의 컴포넌트나 Hook으로 공통화 하면 응집도가 생겨 함번에 수정이 가능하다.
+
+하지만 불필요한 결합도로 수정에 따라 영향을 받는 범위가 넓어진다.
+
+공통화된 코드가 점점 요구사항이 늘어나 복잡해지는 코드로 변해간다. 점점 수정이 어려워지게 된다.
+
+따라서 다소 반복되어 보이는 코드일지 몰라도, 페이지마다 동작이 달라질 여지가 있다면 중복 코드를 허용하는 것이 좋은 방향일 수 있다.
+
+### Props Drilling 지우기
+
+props drilling은 부모와 자식 컴포넌트 사이에 결합도가 생깃것을 말한다.
+
+```jsx
+function ItemEditModal({ open, items, recommendedItems, onConfirm, onClose }) {
+  const [keyword, setKeyword] = useState("");
+
+  // 다른 ItemEditModal 로직 ...
+
+  return (
+    <Modal open={open} onClose={onClose}>
+      <ItemEditBody
+        items={items}
+        keyword={keyword}
+        onKeywordChange={setKeyword}
+        recommendedItems={recommendedItems}
+        onConfirm={onConfirm}
+        onClose={onClose}
+      />
+      {/* ... 다른 ItemEditModal 컴포넌트 ... */}
+    </Modal>
+  );
+}
+
+function ItemEditBody({
+  keyword,
+  onKeywordChange,
+  items,
+  recommendedItems,
+  onConfirm,
+  onClose,
+}) {
+  return (
+    <>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <Input
+          value={keyword}
+          onChange={(e) => onKeywordChange(e.target.value)}
+        />
+        <Button onClick={onClose}>닫기</Button>
+      </div>
+      <ItemEditList
+        keyword={keyword}
+        items={items}
+        recommendedItems={recommendedItems}
+        onConfirm={onConfirm}
+      />
+    </>
+  );
+}
+
+// ...
+```
+
+Props Drilling이 발생하면 props을 불필요하게 참조한느 컴포넌트의 숫자마 많아져, Prop을 참조하는 모든 컴포넌트가 수정되어야 한다.
+
+- 조합 패턴 활용 (부모 컴포넌트가 **자식 컴포넌트를 직접 조립**해서 사용하는 패턴)
+
+```jsx
+function ItemEditModal({ open, items, recommendedItems, onConfirm, onClose }) {
+  const [keyword, setKeyword] = useState("");
+
+  return (
+    <Modal open={open} onClose={onClose}>
+      <ItemEditBody onClose={onClose}>
+        <ItemEditList
+          keyword={keyword}
+          items={items}
+          recommendedItems={recommendedItems}
+          onConfirm={onConfirm}
+        />
+      </ItemEditBody>
+    </Modal>
+  );
+}
+
+function ItemEditBody({ children, onClose }) {
+  return (
+    <>
+      <div style="display: flex; justify-content: space-between;">
+        <Input
+          value={keyword}
+          onChange={(e) => onKeywordChange(e.target.value)}
+        />
+        <Button onClick={onClose}>닫기</Button>
+      </div>
+      {children}
+    </>
+  );
+}
+```
+
+ildren을 사용해 필요한 컴포넌트를 부모에서 작성하도록 하면 props을 일일이 전달해야하는 문제를 해결할 수 있다.
+
+'또, 불필요한 중간 추상화를 제거하여 의도를 명확하게 알 수 있다.
+
+하지만, 조합 패턴만으로는 해결되지 않는 경우도 있다.
+
+- ContextAPI활용
+
+```jsx
+function ItemEditModal({ open, onConfirm, onClose }) {
+  const [keyword, setKeyword] = useState("");
+
+  return (
+    <Modal open={open} onClose={onClose}>
+      <ItemEditBody onClose={onClose}>
+        <ItemEditList keyword={keyword} onConfirm={onConfirm} />
+      </ItemEditBody>
+    </Modal>
+  );
+}
+
+function ItemEditList({ children, onClose }) {
+  const { items, recommendedItems } = useItemEditModalContext();
+
+  return (
+    <>
+      <div style="display: flex; justify-content: space-between;">
+        <Input
+          value={keyword}
+          onChange={(e) => onKeywordChange(e.target.value)}
+        />
+        <Button onClick={onClose}>닫기</Button>
+      </div>
+      {children}
+    </>
+  );
+}
+```
+
+데이터의 흐름을 간소화 하고 계층 구조 전체에 쉽게 접근할 수 있다.
+
+# 마치며
+
+토스 코드 지침서를 읽으며 ‘좋은 코드’란 결국 미래의 나와 함께 일할 동료를 위한 배려이자, 끊임없는 고민의 결과라는 사실을 다시금 깨달았다.
+
+모든 습관을 한 번에 바꾸기는 어렵지만, 이번 경험을 계기로 조금씩 더 나은 방향으로 나아가야겠다.
+
+앞으로는 귀찮다는 이유로 넘어가지 않고, 더 나은 코드를 위한 고민을 습관처럼 이어가야겠다.
+
+결국 좋은 코드는 미래의 나와 동료를 위한 깊은 배려이자, 끊임없는 고민의 결과라는 것을 마음에 새겼다.
+
+## 참고 자료
+
+https://frontend-fundamentals.com/
