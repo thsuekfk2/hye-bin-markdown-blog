@@ -4,22 +4,22 @@ import { MetadataRoute } from "next";
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes: MetadataRoute.Sitemap = ["", "/posts", "/log"].map((route) => ({
     url: `${process.env.NEXT_PUBLIC_BASE_URL}${route}`,
-    changefreq: "daily",
+    changefreq: "daily" as const,
     priority: 0.7,
     lastModified: new Date(),
   }));
 
   const posts: MetadataRoute.Sitemap = allPosts.map((post) => ({
-    url: `${process.env.NEXT_PUBLIC_BASE_URL}/post/${post.title}`,
-    changefreq: "daily",
-    priority: 0.7,
+    url: `${process.env.NEXT_PUBLIC_BASE_URL}/post/${encodeURIComponent(post.title)}`,
+    changefreq: "weekly" as const,
+    priority: 0.8,
     lastModified: new Date(post.date),
   }));
 
   const logs: MetadataRoute.Sitemap = allLogs.map((log) => ({
-    url: `${process.env.NEXT_PUBLIC_BASE_URL}/log/${log._raw.sourceFileName.split(".")[0]}`,
-    changefreq: "daily",
-    priority: 0.7,
+    url: `${process.env.NEXT_PUBLIC_BASE_URL}/log/${log._raw.flattenedPath}`,
+    changefreq: "weekly" as const,
+    priority: 0.6,
     lastModified: new Date(log.date),
   }));
 
