@@ -27,7 +27,7 @@ export const Card = ({
           <Image
             width={300}
             height={250}
-            alt="Picture of the author"
+            alt="점프하는 공룡"
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg==" // 추가
             src={thumbnail}

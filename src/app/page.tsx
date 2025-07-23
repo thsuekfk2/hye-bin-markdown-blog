@@ -6,11 +6,11 @@ export default function Home() {
     <div className="h-full w-full items-center justify-center text-center">
       <div className="flex flex-col">
         <Image
-          src="/jump.gif"
+          src="/jump.webp"
           width={850}
           height={300}
           className="max-md:hidden"
-          alt="Picture of the author"
+          alt="점프하는 공룡"
           placeholder="blur"
           blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg==" // 추가
         />

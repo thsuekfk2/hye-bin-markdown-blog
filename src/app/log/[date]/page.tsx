@@ -17,7 +17,7 @@ export const generateMetadata = ({ params }: { params: { date: string } }) => {
   const defaultDescription = "이혜빈의 개발블로그";
   const description = post?.description || defaultDescription;
   const title = post?.title || "블로그 제목";
-  const imageUrl = post?.thumbnail ?? "jump.gif";
+  const imageUrl = post?.thumbnail ?? "jump.webp";
 
   return {
     title: title,
