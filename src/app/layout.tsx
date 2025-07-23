@@ -8,7 +8,25 @@ import { Analytics } from "@/components/Analytics";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "HyeBin's",
+  title: "이혜빈 | 프론트엔드 개발자",
+  description: "프론트엔드 개발자 이혜빈의 기술 블로그입니다. ",
+  keywords: [
+    "프론트엔드",
+    "개발자",
+    "React",
+    "Next.js",
+    "TypeScript",
+    "이혜빈",
+  ],
+  authors: [{ name: "이혜빈" }],
+  openGraph: {
+    title: "이혜빈 | 프론트엔드 개발자",
+    description: "프론트엔드 개발자의 기술 블로그",
+    url: "https://www.hyebin.me",
+    siteName: "HyeBin's Blog",
+    locale: "ko_KR",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -17,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body className={inter.className}>
         <div className="h-full bg-[#222222] text-[#F9FAFB]">
           <div className="flex h-[8%] justify-center">
@@ -25,7 +43,7 @@ export default function RootLayout({
               <Analytics />
               <Link href="/">
                 <div className="flex items-center gap-2">
-                  <Image src="/cat.png" alt="" width={20} height={20} />
+                  <Image src="/cat.png" alt="고양이" width={20} height={20} />
                   <span className="transition-all delay-75 hover:underline">
                     hyebin
                   </span>

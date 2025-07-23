@@ -60,8 +60,41 @@ export default async function Page({ params }: { params: { title: string } }) {
   const postName = Number(post._raw.sourceFileName.split(".")[0]);
   const postIndex = postName - 1;
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.description,
+    "datePublished": post.date,
+    "dateModified": post.date,
+    "author": {
+      "@type": "Person",
+      "name": "이혜빈",
+      "url": "https://www.hyebin.me"
+    },
+    "publisher": {
+      "@type": "Person", 
+      "name": "이혜빈",
+      "url": "https://www.hyebin.me"
+    },
+    "url": `${process.env.NEXT_PUBLIC_BASE_URL}/post/${params.title}`,
+    "image": post.thumbnail,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `${process.env.NEXT_PUBLIC_BASE_URL}/post/${params.title}`
+    },
+    "inLanguage": "ko"
+  };
+
   return (
-    <div className="ml-3 mr-3 flex w-full flex-col">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData)
+        }}
+      />
+      <div className="ml-3 mr-3 flex w-full flex-col">
       <div>
         <div className="mb-[50px] mt-[40px] text-center font-bold">
           <div className="text-[36px]">{post.title}</div>
@@ -84,5 +117,6 @@ export default async function Page({ params }: { params: { title: string } }) {
         <Giscus />
       </div>
     </div>
+    </>
   );
 }
