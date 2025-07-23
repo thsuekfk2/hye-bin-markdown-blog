@@ -14,6 +14,7 @@ export const Post = defineDocumentType(() => ({
   fields: {
     date: { type: "date", required: true },
     title: { type: "string", required: true },
+    slug: { type: "string", required: true },
     description: { type: "string", required: true },
     thumbnail: { type: "string", required: true },
     tags: { type: "list", of: { type: "string" } },
@@ -36,6 +37,7 @@ const Log = defineDocumentType(() => ({
       description: "The title of the post",
       required: true,
     },
+    slug: { type: "string", required: false },
     description: { type: "string" },
     date: {
       type: "date",

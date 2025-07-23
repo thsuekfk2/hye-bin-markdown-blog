@@ -35,7 +35,7 @@ export default function page() {
           {currentLogs.map((post, key) => (
             <Card
               key={key}
-              href={`post/${post._raw.sourceFileName.split(".")[0]}`}
+              href={`post/${post.slug}`}
               thumbnail={post.thumbnail ?? ""}
               description={post.description}
               title={post.title}

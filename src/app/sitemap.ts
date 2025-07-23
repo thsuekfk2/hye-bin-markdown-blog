@@ -10,7 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   const posts: MetadataRoute.Sitemap = allPosts.map((post) => ({
-    url: `${process.env.NEXT_PUBLIC_BASE_URL}/post/${encodeURIComponent(post.title)}`,
+    url: `${process.env.NEXT_PUBLIC_BASE_URL}/post/${post.slug}`,
     changefreq: "weekly" as const,
     priority: 0.8,
     lastModified: new Date(post.date),

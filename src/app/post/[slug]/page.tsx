@@ -6,12 +6,12 @@ import { Toc } from "@/components/Toc";
 import { PrevNextPagination } from "@/components/PrevNextPagination";
 
 export const generateStaticParams = async () => {
-  return allPosts.map((post: Post) => ({ slug: post._raw.flattenedPath }));
+  return allPosts.map((post: Post) => ({ slug: post.slug }));
 };
 
-export const generateMetadata = ({ params }: { params: { title: string } }) => {
+export const generateMetadata = ({ params }: { params: { slug: string } }) => {
   const post = allPosts.find(
-    (post: Post) => post._raw.sourceFileName === params.title + ".mdx",
+    (post: Post) => post.slug === params.slug,
   );
 
   const defaultDescription = "이혜빈의 개발블로그";
@@ -27,7 +27,7 @@ export const generateMetadata = ({ params }: { params: { title: string } }) => {
       description: description,
       type: "website",
       locale: "ko",
-      url: `${process.env.NEXT_PUBLIC_BASE_URL}/post/${params.title}`,
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/post/${params.slug}`,
       images: [
         {
           width: 1200,
@@ -45,9 +45,9 @@ export const generateMetadata = ({ params }: { params: { title: string } }) => {
   };
 };
 
-export default async function Page({ params }: { params: { title: string } }) {
+export default async function Page({ params }: { params: { slug: string } }) {
   const post = allPosts.find(
-    (post) => post._raw.sourceFileName === params.title + ".mdx",
+    (post) => post.slug === params.slug,
   );
   let MDXContent;
 
@@ -77,11 +77,11 @@ export default async function Page({ params }: { params: { title: string } }) {
       "name": "이혜빈",
       "url": "https://www.hyebin.me"
     },
-    "url": `${process.env.NEXT_PUBLIC_BASE_URL}/post/${params.title}`,
+    "url": `${process.env.NEXT_PUBLIC_BASE_URL}/post/${params.slug}`,
     "image": post.thumbnail,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `${process.env.NEXT_PUBLIC_BASE_URL}/post/${params.title}`
+      "@id": `${process.env.NEXT_PUBLIC_BASE_URL}/post/${params.slug}`
     },
     "inLanguage": "ko"
   };
