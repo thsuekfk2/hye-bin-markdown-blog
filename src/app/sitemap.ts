@@ -17,7 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   const logs: MetadataRoute.Sitemap = allLogs.map((log) => ({
-    url: `${process.env.NEXT_PUBLIC_BASE_URL}/log/${log._raw.flattenedPath}`,
+    url: `${process.env.NEXT_PUBLIC_BASE_URL}/log/${log._raw.sourceFileName.replace('.mdx', '')}`,
     changefreq: "weekly" as const,
     priority: 0.6,
     lastModified: new Date(log.date),
