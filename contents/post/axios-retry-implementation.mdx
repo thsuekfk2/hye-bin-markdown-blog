@@ -1,9 +1,11 @@
 ---
 title: "axios-retry"
 slug: "axios-retry-implementation"
-date: 2024-01-20
+date: "2024-01-20T00:00:00.000+00:00"
 description: "웹 서비스에서는 다양한 이유로 인해 HTTP 요청이 실패할 수 있다. axios-retry로 재시도 로직을 구현해보자."
-thumbnail: "/post/4/cover.png"
+thumbnail: "https://www.hyebin.me/post/4/cover.png"
+tags: []
+lastEditedTime: 2025-07-25T06:16:00.000Z
 ---
 
 서비스를 운영하면서 예상치 못한 네트워크 에러로 인해 데이터가 업로드되지 않는 상황이 발생하였다. 사용자가 서비스를 이용하는 도중에 발생하는 에러는 사용자 경험에 직접적인 영향을 미치며, 심지어 서비스의 신뢰성에도 영향을 미칠 수 있다. 그렇기 때문에 이번 사건을 발판으로 에러 처리에 중요성을 다시금 느끼며 공부한 내용을 기록하기로 마음먹었다.
@@ -20,7 +22,7 @@ thumbnail: "/post/4/cover.png"
 
 처음엔 무작정 재 요청을 하는 코드를 짰다. retries변수로 에러 시 retries를 증가시켰다. 그리고 1초 후 재 요청을 보냈다. 하지만 보기만 해도 코드는 복잡하고 지저분했다.
 
-```jsx
+```javascript
 .catch((error) => {
     if (
       error.message === "Network Error" ||
@@ -53,11 +55,12 @@ thumbnail: "/post/4/cover.png"
 ## 방법 2. axios-retry
 
 다른 방법을 찾아보다가 axios-retry라는 라이브러리를 발견하였다.
+
 `axios-retry`는 Axios 라이브러리와 함께 사용되는 HTTP 요청 재시도를 구현하기 위한 라이브러리로, 네트워크 오류 또는 일시적인 서버 문제와 같은 상황에서 자동으로 HTTP 요청을 다시 시도할 수 있도록 도와준다.
 
 ### 설치하기
 
-```jsx
+```javascript
 npm install axios-retry
 ```
 
@@ -65,7 +68,7 @@ npm install axios-retry
 
 [공식 홈페이지](https://www.npmjs.com/package/axios-retry)에 나와있는 방법을 일단 따라해봤다.
 
-```jsx
+```javascript
 import axiosRetry from "axios-retry";
 
 const client = axios.create({ baseURL: "http://example.com" });
@@ -80,7 +83,7 @@ client.get("/test").then((result) => {
 
 내가 실수한게 있나 검색을 해보니 실패한 모든 요청에 대해서 재시도 조건을 다음과 같이 지정해야했다.
 
-```jsx
+```javascript
 axiosRetry(axios, {
   retries: 3,
   retryCondition: () => true,
@@ -97,8 +100,8 @@ axios-retry는 기본적으로 5xx 오류에 대해 재시도하고 다른 오�
 
 코드는 훨씬 보기 좋고 깔끔해졌다.
 
-```jsx
- import axiosRetry from 'axios-retry';
+```javascript
+import axiosRetry from 'axios-retry';
 
 	const retryInterval = 3000;
   const accessToken = sessionStorage.getItem("token");
@@ -138,12 +141,15 @@ axios-retry는 기본적으로 5xx 오류에 대해 재시도하고 다른 오�
 - 예측 불가능한 예외
 
   - 에러와 같은 수준의 레벨.     ex) 버그, 시스템의 메모리 문제 .. 등
+
   - 시스템 환경에서 개선해야 한다.
 
 ## 예외에 대한 생각 정리
 
 프로그램 설계는 참 중요하다. 무작정 개발만 하는 것이 아닌 수많은 예외 상황을 고려하며 설계해야한다. 하지만 예외 상황을 다 예측하기에는 너무 힘든게 사실이다. 회사를 다니면서 기획의 중요성을 참 많이 느꼈다. 기획이 계속 틀어지면서 처음 설계한 프로그램이 꼬이기 시작하고, 그로 인해 없었던 사이드 이펙트 까지 생겨나게 되버린것이다. 하지만 그런 기획까지 예측하며, 잘게 쪼개고 나누는 것이 개발자의 몫인건가.🤔 참 어려운 것 같다. (이런 문제가 많아서 아토믹이 생겨난 것 같기도 하다)
+
 예외 상황은 빈번하게 발생한다. 하지만 예외 상황이 발생한 것 보다 이를 보완하며 고쳐나가는 자세가 더 중요한 것 같다. 분명 작은 예외를 무시할 경우 더 큰 예외 상황이 될 것이다.
+
 예외에 대해 생각하고 또 생각하자.
 
 ## 참고
@@ -151,5 +157,7 @@ axios-retry는 기본적으로 5xx 오류에 대해 재시도하고 다른 오�
 - [https://geshan.com.np/blog/2023/09/axios-retry/](https://geshan.com.np/blog/2023/09/axios-retry/)
 - [https://www.npmjs.com/package/axios-retry](https://www.npmjs.com/package/axios-retry)
 - [https://stackoverflow.com/questions/71851609/axios-retry-not-working-as-expected-what-is-wrong-with-my-config
+
   ](https://stackoverflow.com/questions/71851609/axios-retry-not-working-as-expected-what-is-wrong-with-my-config)
+
 - [https://swiftymind.tistory.com/1](https://swiftymind.tistory.com/1)

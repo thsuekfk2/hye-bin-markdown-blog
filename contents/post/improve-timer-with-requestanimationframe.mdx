@@ -1,9 +1,11 @@
 ---
 title: "requestAnimationFrame으로 타이머 개선"
 slug: "improve-timer-with-requestanimationframe"
-date: 2023-11-04
+date: "2023-11-04T00:00:00.000+00:00"
 description: "내가 하고있는 프로젝트는 타이머가 굉장히 중요하다..! 0초라는 타이밍에 많은 로직과 api 전송이 이뤄지는데 타이머가 느려지는 이슈가 있었다. 근데 이해가 안가는 것은 타이머는 버벅거리는데 왜 CSS animation은 정말 잘 움직이는 걸까?"
-thumbnail: "/post/2/cover.png"
+thumbnail: "https://www.hyebin.me/post/2/cover.png"
+tags: []
+lastEditedTime: 2025-07-25T06:17:00.000Z
 ---
 
 내가 하고있는 프로젝트는 타이머가 굉장히 중요하다..! 0초라는 타이밍에 많은 로직과 api 전송이 이뤄지는데 타이머가 느려지는 이슈가 있었다. 🤔 근데 이해가 안가는 것은 타이머는 버벅거리는데 왜 CSS animation은 정말 잘 움직이는 걸까? .. why..
@@ -54,7 +56,7 @@ setInterval에서는 준비가 되지 않아도 페인팅을 요청하는 것과
 
 ## requestAnimationFrame을 활용한 타이머 코드 작성하기
 
-```jsx
+```javascript
 const timerIdRef = useRef();
 const [countdownSeconds, setCountdownSeconds] = useState();
 

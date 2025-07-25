@@ -1,9 +1,11 @@
 ---
 title: "새로고침을 했는데 영상이 통째로 사라졌어요"
 slug: "video-recovery-problem-solving"
-date: 2025-03-02
+date: "2025-03-02T00:00:00.000+00:00"
 description: "이 문제는 저에게 항상 골칫거리였습니다. 녹화 중에 새로고침을 하거나 캠 연결이 끊기면, 촬영한 영상이 그대로 사라지는 문제가 있었습니다. 통째로 사라지게 된 영상으로 중요한 기록이 남아 있지 않게 되었다면, 사용자의 PC문제일지라도 개발자의 잘못이라고 생각합니다. 이를 해결하기 위해 여러 방안을 고민해왔습니다"
-thumbnail: "/post/10/cam.webp"
+thumbnail: "https://www.hyebin.me/post/10/cam.webp"
+tags: []
+lastEditedTime: 2025-07-25T06:17:00.000Z
 ---
 
 “녹화 중 새로고침을 하니 영상이 통째로 사라졌어요”
@@ -35,10 +37,15 @@ thumbnail: "/post/10/cam.webp"
 예를 들어 1초에 30장의 사진이 재생되면 자연스러운 영상이 됩니다.
 
 > [!note] 🚀 FPS
+
 > FPS는 Frames Per Second으로 초당 프레임 수를 나타냅니다.
+
 >
+
 > - 1초에 30장의 사진이 재생되면 30 FPS라고 합니다.
+
 > - 24~30 FPS → 일반적인 영화, 방송 콘텐츠
+
 > - 60 FPS 이상 → 게임, 스포츠 영상, 실시간 스트리밍
 
 ## 코덱
@@ -105,13 +112,21 @@ thumbnail: "/post/10/cam.webp"
 현재 녹화 방식은 특정 이벤트가 발생하면 녹화를 시작하고, 중지 되면서 저장되는 구조입니다.
 
 1. 녹화 시작 (트리거 발생)
+
    - 사용자의 특정 이벤트가 발생하면 녹화가 시작됨
+
    - MediaRecorder API 또는 RecordRTC 등을 이용해 웹캠 스트림을 녹화
-2. 녹화 진행
+
+1. 녹화 진행
+
    - 비디오 데이터를 실시간으로 인코딩 (보통 WebM, MP4 포맷 사용)
+
    - 일반적으로 녹화가 끝날 때까지 메모리에 임시 저장됨
-3. 녹화 중지 & 저장
+
+1. 녹화 중지 & 저장
+
    - 사용자가 녹화 중지 버튼을 클릭하거나 트리거에 의해 최종적으로 파일이 생성됨
+
    - 브라우저에서 Blob 객체로 데이터를 변환하여 서버 업로드 방식
 
 ### 현재 방식에서 개선 방안 고민
@@ -137,10 +152,15 @@ thumbnail: "/post/10/cam.webp"
 비디오 데이터 저장을 위해 단순하게 `Base64`로 변환하여 저장한다면 된다고 생각했어요. 하지만 `Base64 저장방식`은 적절하지 못했고, 이로 인해 발생할 수 있는 오류들이 있었습니다.
 
 1. atob() 디코딩 에러 (Base64 → 바이너리 변환 문제)
+
    - Base64로 데이터를 저장하면 텍스트 문자열로 변환되기 때문에, 재사용하기 위해서는 디코딩 과정이 필요합니다. (이는 속도 저하의 원인이 됩니다.)
+
    - Base64는 문자열이 깨지면 원본 데이터를 복원할 수 없습니다.
+
    - 스토리지에서 저장한 후 불러올 때, 일부 문자열이 잘리거나 변형되면 atob() 디코딩 오류 발생하게 됩니다.
-2. Base64 변환으로 인한 파일 크기 증가 문제
+
+1. Base64 변환으로 인한 파일 크기 증가 문제
+
    - Base64는 파일 크기를 약 33% 증가시켜 대용량 비디오 데이터 저장 시 비효율적입니다.
 
 이러한 문제들은 `Base64` 대신 `ArrayBuffer 사용`하여 해결하였습니다.
@@ -150,15 +170,18 @@ ArrayBuffer를 저장하면, 불필요한 디코딩 과정 없이 바로 Blob으
 ### Base64 vs ArrayBuffer
 
 | 저장 방식   | 저장 형태                     | 장점                             | 단점                                  |
+
 | ----------- | ----------------------------- | -------------------------------- | ------------------------------------- |
+
 | Base64      | 문자열                        | 텍스트 기반 → 어디서나 사용 가능 | 변환 과정에서 파일 크기가 약 33% 증가 |
+
 | ArrayBuffer | 바이너리 데이터 (바이트 배열) | 원본 크기를 유지 → 용량 최적화   | 문자열처럼 다루기 어려움              |
 
 ### ArrayBuffer란?
 
 `ArrayBuffer`는 고정된 크기의 바이너리 데이터 버퍼를 저장하는 객체입니다. 즉, 데이터를 숫자 배열처럼 저장하는 방법입니다. 데이터를 숫자 배열(0과 1의 조합)처럼 다룰 수 있어 파일을 직접 조작하거나, 숫자로 변환해야 할 때 사용됩니다. 따라서 파일처럼 바로 사용은 어렵고, 변환 과정이 필요합니다.
 
-```jsx
+```javascript
 let buffer = new ArrayBuffer(8); // 8바이트 크기의 빈 메모리 공간 생성
 let view = new Uint8Array(buffer); // 숫자로 조작 가능하도록 변환
 view[0] = 255; // 첫 번째 바이트에 255 저장
@@ -169,7 +192,7 @@ console.log(view); // Uint8Array(8) [255, 0, 0, 0, 0, 0, 0, 0]
 
 `Blob`은 데이터를 파일처럼 저장하는 방식으로 데이터를 즉시 다운로드하거나, 비디오/이미지로 재생할 때 사용합니다.  파일처럼 URL을 생성해서 다운로드하거나, 비디오 재생 가능하며, 메모리에 직접 올리지 않고, 브라우저에서 저장 가능합니다.
 
-```jsx
+```javascript
 let blob = new Blob(["Hello, Blob!"], { type: "text/plain" }); // 텍스트 데이터를 Blob으로 저장
 let link = document.createElement("a");
 link.href = URL.createObjectURL(blob); // Blob을 URL로 변환
@@ -183,7 +206,7 @@ document.body.removeChild(link);
 
 ArrayBuffer → Blob 변환 (비디오 저장 시 유용!)
 
-```jsx
+```javascript
 const arrayBufferToBlob = (buffer, mimeType = "video/webm") => {
   return new Blob([buffer], { type: mimeType });
 };
@@ -191,7 +214,7 @@ const arrayBufferToBlob = (buffer, mimeType = "video/webm") => {
 
 Blob → ArrayBuffer 변환 (파일 데이터를 메모리에서 조작할 때)
 
-```jsx
+```javascript
 const blobToArrayBuffer = async (blob) => {
   return await blob.arrayBuffer();
 };
@@ -205,7 +228,7 @@ const blobToArrayBuffer = async (blob) => {
 
 RecordRTC를 사용하여 녹화 데이터를 10초마다 자동으로 저장
 
-```jsx
+```javascript
 recorder = new RecordRTC(mediaStream, {
   type: "video",
   mimeType: "video/webm",
@@ -216,7 +239,7 @@ recorder = new RecordRTC(mediaStream, {
 
 녹화 데이터를 조각 단위로 세션 스토리지에 저장
 
-```jsx
+```javascript
 const saveChunkToStorage = async (blob) => {
   const reader = new FileReader();
   reader.readAsArrayBuffer(blob);
@@ -230,7 +253,7 @@ const saveChunkToStorage = async (blob) => {
 
 녹화된 조각을 합쳐서 하나의 영상으로 변환 후 재생
 
-```jsx
+```javascript
 const playRestoredVideo = () => {
   const storedData = JSON.parse(
     sessionStorage.getItem("recordedChunks") || "[]",
@@ -254,7 +277,7 @@ const playRestoredVideo = () => {
 
 ArrayBuffer → Blob 변환
 
-```jsx
+```javascript
 const arrayBufferToBlob = (buffer) => {
   return new Blob([buffer], { type: "video/webm" });
 };
@@ -268,7 +291,7 @@ const arrayBufferToBlob = (buffer) => {
 
 하지만 세션 스토리지는 브라우저를 닫으면 데이터가 삭제되는 점과, 한정된 용량으로 대용량 비디오 데이터를 저장하는데는 적합하지 않았습니다.
 
-```jsx
+```javascript
 Uncaught QuotaExceededError: Failed to execute 'setItem' on 'Storage': Setting the value of 'recordedChunks' exceeded the quota. at reader.onloadend
 ```
 
@@ -287,7 +310,7 @@ Uncaught QuotaExceededError: Failed to execute 'setItem' on 'Storage': Setting t
 
 녹화 조각을 IndexedDB에 저장
 
-```jsx
+```javascript
 const saveChunkToIndexedDB = (blob) => {
   const reader = new FileReader();
   reader.readAsArrayBuffer(blob);
@@ -300,7 +323,7 @@ const saveChunkToIndexedDB = (blob) => {
 
 저장된 녹화 데이터를 합쳐서 재생
 
-```jsx
+```javascript
 const playRestoredVideo = () => {
   const transaction = db.transaction(["chunks"], "readonly");
   const request = transaction.objectStore("chunks").getAll();
@@ -316,7 +339,7 @@ const playRestoredVideo = () => {
 
 IndexedDB 데이터 삭제 (초기화)
 
-```jsx
+```javascript
 const clearIndexedDB = () => {
   db.transaction(["chunks"], "readwrite").objectStore("chunks").clear();
 };
@@ -324,7 +347,7 @@ const clearIndexedDB = () => {
 
 ArrayBuffer → Blob 변환
 
-```jsx
+```javascript
 const arrayBufferToBlob = (buffer) =>
   new Blob([buffer], { type: "video/webm" });
 ```

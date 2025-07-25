@@ -1,9 +1,11 @@
 ---
 title: "리액트로 chrome extension 만들기 (setting)"
 slug: "react-chrome-extension-setup"
-date: 2024-02-04
+date: "2024-02-04T00:00:00.000+00:00"
 description: "chrome extension을 만들어 보자!"
-thumbnail: "/post/5/cover.png"
+thumbnail: "https://www.hyebin.me/post/5/cover.png"
+tags: []
+lastEditedTime: 2025-07-25T06:17:00.000Z
 ---
 
 ## 개발 동기
@@ -33,7 +35,7 @@ npm i @crxjs/vite-plugin@beta -D
 
 CRXJS 라이브러리를 적용시켜준다.
 
-```jsx
+```javascript
 // vite.config.js
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
@@ -116,7 +118,7 @@ CRXJS를 이용하면 매니페스트를 Vite 구성으로 가져오기 때문�
 
 나는 manifest.json을 manifest.config.ts로 다음과 같이 만들었다.
 
-```jsx
+```javascript
 import { defineManifest } from "@crxjs/vite-plugin";
 
 import packageJson from "./package.json";
@@ -166,7 +168,7 @@ export default defineManifest(async (env) => ({
 
 그리고 vite.config.ts 도 수정해주었다.
 
-```jsx
+```javascript
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { crx } from "@crxjs/vite-plugin";
