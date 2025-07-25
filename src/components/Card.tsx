@@ -14,7 +14,7 @@ export const Card = ({
   title: string;
 }) => {
   return (
-    <div className="flex w-[80%] flex-col sm:w-[300px]">
+    <div className="flex w-[80%] h-[260px] flex-col sm:w-[300px]">
       <Link
         href={href}
         className="flex flex-col text-xs text-transparent hover:text-white"
@@ -35,7 +35,7 @@ export const Card = ({
           />
         </div>
       </Link>
-      <span className="text-sm font-thin">{title}</span>
+      <span className="text-sm font-thin mt-2 line-clamp-2 h-[40px] overflow-hidden">{title}</span>
     </div>
   );
 };

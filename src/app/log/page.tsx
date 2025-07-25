@@ -31,8 +31,8 @@ export default function LogsPage() {
         <div>TIL</div>
         <div className="text-xs">* Today I Learned.</div>
       </header>
-      <div className="flex h-[70vh] max-h-[800px] w-full flex-col justify-between">
-        <div className="flex min-h-[500px] w-full flex-col">
+      <div className="flex min-h-[calc(100vh-200px)] sm:h-[calc(100vh-200px)] w-full flex-col">
+        <div className="flex flex-1 sm:h-[calc(100%-80px)] w-full flex-col overflow-y-auto">
           {currentLogs.map((post, idx) => (
             <ListItem
               key={idx}
@@ -41,11 +41,13 @@ export default function LogsPage() {
             />
           ))}
         </div>
-        <Pagination
-          route="log"
-          pageCount={pageCount}
-          currentPage={currentPage}
-        />
+        <div className="flex h-[80px] items-center justify-center flex-shrink-0">
+          <Pagination
+            route="log"
+            pageCount={pageCount}
+            currentPage={currentPage}
+          />
+        </div>
       </div>
     </div>
   );

@@ -30,8 +30,8 @@ export default function page() {
       <div className="flex flex-col justify-center pb-10 text-center">
         <div>기록</div>
       </div>
-      <div className="flex h-[70vh] max-h-[800px] flex-col justify-between">
-        <div className="flex min-h-[500px] flex-wrap justify-center gap-6">
+      <div className="flex min-h-[calc(100vh-200px)] sm:h-[calc(100vh-200px)] flex-col">
+        <div className="flex flex-1 sm:h-[calc(100%-80px)] flex-wrap justify-center gap-6 content-start overflow-y-auto">
           {currentLogs.map((post, key) => (
             <Card
               key={key}
@@ -42,11 +42,13 @@ export default function page() {
             />
           ))}
         </div>
-        <Pagination
-          route="post"
-          pageCount={pageCount}
-          currentPage={currentPage}
-        />
+        <div className="flex h-[80px] items-center justify-center flex-shrink-0">
+          <Pagination
+            route="post"
+            pageCount={pageCount}
+            currentPage={currentPage}
+          />
+        </div>
       </div>
     </div>
   );
