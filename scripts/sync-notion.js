@@ -37,10 +37,33 @@ const n2m = new NotionToMarkdown({
 const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 // 콘텐츠 디렉토리 경로
 const CONTENTS_DIR = path.join(process.cwd(), "contents");
+// 해시 캐시 파일 경로
+const HASH_CACHE_FILE = path.join(process.cwd(), ".sync-cache.json");
+
+// 해시 캐시 로드
+function loadHashCache() {
+  if (fs.existsSync(HASH_CACHE_FILE)) {
+    try {
+      return JSON.parse(fs.readFileSync(HASH_CACHE_FILE, "utf8"));
+    } catch (error) {
+      console.warn("해시 캐시 파일 로드 실패, 새로 생성합니다.");
+      return {};
+    }
+  }
+  return {};
+}
+
+// 해시 캐시 저장
+function saveHashCache(cache) {
+  fs.writeFileSync(HASH_CACHE_FILE, JSON.stringify(cache, null, 2));
+}
 
 async function syncNotionToMDX() {
   try {
     console.log("🚀 노션에서 데이터를 가져오는 중...");
+
+    // 해시 캐시 로드
+    const hashCache = loadHashCache();
 
     // 노션 데이터베이스에서 모든 글 가져오기 (테스트용)
     const response = await notion.databases.query({
@@ -56,8 +79,11 @@ async function syncNotionToMDX() {
     console.log(`📝 ${response.results.length}개의 글을 찾았습니다.`);
 
     for (const page of response.results) {
-      await processPage(page);
+      await processPage(page, hashCache);
     }
+
+    // 해시 캐시 저장
+    saveHashCache(hashCache);
 
     console.log("동기화가 완료되었습니다!");
   } catch (error) {
@@ -65,7 +91,7 @@ async function syncNotionToMDX() {
   }
 }
 
-async function processPage(page) {
+async function processPage(page, hashCache) {
   try {
     // 페이지 속성 추출
     const properties = page.properties;
@@ -131,17 +157,41 @@ async function processPage(page) {
       .update(mdxContent)
       .digest("hex");
 
-    // 기존 파일이 있으면 내용 비교
+    // 캐시된 해시와 비교 (파일이 존재하는 경우)
     if (fs.existsSync(filePath)) {
-      const existingContent = fs.readFileSync(filePath, "utf8");
-      const existingContentHash = crypto
-        .createHash("md5")
-        .update(existingContent)
-        .digest("hex");
-
-      if (existingContentHash === newContentHash) {
+      const fileStats = fs.statSync(filePath);
+      const cacheKey = filePath;
+      const cachedData = hashCache[cacheKey];
+      
+      // 캐시 데이터 구조: { hash, size, mtime }
+      const newSize = Buffer.byteLength(mdxContent, 'utf8');
+      
+      // 캐시된 데이터가 있고, 크기가 같고, 해시도 같으면 건너뛰기
+      if (cachedData && 
+          cachedData.size === newSize && 
+          cachedData.hash === newContentHash) {
         console.log(`⏭️  변경사항 없음: "${title}" - 건너뛰기`);
         return;
+      }
+      
+      // 캐시된 데이터가 없거나 크기가 다르면 파일을 읽어서 확인
+      if (!cachedData || cachedData.size !== newSize) {
+        const existingContent = fs.readFileSync(filePath, "utf8");
+        const existingContentHash = crypto
+          .createHash("md5")
+          .update(existingContent)
+          .digest("hex");
+
+        if (existingContentHash === newContentHash) {
+          console.log(`⏭️  변경사항 없음: "${title}" - 건너뛰기`);
+          // 캐시에 저장 (해시, 크기, 수정시간)
+          hashCache[cacheKey] = {
+            hash: newContentHash,
+            size: newSize,
+            mtime: fileStats.mtime.getTime()
+          };
+          return;
+        }
       }
     }
 
@@ -153,7 +203,16 @@ async function processPage(page) {
 
     // 파일 쓰기
     fs.writeFileSync(filePath, mdxContent, "utf8");
-    console.log(`업데이트됨: ${filePath}`);
+    
+    // 캐시에 새 데이터 저장
+    const fileStats = fs.statSync(filePath);
+    hashCache[filePath] = {
+      hash: newContentHash,
+      size: Buffer.byteLength(mdxContent, 'utf8'),
+      mtime: fileStats.mtime.getTime()
+    };
+    
+    console.log(`✅ 업데이트됨: ${filePath}`);
   } catch (error) {
     console.error(`페이지 처리 실패 (${page.id}):`, error);
   }
