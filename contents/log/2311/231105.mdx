@@ -5,7 +5,6 @@ date: "2023-11-05T00:00:00.000+00:00"
 description: "소프트웨어는 녹이 슨다"
 thumbnail: ""
 tags: []
-lastEditedTime: 2025-07-25T06:18:00.000Z
 ---
 
 ## 소프트웨어는 녹이 슨다.
@@ -23,7 +22,7 @@ lastEditedTime: 2025-07-25T06:18:00.000Z
 - `core-js`, `regenerator-runtime` 도 폴리필의 일종이다. 라이브러리를 보면 내부 코드가 어떻게 구현되어 있는지 찾아 볼 수 있다.
 - 코어 js는 개인 개발자가 만든 라이브러리인데 왕을 먹었다고 한다 ㅋㅋ
 
-```jsx
+```javascript
 //"forEach" 폴리필 작성
 if (!Array.prototype.forEach) {
   Array.prototype.forEach = function (callback, thisArg) {
@@ -49,7 +48,7 @@ numbers.forEach(function (number) {
 
 즉, 나만의 폴리필 언어를 구현할 수 있는것
 
-```jsx
+```javascript
 Array.prototype.map = function () {
   //나만의 폴리필 코드를 구현할 수 있다!!
 };

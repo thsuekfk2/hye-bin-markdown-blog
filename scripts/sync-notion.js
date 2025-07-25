@@ -2,6 +2,7 @@ const { Client } = require("@notionhq/client");
 const { NotionToMarkdown } = require("notion-to-md");
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 
 // 환경변수 수동 로드
 function loadEnv() {
@@ -86,8 +87,6 @@ async function processPage(page) {
       properties["Thumbnail"]?.files?.[0]?.file?.url ||
       properties["Thumbnail"]?.files?.[0]?.external?.url ||
       "";
-    const lastEditedTime = page.last_edited_time;
-
     // 필수 필드 확인
     if (!title || !slug || !date) {
       console.log(
@@ -100,27 +99,7 @@ async function processPage(page) {
     const mdblocks = await n2m.pageToMarkdown(page.id);
     const mdString = n2m.toMarkdownString(mdblocks);
 
-    // 파일 경로 결정
-    const filePath = getFilePath(category, slug, date);
-
-    // 기존 파일이 있는지 확인하고 수정 날짜 비교
-    if (fs.existsSync(filePath)) {
-      const existingContent = fs.readFileSync(filePath, "utf8");
-      const frontmatterMatch = existingContent.match(/^---\n([\s\S]*?)\n---/);
-
-      if (frontmatterMatch) {
-        const existingLastEdited = frontmatterMatch[1].match(
-          /lastEditedTime: "([^"]+)"/,
-        );
-
-        if (existingLastEdited && existingLastEdited[1] === lastEditedTime) {
-          console.log(`⏭️  변경사항 없음: "${title}" - 건너뛰기`);
-          return;
-        }
-      }
-    }
-
-    // frontmatter 생성 (lastEditedTime 포함)
+    // frontmatter 생성
     const frontmatter = createFrontmatter({
       title,
       slug,
@@ -128,12 +107,43 @@ async function processPage(page) {
       description,
       thumbnail,
       tags,
-      lastEditedTime,
     });
 
-    // 최종 MDX 내용
-    const cleanedMarkdown = mdString.parent.replace(/\n\n\n+/g, "\n\n").trim();
+    // 최종 MDX 내용 (불필요한 줄바꿈 제거)
+    let cleanedMarkdown = mdString.parent
+      // 3개 이상의 연속 줄바꿈을 2개로 줄임
+      .replace(/\n\n\n+/g, "\n\n")
+      // 테이블 행 사이의 불필요한 줄바꿈 제거
+      .replace(/\|\s*\n\s*\n\s*\|/g, "|\n|")
+      // 콜아웃 내부의 불필요한 줄바꿈 제거
+      .replace(/(> .*)\n\s*\n\s*(> )/g, "$1\n$2")
+      // 콜아웃과 다음 내용 사이의 과도한 줄바꿈 정리
+      .replace(/(> .*)\n\s*\n\s*\n+/g, "$1\n\n")
+      .trim();
     const mdxContent = `${frontmatter}\n\n${cleanedMarkdown}`;
+
+    // 파일 경로 결정
+    const filePath = getFilePath(category, slug, date);
+
+    // 새로운 내용의 해시 생성
+    const newContentHash = crypto
+      .createHash("md5")
+      .update(mdxContent)
+      .digest("hex");
+
+    // 기존 파일이 있으면 내용 비교
+    if (fs.existsSync(filePath)) {
+      const existingContent = fs.readFileSync(filePath, "utf8");
+      const existingContentHash = crypto
+        .createHash("md5")
+        .update(existingContent)
+        .digest("hex");
+
+      if (existingContentHash === newContentHash) {
+        console.log(`⏭️  변경사항 없음: "${title}" - 건너뛰기`);
+        return;
+      }
+    }
 
     // 디렉토리 생성
     const dir = path.dirname(filePath);
@@ -156,7 +166,6 @@ function createFrontmatter({
   description,
   thumbnail,
   tags,
-  lastEditedTime,
 }) {
   const tagList =
     tags.length > 0 ? tags.map((tag) => `"${tag}"`).join(", ") : "";
@@ -168,7 +177,6 @@ date: "${date}"
 description: "${description}"
 thumbnail: "${thumbnail}"
 tags: ${tags.length > 0 ? `[${tagList}]` : `[]`}
-lastEditedTime: ${lastEditedTime ? `${lastEditedTime}` : ""}
 ---`;
 }
 
