@@ -1,7 +1,11 @@
 ---
 title: "swcMinify build SyntaxError Error"
-date: 2023-10-18
+slug: "231018"
+date: "2023-10-18T00:00:00.000+00:00"
 description: "swcMinify build SyntaxError Error"
+thumbnail: ""
+tags: []
+lastEditedTime: 2025-07-25T06:17:00.000Z
 ---
 
 어제 수정한 코드를 vercel로 배포했는데 문제가 발생했다. 개발 환경에서는 전혀 문제가 없었는 배포 환경에서만 에러가 발생한 것 🤔
@@ -24,7 +28,7 @@ token 이라는 것은 프로그래밍에서 의미를 가지는 최소 단위�
 
 next.config.js에서 swcMinify를 false를 추가해주었다.
 
-```js
+```javascript
 const { withContentlayer } = require("next-contentlayer");
 
 module.exports = withContentlayer({

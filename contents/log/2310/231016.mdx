@@ -1,21 +1,28 @@
 ---
 title: "Calendar 날짜 선택 로직 추가 및 코드 리팩토링"
-date: 2023-10-16
+slug: "231016"
+date: "2023-10-16T00:00:00.000+00:00"
 description: "Calendar 날짜 선택 로직 추가 및 코드 리팩토링"
+thumbnail: ""
+tags: []
+lastEditedTime: 2025-07-25T06:17:00.000Z
 ---
 
 최근에 react-datepicker 라이브러리를 커스텀 하는 재미에 빠졌다.
+
 오늘은 로그를 쓰지 못한 날 날짜 선택 비활성화 기능을 추가하고 기존 Calendar 컴포넌트 리팩토링 작업을 했다.
 
 ## 달력 날짜 선택 로직
 
 react-datepicker 라이브러리의 filterDate를 사용하였다.
+
 이 기능은 사용자가 지정한 규칙에 따라 특정 날짜를 선택할 수 있으며 true, false 반환값을 가지기 때문에
+
 느낌표 두개(!!) 연산자로 확실한 논리결과를 리턴했다.
 
 필터 로직은 다음과 같이 구현하였다.
 
-```jsx
+```javascript
 const isLogAvailable = (date: Date) => {
   const formatDate = format(date, "yyMMdd");
   const isFindLog = allLogs.find(
@@ -28,7 +35,9 @@ const isLogAvailable = (date: Date) => {
 ## 😁 재미있는 리팩토링 하기
 
 기존 코드를 봤을 때 중복된 코드가 많았고, 내부 로직 함수 분리가 안되어 있어 가독성이 떨어졌었다.
+
 그리고 any 타입을 무분별하게 사용하여 타입에러를 다 숨겨놓는 수준이었다. 😵‍💫
+
 또 svg 아이콘이 이곳저곳.. 도저히 참을 수 없어 리팩토링 작업을 시작했다.
 
 1. 내부 로직 함수 분리
@@ -39,9 +48,10 @@ const isLogAvailable = (date: Date) => {
 ## 부끄러운 리팩토링 전 코드
 
 <details>
+
 <summary>😡</summary>
 
-```jsx
+```javascript
 "use client";
 
 import Link from "next/link";
@@ -89,7 +99,12 @@ export const Calendar = () => {
       maxDate={today}
       filterDate={(date) => {
         const formatDate = format(date, "yyMMdd");
-        const isFindLog = allLogs.find(
+```
+
+--- (continued) ---
+
+```javascript
+const isFindLog = allLogs.find(
           (log: any) => formatDate === format(new Date(log.date), "yyMMdd")
         );
         return !!isFindLog;
@@ -145,7 +160,13 @@ export const Calendar = () => {
         );
         if (!isFindLog) {
           return (
-            <div className="flex w-full h-full">
+            <div className="
+```
+
+--- (continued) ---
+
+```javascript
+flex w-full h-full">
               <div className="w-full h-full">{day}</div>
             </div>
           );
@@ -167,7 +188,7 @@ export const Calendar = () => {
 
 ## 리팩토링 완료 한 코드
 
-```jsx
+```javascript
 "use client";
 
 import Link from "next/link";
@@ -235,7 +256,13 @@ export const Calendar = () => {
       </div>
     );
   };
-  const renderDayContents = (day: number, date: Date) => {
+  const renderDayContents = (day: number, date: Date)
+```
+
+--- (continued) ---
+
+```javascript
+=> {
     const formatDate = format(date, "yyMMdd");
     const isFindLog = isLogAvailable(date);
     if (!isFindLog) {

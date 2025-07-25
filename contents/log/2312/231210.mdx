@@ -1,10 +1,15 @@
 ---
 title: "Next 13 Google Analytics 추적 코드 추가"
-date: 2023-12-10
+slug: "231210"
+date: "2023-12-10T00:00:00.000+00:00"
 description: "Google Analytics 추적 코드 추가하면서 기록하기"
+thumbnail: ""
+tags: []
+lastEditedTime: 2025-07-24T08:45:00.000Z
 ---
 
 블로그를 운영하면서 어떤 사람들이 어떻게 내 블로그에 들어오는지 궁금했다.
+
 그래서 사용자 행동 데이터를 추적하여 분석하는 도구 google analytics를 블로그에 심기로 결정했다.
 
 ## Google Analytics란 ?
@@ -20,19 +25,23 @@ Google Analytics 웹사이트(https://analytics.google.com) 가서 Google 계정
 계정은 사업자(업체)를 입력하면 된다. ex) 강남천하제일내과
 
 ![image](https://github.com/thsuekfk2/hye-bin-markdown-blog/assets/76821963/054cccba-2484-4baa-be21-92537250dd31)
+
 데이터 공유 설정은 모두 체크해주었다.
 
 ![image](https://github.com/thsuekfk2/hye-bin-markdown-blog/assets/76821963/5ae5b34a-85ee-4f98-b82e-8113a2c7f4ad)
+
 속성에서 사용 중인 도메인 ([gangnambestclinic.com](http://gangnambestclinic.com/)) 을 입력해준다.
 
 보고 시간대와 통화도 설정해준다.
 
 ![image](https://github.com/thsuekfk2/hye-bin-markdown-blog/assets/76821963/ef52de2c-e3d0-4211-a5a7-50a77d70771c)
+
 업체 카테고리 선택, 마땅한 카테고리가 없는 경우 "기타"로 선택해도 무방하다.
 
 그리고 비즈니스 목표 설정과 약관 동의까지 하면 완료된다.
 
 ![image](https://github.com/thsuekfk2/hye-bin-markdown-blog/assets/76821963/70d684ee-3459-411f-bbcd-300a60e9a6dc)
+
 계정과 속성이 생성되면 분석할 웹사이트를 연결한다. 연결할 웹사이트의 URL과 입력하고 이름을 만들어 준다.
 
 스트림 만들기 버튼을 클릭하면, 하단에 코드가 나타나는데 해당 코드 전체를 웹사이트/블로그 HTML의 헤드에 삽입하면 된다.
@@ -43,7 +52,7 @@ Next.js에서 GA를 사용하는 [공식 예시](https://github.com/vercel/next
 
 하지만 js로 작성되어 있어 ts에 호환되도록 추가 작업이 진행되어야 한다.
 
-```jsx
+```javascript
 yarn add -D @types/gtag.js
 ```
 
@@ -51,7 +60,7 @@ yarn add -D @types/gtag.js
 
 구글 애널리틱스 페이지에서 애널리틱스를 하나 만들고, 생성된 코드를 env에 입력한다.
 
-```jsx
+```javascript
 NEXT_PUBLIC_GOOGLE_ANALYTICS = G - 0000000000;
 ```
 
@@ -59,7 +68,7 @@ NEXT_PUBLIC_GOOGLE_ANALYTICS = G - 0000000000;
 
 gtag.ts 파일을 생성해서 아래와 같은 코드를 입력한다.
 
-```jsx
+```javascript
 export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 export const pageview = (url: URL) => {
@@ -92,8 +101,7 @@ _만약 'Window & typeof globalThis' 형식에 'gtag' 속성이 없습니다.ts(
 
 tsconfig.json
 
-```jsx
-
+```javascript
 {
   "compilerOptions": {
 		...
@@ -109,7 +117,7 @@ tsconfig.json
 
 Analytics라는 컴포넌트를 만들어주었다.
 
-```jsx
+```javascript
 import Script from "next/script";
 
 export const Analytics = () => {

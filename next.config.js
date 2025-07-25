@@ -7,6 +7,12 @@ module.exports = withContentlayer({
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: 'www.hyebin.me',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'prod-files-secure.s3.us-west-2.amazonaws.com',
         port: '',
         pathname: '/**',

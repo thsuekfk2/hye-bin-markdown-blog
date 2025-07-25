@@ -78,7 +78,6 @@ async function processPage(page) {
       "";
     const slug = properties["Slug"]?.rich_text?.[0]?.plain_text || "";
     const category = properties["Category"]?.select?.name || "post";
-    const status = properties["Status"]?.select?.name || "";
     const date = properties["Date"]?.date?.start || "";
     const description =
       properties["Description"]?.rich_text?.[0]?.plain_text || "";
@@ -87,6 +86,7 @@ async function processPage(page) {
       properties["Thumbnail"]?.files?.[0]?.file?.url ||
       properties["Thumbnail"]?.files?.[0]?.external?.url ||
       "";
+    const lastEditedTime = page.last_edited_time;
 
     // 필수 필드 확인
     if (!title || !slug || !date) {
@@ -100,7 +100,27 @@ async function processPage(page) {
     const mdblocks = await n2m.pageToMarkdown(page.id);
     const mdString = n2m.toMarkdownString(mdblocks);
 
-    // frontmatter 생성
+    // 파일 경로 결정
+    const filePath = getFilePath(category, slug, date);
+
+    // 기존 파일이 있는지 확인하고 수정 날짜 비교
+    if (fs.existsSync(filePath)) {
+      const existingContent = fs.readFileSync(filePath, "utf8");
+      const frontmatterMatch = existingContent.match(/^---\n([\s\S]*?)\n---/);
+
+      if (frontmatterMatch) {
+        const existingLastEdited = frontmatterMatch[1].match(
+          /lastEditedTime: "([^"]+)"/,
+        );
+
+        if (existingLastEdited && existingLastEdited[1] === lastEditedTime) {
+          console.log(`⏭️  변경사항 없음: "${title}" - 건너뛰기`);
+          return;
+        }
+      }
+    }
+
+    // frontmatter 생성 (lastEditedTime 포함)
     const frontmatter = createFrontmatter({
       title,
       slug,
@@ -108,13 +128,12 @@ async function processPage(page) {
       description,
       thumbnail,
       tags,
+      lastEditedTime,
     });
 
     // 최종 MDX 내용
-    const mdxContent = `${frontmatter}\n${mdString.parent}`;
-
-    // 파일 경로 결정
-    const filePath = getFilePath(category, slug, date);
+    const cleanedMarkdown = mdString.parent.replace(/\n\n\n+/g, "\n\n").trim();
+    const mdxContent = `${frontmatter}\n\n${cleanedMarkdown}`;
 
     // 디렉토리 생성
     const dir = path.dirname(filePath);
@@ -124,7 +143,7 @@ async function processPage(page) {
 
     // 파일 쓰기
     fs.writeFileSync(filePath, mdxContent, "utf8");
-    console.log(`저장됨: ${filePath}`);
+    console.log(`업데이트됨: ${filePath}`);
   } catch (error) {
     console.error(`페이지 처리 실패 (${page.id}):`, error);
   }
@@ -137,7 +156,7 @@ function createFrontmatter({
   description,
   thumbnail,
   tags,
-  category,
+  lastEditedTime,
 }) {
   const tagList =
     tags.length > 0 ? tags.map((tag) => `"${tag}"`).join(", ") : "";
@@ -148,7 +167,8 @@ slug: "${slug}"
 date: "${date}"
 description: "${description}"
 thumbnail: "${thumbnail}"
-${tags.length > 0 ? `tags: [${tagList}]` : ""}
+tags: ${tags.length > 0 ? `[${tagList}]` : `[]`}
+lastEditedTime: ${lastEditedTime ? `${lastEditedTime}` : ""}
 ---`;
 }
 

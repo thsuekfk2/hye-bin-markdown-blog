@@ -1,7 +1,11 @@
 ---
 title: "Table of Contents 생성하여 목차 구현"
-date: 2023-11-03
+slug: "231103"
+date: "2023-11-03T00:00:00.000+00:00"
 description: "Table of Contents 생성하여 목차 구현"
+thumbnail: ""
+tags: []
+lastEditedTime: 2025-07-25T06:18:00.000Z
 ---
 
 블로그의 기능 중 목차 기능을 꼭 만들어 보고 싶었다. 🚀
@@ -9,7 +13,6 @@ description: "Table of Contents 생성하여 목차 구현"
 ## 목차 기능 설명 ✨
 
 1. 페이지 내에 있는 `h2`와 `h3` 를 찾고, 스크롤 위치에 따라 현재 보이는 섹션의 제목을 강조하는 기능을 구현하였다.
-
 2. 이때 Intersection Observer API를 사용하였다.
 
 ## Intersection Observer?
@@ -28,7 +31,7 @@ description: "Table of Contents 생성하여 목차 구현"
 
 생성자는 2개의 인수(`callback`, `options`)를 가진다.
 
-```jsx
+```javascript
 const io = new IntersectionObserver(callback, options); // 관찰자 초기화
 io.observe(element); // 관찰하고자 하는 HTML 요소
 ```
@@ -39,7 +42,7 @@ io.observe(element); // 관찰하고자 하는 HTML 요소
 
 콜백은 2개의 인수(**`entries`**, **`observer`**)를 가집니다.
 
-```jsx
+```javascript
 const io = new IntersectionObserver((entries, observer) => {}, options);
 io.observe(element);
 ```
@@ -64,7 +67,7 @@ ex) TOP, RIGHT, BOTTOM, LEFT ( **`10px 0px 30px 0px`** )
 
 ### getIntersectionObserver 함수
 
-```jsx
+```javascript
 import { Dispatch, SetStateAction } from "react";
 
 const observerOptions = {
@@ -89,7 +92,7 @@ export const getIntersectionObserver = (
 
 ### Toc 컴포넌트
 
-```jsx
+```javascript
 "use client";
 
 import { getIntersectionObserver } from "@/utils/observer";
@@ -149,5 +152,7 @@ export const Toc = () => {
 ## Reference
 
 [https://heropy.blog/2019/10/27/intersection-observer/](https://heropy.blog/2019/10/27/intersection-observer/)
+
 [https://blog.hyeyoonjung.com/2019/01/09/intersectionobserver-tutorial/
+
 ](https://blog.hyeyoonjung.com/2019/01/09/intersectionobserver-tutorial/)

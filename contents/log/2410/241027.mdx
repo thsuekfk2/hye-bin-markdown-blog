@@ -1,8 +1,11 @@
 ---
 title: "리액트 컴파일러 등장"
-date: 2024-10-27
-thumbnail: "/log/2410/1.png"
+slug: "241027"
+date: "2024-10-27T00:00:00.000+00:00"
 description: "리액트 19 버전의 출시가 얼마 남지 않았습니다. 이번 업데이트에서 특히 주목받는 주제는 '리액트 컴파일러'인데요. 이 컴파일러는 이미 인스타그램의 서비스 환경에서 테스트되고 있으며, 앞으로 메타의 다른 서비스에도 확대될 예정입니다. 오픈 소스로도 공개 준비 중인 리액트 컴파일러가 무엇인지, 또 어떤 이점을 제공하는지 정리해 보았습니다."
+thumbnail: ""
+tags: []
+lastEditedTime: 2025-07-24T08:45:00.000Z
 ---
 
 ## 개요
@@ -25,22 +28,22 @@ description: "리액트 19 버전의 출시가 얼마 남지 않았습니다. �
 
 이 토큰들은 컴파일러에 의해 저장되어 이후 단계에서 사용됩니다.
 
-2. 구문분석
+1. 구문분석
 
 구문 분석 단계에서는 어휘 분석에서 만들어진 토큰을 모아 **코드의 구조를 이해할 수 있는 트리** 형태로 정리합니다. 이 트리 구조를 추상 구문 트리라고 부릅니다.
 
 예를 들어, 구문 분석기는 다음과 같은 구조를 만들어냅니다:
+
 ![구문 분석 트리](/log/2410/2.png)
 
-3. 의미분석
+1. 의미분석
 
 구문이 맞더라도 의미가 맞는지 분석하는 단계입니다.
 
 - 변수가 선언된 이후에 사용되는지
 - 변수 타입이 일치하는지
 - 반환 값이 올바른 타입인지
-
-4. 중간코드(IR) 생성
+1. 중간코드(IR) 생성
 
 의미 분석이 끝나면 **중간 코드**가 생성됩니다. 소스 코드와 기계어 사이의 중간 단계로 생성되는 코드입니다. 중간코드는 특정 하드웨어나 운영체제에 종속되지 않습니다.
 
@@ -62,11 +65,11 @@ t3 = t1 + t2
 
 이렇게 `x`, `y`, `z` 대신 `t1`, `t2`, `t3`와 같은 임시 변수를 사용해 값들을 저장합니다. 중간 코드는 **수학적인 연산이나 변수 할당을 표현하기 위해 간결한 명령어 형식으로 구성**되므로, 여러 플랫폼에서 기계어로 변환하기 쉽고, 최적화하기에 용이한 구조입니다.
 
-5. 최적화
+1. 최적화
 
 중간 코드가 생성된 후, 컴파일러는 이를 최적화하여 더 효율적인 코드를 만듭니다. 예를 들어, 만약 `z`가 사용되지 않는다면, 이를 최적화할 수 있습니다.
 
-6. 기계어 생성
+1. 기계어 생성
 
 최종 단계에서는 최적화된 중간 코드를 실제 기계어로 변환합니다. 각 명령어는 CPU에서 실행 가능한 기계어 명령으로 바뀝니다. 예를 들어, 컴파일러는 다음과 같은 x86 기계어를 생성할 수 있습니다:
 
@@ -115,17 +118,18 @@ React 팀은 이러한 문제를 해결하기 위해 개발자가 직접 메모�
 리액트 19의 정식 출시 전 버전(RC)에는 기본적으로 필요한 파일들이 모두 포함되어 있지 않습니다. 그래서 리액트 19 프로젝트를 사용하려면, 몇 가지 필요한 파일들을 직접 설치하고, 컴파일러가 리액트를 제대로 처리할 수 있도록 설정을 해줘야 합니다.
 
 ![컴파일러 전](/log/2410/3.png)
+
 ![컴파일러 후](/log/2410/4.png)
 
 1. RC 버전 설치하기
 
-```jsx
+```javascript
 npm install --save-exact react@rc react-dom@rc
 ```
 
-2. 컴파일 설정 전 코드베이스가 호환되는지 확인
+1. 컴파일 설정 전 코드베이스가 호환되는지 확인
 
-```jsx
+```javascript
 npx react-compiler-healthcheck@experimental
 ```
 
@@ -136,9 +140,10 @@ npx react-compiler-healthcheck@experimental
 - **호환성 문제**: 지금 프로젝트에 컴파일러와 충돌할 수 있는 라이브러리가 있는지 알려줍니다.
 
 Next로 만든 블로그에 검사를 해봤는데 `StrictMode usage not found.`에러가 떠서 next.config.js 에서 reactStrictMode를 설정해줬습니다.
+
 `StrictMode`는 React의 개발 도구로, 애플리케이션에서 잠재적인 문제를 미리 감지하고 경고해줍니다. 프로덕션 환경에는 영향을 주지 않으며, 주로 개발 모드에서만 활성화되어 다음을 검사합니다:
 
-```jsx
+```javascript
 // next.config.js
 module.exports = {
   reactStrictMode: true,
@@ -147,9 +152,9 @@ module.exports = {
 
 ![내 블로그가 컴파일 설정 호환되는지 확인](/log/2410/5.png)
 
-3. 리액트 컴파일과 관련된 ESLint 플러그인 설치
+1. 리액트 컴파일과 관련된 ESLint 플러그인 설치
 
-```jsx
+```javascript
 npm install eslint-plugin-react-compiler@experimental
 ```
 
@@ -157,7 +162,7 @@ npm install eslint-plugin-react-compiler@experimental
 
 설치 후 ESLint 설정 파일 .eslintrc(Vite의 경우 `.eslintrc.cjs`)에서 다음을 추가하세요.
 
-```jsx
+```javascript
 module.exports = {
   plugins: ["eslint-plugin-react-compiler"],
   rules: {
@@ -166,9 +171,9 @@ module.exports = {
 };
 ```
 
-4. 리액트 컴파일용 바벨 플로그인을 설치
+1. 리액트 컴파일용 바벨 플로그인을 설치
 
-```jsx
+```javascript
 npm install babel-plugin-react-compiler@experimental
 ```
 
@@ -176,7 +181,7 @@ npm install babel-plugin-react-compiler@experimental
 
 설치가 완료되면 바벨 설정 파일 `babel.config.js`에 옵션을 추가하여 설정을 완료해야 합니다. Vite를 사용하고 있으므로 `vite.config.js` 파일을 열고 내용을 다음 코드로 교체해주세요.
 
-```jsx
+```javascript
 // babel.config.js
 const ReactCompilerConfig = {
   /* ... */
@@ -192,7 +197,7 @@ module.exports = function () {
 };
 ```
 
-```jsx
+```javascript
 //vite.config.js
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
@@ -226,6 +231,9 @@ export default defineConfig({
 ## 참고 블로그
 
 [https://www.freecodecamp.org/news/react-compiler-complete-guide-react-19/](https://www.freecodecamp.org/news/react-compiler-complete-guide-react-19/)
+
 [https://react.dev/learn/react-compiler](https://react.dev/learn/react-compiler)
+
 [https://react.dev/blog/2024/02/15/react-labs-what-we-have-been-working-on-february-2024
+
 ](https://react.dev/blog/2024/02/15/react-labs-what-we-have-been-working-on-february-2024)

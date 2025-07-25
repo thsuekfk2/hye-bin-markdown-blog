@@ -1,8 +1,11 @@
 ---
 title: "리액트 19 새로운 훅 정리"
-date: 2025-02-02
-thumbnail: "/log/2502/1.webp"
+slug: "250202"
+date: "2025-02-02T00:00:00.000+00:00"
 description: "리액트 19가 12월 초에 업데이트가 되었습니다. 리액트 19가 나옴과 동시에 얼마나 코드가 많이 바뀔까 걱정을 했는데, 다행히 이번 리액트 19의 컨셉은 코드를 최대한 덜치자 주의더라구요. 귀찮게 치고 있었던 코드를 오히려 간단하게 한줄로 끝내버릴수 있다는 것! 이런 유용한 마법의 훅들을 미리 알고, 정리해 보려합니다."
+thumbnail: ""
+tags: []
+lastEditedTime: 2025-07-24T08:45:00.000Z
 ---
 
 리액트 19가 12월 초에 업데이트가 되었습니다. 리액트 19가 나옴과 동시에 얼마나 코드가 많이 바뀔까 걱정을 했는데, 다행히 이번 리액트 19의 컨셉은 코드를 최대한 덜치자 주의더라구요. 귀찮게 치고 있었던 코드를 오히려 간단하게 한줄로 끝내버릴수 있다는 것! 이런 유용한 마법의 훅들을 미리 알고, 정리해 보려합니다.
@@ -26,7 +29,7 @@ description: "리액트 19가 12월 초에 업데이트가 되었습니다. 리�
 
 ### useTransition 기본 사용법
 
-```tsx
+```typescript
 import { useTransition, useState } from "react";
 
 function Search() {
@@ -62,7 +65,7 @@ function Search() {
 
 리액트 19에서는 `startTransition`을 **비동기 작업에도 적용할 수 있게** 되었습니다. 여러 네트워크 요청이 있을 때 **더 중요한 요청을 먼저 실행**하고, 덜 중요한 요청은 나중에 실행하도록 우선순위를 조정할 수 있습니다. 또한, **비동기 함수의 로딩 상태까지 자동으로 관리할 수 있어** 별도로 로딩 상태를 관리할 필요가 없습니다! 🚀
 
-```tsx
+```typescript
 function UpdateName({}) {
   const [name, setName] = useState("");
   const [error, setError] = useState(null);
@@ -100,11 +103,12 @@ function UpdateName({}) {
 이 훅을 알기 전에 Action이 뭔지 알아봅시다. 리액트 공식 문서에서 액션을 다음과 같이 설명합니다.
 
 > [!info] 💡 Action이란
+
 > 비동기 함수를 액션이라고 부른다. 즉, Action State는 비동기 처리에 관련된 모든 state를 말한다
 
 ### useActionState 기본 사용법
 
-```tsx
+```typescript
 function ChangeName({ name, setName }) {
   const [error, submitAction, isPending] = useActionState(
     async (previousState, formData) => {
@@ -137,13 +141,14 @@ function ChangeName({ name, setName }) {
 ### 낙관적 업데이트란?
 
 > [!info] 💡 낙관적 업데이트란
+
 > 사용자가 데이터를 변경하려고 할 때, **실제 변경이 완료되기 전에 UI를 먼저 업데이트**하는 방식입니다.
 
 낙관적 업데이트를 구현하기 위해서는 **로딩 상태 관리**, **낙관적 업데이트 실패 시 롤백** 등을 구현해야 했습니다. 이제 `useOptimistic` 훅을 사용하면 이 모든 과정을 훨씬 간단하게 처리할 수 있게 되었습니다!
 
 ### useOptimistic 기본 사용법
 
-```tsx
+```typescript
 function ChangeName({ currentName, onUpdateName }) {
   const [optimisticName, setOptimisticName] = useOptimistic(currentName);
 
@@ -179,13 +184,13 @@ function ChangeName({ currentName, onUpdateName }) {
 
 `useFormStatus`는 마지막 폼 제출의 상태 정보를 제공하는 훅입니다.
 
-```tsx
+```typescript
 const { pending, data, method, action } = useFormStatus();
 ```
 
 ### useFormStatus 기본 사용법
 
-```tsx
+```typescript
 import { useFormStatus } from "react-dom";
 import { submitForm } from "./actions.js";
 
@@ -224,7 +229,7 @@ export default function App() {
 
 비동기 함수는 다른 파일에서 작성하고, 그 결과를 **`use` 훅**으로 추적합니다. 이렇게 하면 비동기 작업을 처리하는 과정에서 로딩 상태는 `Suspense`로, 에러는 `ErrorBoundary`로 자동으로 처리할 수 있습니다. 즉, **비동기 작업의 상태 관리**를 훅과 컴포넌트를 통해 간편하게 처리할 수 있습니다.
 
-```tsx
+```typescript
 "use client";
 
 import { use, Suspense } from "react";
@@ -263,7 +268,7 @@ useContext를 사용하지 않고 use로 컨텍스트를 읽어 올 수 있습�
 
 추가로 `use`는 `if` 와 같은 조건문과 반복문 내부에서 호출할 수 있습니다.
 
-```tsx
+```typescript
 function HorizontalRule({ show }) {
   if (show) {
     const theme = use(ThemeContext);
@@ -277,7 +282,11 @@ function HorizontalRule({ show }) {
 
 - use API는 컴포넌트나 Hook 내부에서 호출되어야 합니다.
 - [서버 컴포넌트](https://ko.react.dev/reference/rsc/use-server)에서 데이터를 가져올 때는 use보다 async 및 await을 사용합니다.
+
   → 만약 서버 컴포넌트 내에서 use를 사용했을 경우 데이터가 오지 않아 로딩을 보여주기 때문에 seo에 좋지 않습니다.
+
   → use는 유저에게 친근하게 로딩 중 ui를 보여주는 클라이언트 컴포넌트에 효과적입니다.
+
 - **클라이언트에서 Promise 생성할 경우** 매 렌더링마다 새로 생성되어 불필요한 요청이 반복될 수 있습니다. 따라서, **서버에서 Promise 생성하여** 한 번만 API를 호출하고, 클라이언트로 데이터를 안정적으로 전달할 수 있습니다
+
   → props로 전달하는거 귀찮긴 한데 효율을 위해서 props로 전달하자..!

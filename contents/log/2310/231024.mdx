@@ -1,7 +1,11 @@
 ---
 title: "캘리더 default date 설정"
-date: 2023-10-24
+slug: "231024"
+date: "2023-10-24T00:00:00.000+00:00"
 description: "캘리더 default date 설정"
+thumbnail: ""
+tags: []
+lastEditedTime: 2025-07-25T06:18:00.000Z
 ---
 
 ## ✨ 내가 원하는 기능
@@ -12,7 +16,7 @@ description: "캘리더 default date 설정"
 
 ## 기능을 구현한 코드 🧐
 
-```jsx
+```javascript
 const { date } = useParams() as { date?: string }; //231023
 const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
@@ -26,10 +30,9 @@ useEffect(() => {
       setSelectedDate(null);
     }
   }, [date]);
-
 ```
 
-```tsx
+```typescript
 // @/utils/date.ts
 
 //231023 -> new date 객체로 리턴받음
@@ -43,7 +46,7 @@ export const parseDateStringToDate = (dateString: string) => {
 
 useParams는 URL에서 경로 매개변수를 추출하는 데 사용된다. 다음은 Next.js 공식홈페이지 useParams을 사용한 예제 코드이다.
 
-```jsx
+```javascript
 "use client";
 
 import { useParams } from "next/navigation";

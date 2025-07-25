@@ -1,7 +1,11 @@
 ---
 title: "Giscus 댓글 기능 추가"
-date: 2023-10-31
+slug: "231031"
+date: "2023-10-31T00:00:00.000+00:00"
 description: "Giscus 댓글 기능 추가"
+thumbnail: ""
+tags: []
+lastEditedTime: 2025-07-25T06:18:00.000Z
 ---
 
 개발 블로그들을 보다가 깃허브로 로그인 시 댓글을 달 수 있는 기능이 있었다! 찾아보니 쉽게 적용할 수 있는 오픈소스였다 😁 그래서 바로 적용해 보려고 한다.
@@ -15,18 +19,14 @@ description: "Giscus 댓글 기능 추가"
 ## **Giscus 설치**
 
 1. public 한 레포를 준비한다.
-
 2. Github 계정에 **[giscus](https://github.com/apps/giscus)** 앱을 설치한다.
-
 3. Settings에서 **[discussions](<https://bepyan.github.io/blog/nextjs-blog/(https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/enabling-or-disabling-github-discussions-for-a-repository).>)** 기능을 활성화 합니다.
-
 4. [Giscus App 페이지](https://giscus.app/) 로 이동해서 내 마음에 맞는 댓글 시스템을 구성해본다.
-
 5. 설정이 다 마무리 되면 임베딩 시킬 수 있는 JavaScript 코드를 생성해주는데 해당 코드를 복사해서 본인의 블로그에 붙여넣는다.
 
 ## **Giscus 컴포넌트 구현**
 
-```jsx
+```javascript
 "use client";
 
 import React, { useRef } from "react";

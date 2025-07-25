@@ -1,7 +1,11 @@
 ---
 title: "번들 사이즈 최적화 방법"
-date: 2023-10-25
+slug: "231025"
+date: "2023-10-25T00:00:00.000+00:00"
 description: "번들 사이즈 최적화 방법"
+thumbnail: ""
+tags: []
+lastEditedTime: 2025-07-25T06:18:00.000Z
 ---
 
 ## 번들사이즈가 중요해진 배경
@@ -28,23 +32,33 @@ description: "번들 사이즈 최적화 방법"
    webpack.config 설정의 splitChunks의 chunks을 all로 해준다.
 
    ```jsx
+
    //webpack.config.js
 
    optimization: {
+
      splitChunks: {
+
    	  chunks: 'all',
+
    },
+
    ```
 
    splitChunks의 minsize 조정해준다.
 
    ```jsx
+
    //webpack.config.js
 
    optimization: {
+
      splitChunks: {
+
    	  minSize: '100',
+
    },
+
    ```
 
 ### 2. 트리쉐이킹(Tree Shaking)
@@ -55,7 +69,7 @@ description: "번들 사이즈 최적화 방법"
 
 이런 경우, package.json 파일에서 _sideEffects_ 설정을 통해 사이드 이펙트를 정의할 수 있다. "사이드 이펙트가 없는 코드"는 `false`로 설정하고, 사이드 이펙트가 있는 경우 해당 경로를 설정한다.
 
-```jsx
+```javascript
 //package.json
 
 "sideEffects": [
@@ -67,11 +81,12 @@ description: "번들 사이즈 최적화 방법"
 또한, `sideEffects`를 `false`로 설정해도 제거되지 않는 경우, 해당 코드를 Re-export 해주는 방법을 사용할 수 있다.
 
 <details>
+
 <summary>Re-export란 뭘까?</summary>
 
 Re-export는 다른 모듈에서 정의된 변수, 함수 또는 객체를 현재 모듈에서 다시 내보내는 것을 의미한다. 아래 예시를 보면 이해가 쉽다. main.js에서도 add, subtract 함수를 사용할 수 있다.
 
-```jsx
+```javascript
 // 모듈 파일 math.js
 export function add(a, b) {
   return a + b;
@@ -82,7 +97,7 @@ export function subtract(a, b) {
 }
 ```
 
-```jsx
+```javascript
 // 모듈 파일 main.js
 export { add, subtract } from "./math";
 ```
@@ -91,7 +106,7 @@ export { add, subtract } from "./math";
 
 특히 개발 모드와 프로덕션 모드를 구분하는 변수인 `isDevelopment`와 같은 조건문을 사용하는 경우, 주의가 필요하다. 이는 트리 쉐이킹이 컴파일 단계에서 이뤄지는 반면, `isDevelopment`와 같은 런타임 변수는 런타임 환경에서 평가되므로 컴파일 단계에서 최적화가 어려울 수 있다. 이는 변수를 사용하는 대신 조건문을 바로 입력하여 처리하는 것이 좋다.
 
-```jsx
+```javascript
 import { someFunction } from "./utils";
 
 const isDevelopment = process.env.NODE_ENV === "development";

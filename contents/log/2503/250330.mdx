@@ -1,8 +1,11 @@
 ---
 title: "좋은 코드란 무엇인가"
-date: 2025-03-30
-thumbnail: "/log/2503/2.webp"
+slug: "250330"
+date: "2025-03-30T00:00:00.000+00:00"
 description: "토스에서 '변경하기 쉬운 프론트엔드 코드를 위한 지침서'를 만들었다. 좋은 코드란 무엇인가에 대한 생각은 개발자에게 빠질수 없는 고민거리라고 생각한다. 차근차근 읽어보면서 공감했던 부분과 내가 놓치고 있었던 새로운 부분을 정리해보려고 한다."
+thumbnail: ""
+tags: []
+lastEditedTime: 2025-07-24T08:45:00.000Z
 ---
 
 토스에서 '변경하기 쉬운 프론트엔드 코드를 위한 지침서'를 만들었다. “좋은 코드란 무엇인가”는 개발자라면 누구나 한 번쯤 깊이 고민하게 되는 주제다. 차근차근 읽어보면서 공감했던 부분과 내가 놓치고 있었던 새로운 부분을 정리해보려고 한다. 들어가기에 앞서 변경하기 쉬운 코드란 무엇일까? 새로운 요구사항을 구현할 때 코드를 수정하고 배포하기가 편한 코드가 변경하기 쉬운 코드이다. 이러한 코드는 4가지 기준으로 판단할 수 있다.
@@ -24,7 +27,7 @@ description: "토스에서 '변경하기 쉬운 프론트엔드 코드를 위한
 
 코드를 읽는 사람은 해당 분기에서만 읽을 수 있도록 고려하기
 
-```jsx
+```javascript
 function SubmitButton() {
   const isViewer = useRole() === "viewer";
 
@@ -50,7 +53,7 @@ function AdminSubmitButton() {
 
 사용자가 '로그인을 확인하고 이동하는 로직'을 하나의 컴포넌트로 넣기 보다는 Wrapper 컴포넌트를 사용해서 감싸자
 
-```jsx
+```javascript
 function App() {
   return (
     <AuthGuard>
@@ -92,7 +95,7 @@ function LoginStartPage() {
 
 단, 로직이 매우 간단하거나 단순한 로직, 또 한번만 사용 되면서 로직이 복잡 하지 않을 경우는 이름을 따로 붙이지 않아도 된다.
 
-```jsx
+```javascript
 const matchedProducts = products.filter((product) => {
   return product.categories.some((category) => {
     const isSameCategory = category.id === targetCategory.id;
@@ -113,7 +116,7 @@ const matchedProducts = products.filter((product) => {
 
 상수를 사용할 경우, 상수만 바꾸면 수정되어야 할 코드가 모두 수정되기 때문에 응집도를 높일 수 있다.
 
-```jsx
+```javascript
 const ANIMATION_DELAY_MS = 300;
 
 async function onLikeClick() {
@@ -131,7 +134,7 @@ async function onLikeClick() {
 
 - 조건을 펼쳐서 그대로 드러내기 (위에서 아래로만 읽으면 한눈에 권한 파악)
 
-```jsx
+```javascript
 function Page() {
   const user = useUser();
 
@@ -158,7 +161,7 @@ function Page() {
 
 - 조건을 한눈에 볼 수 있는 객체 만들기
 
-```jsx
+```javascript
 function Page() {
   const user = useUser();
   const policy = {
@@ -183,7 +186,7 @@ function Page() {
 
 if문을 풀어서 사용하여 명확하고 간단하게 조건을 나타내자
 
-```jsx
+```javascript
 const status = (() => {
   if (A조건 && B조건) return "BOTH";
   if (A조건) return "A";
@@ -204,7 +207,7 @@ const status = (() => {
 
 **안 좋은 예시**
 
-```jsx
+```javascript
 // 이 서비스는 `http`라는 라이브러리를 쓰고 있어요
 import { http as httpLibrary } from "@some-library/http";
 
@@ -223,7 +226,7 @@ export const http = {
 
 **좋은 예시**
 
-```jsx
+```javascript
 // 이 서비스는 `http`라는 라이브러리를 쓰고 있어요
 import { http as httpLibrary } from "@some-library/http";
 
@@ -254,13 +257,13 @@ export const httpService = {
 
 하나의 공통 속성(kind, type, ok 등)을 가진 여러 타입을 그 속성에 따라 자동으로 타입을 좁혀 안전하게 다루는 타
 
-```tsx
+```typescript
 type Result = { ok: true } | { ok: false; reason: string };
 ```
 
 ok가 true인 경우 reason이 존재하지 않고, false인 경우만 reason이 있다.
 
-```jsx
+```javascript
 if (isAgeValid.ok) {
   isAgeValid.reason; // ❌ 타입 에러!
 }
@@ -272,7 +275,7 @@ if (isAgeValid.ok) {
 
 if (조건)문 안에서 타입이 자동으로 좁혀지는 것은 TS의 강력한 기능이다. 적극적으로 활용하자.
 
-```jsx
+```javascript
 type ValidationCheckReturnType = { ok: true } | { ok: false; reason: string };
 
 function checkIsAgeValid(age: number): ValidationCheckReturnType {
@@ -304,7 +307,7 @@ if (isAgeValid.ok) {
 
 **전**
 
-```jsx
+```javascript
 async function fetchBalance(): Promise<number> {
   const balance = await http.get<number>("...");
 
@@ -316,7 +319,7 @@ async function fetchBalance(): Promise<number> {
 
 **후**
 
-```jsx
+```javascript
 <Button
   onClick={async () => {
     const balance = await fetchBalance();
@@ -421,7 +424,7 @@ async function fetchBalance(): Promise<number> {
 
 예를들어 5000초를 그대로 사용하는 것이다, 상태를 404 값으로 바로 사용하는 것들이다.
 
-```jsx
+```javascript
 const ANIMATION_DELAY_MS = 300;
 
 async function onLikeClick() {
@@ -445,7 +448,7 @@ async function onLikeClick() {
 
 필드 단위 응집은 개별 입력 요소를 독립적으로 관리하여, 각 필드가 고유의 검증 로직을 가지기 때문에 유지보수가 쉽다. 또한 각 필드가 독립적 이러서 다른 필드에 영향을 주지 않는다.
 
-```jsx
+```javascript
 import { useForm } from "react-hook-form";
 
 export function Form() {
@@ -518,7 +521,7 @@ function isEmptyStringOrNil(value: NullableString): boolean {
 
 모든 필드의 검증 로직이 폼에 종속되어 있는 것을 말한다. 전체적인 흐름을 고려하여 설계되며, 변경단위 또한 폼 단위로 발생한다. 폼 전체 응집도가 높아지고 검증 관리가 편하며, 전체 흐름을 파악하기 쉽다. 하지만 필드간 결합도가 높아져 재사용성이 떨어진다.
 
-```jsx
+```javascript
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -592,7 +595,7 @@ export function Form() {
 
 ### 책임을 하나씩 관리하기
 
-```jsx
+```javascript
 import moment, { Moment } from "moment";
 import { useMemo } from "react";
 import {
@@ -645,7 +648,7 @@ export function usePageState() {
 
 이로 인해 다른 컴포넌트나 페이지가 훅에 의존할 수 있고, 수정 범위가 크게 늘어난다. 즉 유지관리가 어려워진다.
 
-```jsx
+```javascript
 import { useQueryParam } from "use-query-params";
 
 export function useCardIdQueryParam() {
@@ -679,7 +682,7 @@ export function useCardIdQueryParam() {
 
 props drilling은 부모와 자식 컴포넌트 사이에 결합도가 생깃것을 말한다.
 
-```jsx
+```javascript
 function ItemEditModal({ open, items, recommendedItems, onConfirm, onClose }) {
   const [keyword, setKeyword] = useState("");
 
@@ -734,7 +737,7 @@ Props Drilling이 발생하면 props을 불필요하게 참조한느 컴포넌�
 
 - 조합 패턴 활용 (부모 컴포넌트가 **자식 컴포넌트를 직접 조립**해서 사용하는 패턴)
 
-```jsx
+```javascript
 function ItemEditModal({ open, items, recommendedItems, onConfirm, onClose }) {
   const [keyword, setKeyword] = useState("");
 
@@ -776,7 +779,7 @@ ildren을 사용해 필요한 컴포넌트를 부모에서 작성하도록 하�
 
 - ContextAPI활용
 
-```jsx
+```javascript
 function ItemEditModal({ open, onConfirm, onClose }) {
   const [keyword, setKeyword] = useState("");
 

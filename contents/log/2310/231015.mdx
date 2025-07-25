@@ -1,7 +1,11 @@
 ---
 title: "react-datepicker css 커스텀"
-date: 2023-10-15
+slug: "231015"
+date: "2023-10-15T00:00:00.000+00:00"
 description: "react-datepicker css 커스텀"
+thumbnail: ""
+tags: []
+lastEditedTime: 2025-07-25T06:17:00.000Z
 ---
 
 ## react datepicker 설치
@@ -43,7 +47,7 @@ react-datepicker 라이브러리의 renderCustomHeader, renderDayContents으로 
 
 Calendar 컴포넌트 전체 부분은 다음과 같다.
 
-```tsx
+```typescript
 "use client";
 
 import Link from "next/link";
@@ -90,7 +94,13 @@ export const Calendar = () => {
       selected={selectedDate}
       onChange={(date) => setSelectedDate(date)}
       customInput={<ExampleCustomInput />}
-      renderCustomHeader={({
+      renderCustomHeader
+```
+
+--- (continued) ---
+
+```typescript
+={({
         date,
         decreaseMonth,
         increaseMonth,
