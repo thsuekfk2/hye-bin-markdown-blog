@@ -342,73 +342,41 @@ async function fetchBalance(): Promise<number> {
 프로젝트 코드를 작성하면 여러 파일로 나눠서 관리하게 되는데, 쉽게 만들고 찾고 삭제할 수 있도록 디렉토리 구조를 관리하는것이 중요하다.
 
 /code
-
 └─ src
-
 ├─ components
-
 ├─ constants
-
 ├─ containers
-
 ├─ contexts
-
 ├─ remotes
-
 ├─ hooks
-
 ├─ utils
-
 └─ ...
 
 보통 이런식으로 나누게 된다. 하지만 종료별로 나눌 경우 어떤 코드를 참조하는지 쉽게 파악하기 어렵다. 특정 컴포넌트를 사용하지 않아 삭제해야 할 경우에도 연관된 코드가 같이 삭제되지 못해서 남아있는 경우가 생길 수 있다. 프로젝트가 커짐에 따라 의존 관계가 복잡해지고 디렉토리 안에 많은 파일이 생기게 된다.
 
 └─ src
-
 │ // 전체 프로젝트에서 사용되는 코드
-
 ├─ components
-
 ├─ containers
-
 ├─ hooks
-
 ├─ utils
-
 ├─ ...
-
 │
-
 └─ domains
-
 │ // Domain1에서만 사용되는 코드
-
 ├─ Domain1
-
 │ ├─ components
-
 │ ├─ containers
-
 │ ├─ hooks
-
 │ ├─ utils
-
 │ └─ ...
-
 │
-
 │ // Domain2에서만 사용되는 코드
-
 └─ Domain2
-
 ├─ components
-
 ├─ containers
-
 ├─ hooks
-
 ├─ utils
-
 └─ ...
 
 이런식으로 함께 수정되는 코드를 하나의 디렉토리(도메인) 안에 두면 의존 관계를 쉽게 파악할 수 있다.
