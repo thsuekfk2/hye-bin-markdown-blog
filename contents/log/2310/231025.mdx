@@ -28,37 +28,25 @@ tags: []
 1. **React.lazy를 활용해 페이지를 분리하기**
 2. **중복된 청크 제거**
 
-   webpack.config 설정의 splitChunks의 chunks을 all로 해준다.
+webpack.config 설정의 splitChunks의 chunks을 all로 해준다.
 
-   ```jsx
+```jsx
+//webpack.config.js
+optimization: {
+  splitChunks: {
+  chunks: 'all',
+},
+```
 
-   //webpack.config.js
+splitChunks의 minsize 조정해준다.
 
-   optimization: {
-
-     splitChunks: {
-
-   	  chunks: 'all',
-
-   },
-
-   ```
-
-   splitChunks의 minsize 조정해준다.
-
-   ```jsx
-
-   //webpack.config.js
-
-   optimization: {
-
-     splitChunks: {
-
-   	  minSize: '100',
-
-   },
-
-   ```
+```jsx
+//webpack.config.js
+optimization: {
+  splitChunks: {
+	  minSize: '100',
+},
+```
 
 ### 2. 트리쉐이킹(Tree Shaking)
 
