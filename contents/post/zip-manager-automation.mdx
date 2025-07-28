@@ -1,0 +1,205 @@
+---
+title: "사내 프로젝트 ZIP 파일 관리 자동화 도구 (feat. 노가다 탈출 프로젝트)"
+slug: "zip-manager-automation"
+date: "2025-07-28"
+description: "나의 목표는 수동으로 처리하던 파일 압축, 해제, 관리 작업들을 웹 인터페이스를 통해 효율적으로 처리할 수 있는 도구를 만들어, 기존에 1시간 업무를 5분으로 줄이는 것을 목표로 잡았다."
+thumbnail: "https://prod-files-secure.s3.us-west-2.amazonaws.com/08186c4d-8140-450f-af44-70f5092b5ec2/7fd1d5f1-1bab-49bc-b65a-a7f172ee3f84/%E1%84%92%E1%85%A1%E1%84%82%E1%85%A1%E1%84%80%E1%85%A1%E1%84%8B%E1%85%A5%E1%86%B9%E1%84%8B%E1%85%A5%E1%84%8C%E1%85%B5%E1%84%86%E1%85%A7%E1%86%AB.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB4667WMPCHQB%2F20250728%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250728T064920Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEF8aCXVzLXdlc3QtMiJHMEUCIQDgoumrepwiWxTkR%2FDtEURVlih8OwNnRmt48OhsjIlXNgIgDTSloKfQHl9skU7OadHk6LUISlkBJI51vTmF%2B7C9MBkqiAQIh%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw2Mzc0MjMxODM4MDUiDNhAqn2l2NQEKQIY%2FSrcAxF4NSaZJ%2FhhY84SneU3iK3mWutH8wq0pTUF5aTmAgc6tSssQKXTVlFYOVpbQBj%2FDDTND5yiFoQ7Nles28XlNNFud1ilwDilfeGWUrN%2BrhISvTIJzzRpYdbKzpmx9Rg8%2BsV9mrHKkcYxg7y%2Ftb3efE69fYMo8w4MdPGCoEu289hJ%2FRV9afjqQYOUy8QNo3NAqBXq9qvOKxAD4G3O83fbLBCRhAZedlPqE7E5EPu2EaAnK7sGPTTj93RcEUDYGRuyIBTEtO9pbOsRniSNnfwyeO%2BZ%2FdTZkOMhAV%2FPh5N5kkQhuoCILnJfHw2Im81OyW3teWGIyrlPt0%2Bo3SxucZizntj6pvqbXvayKThRuMBl%2B1AFqeG%2BQ2RWQ%2B%2F0j3%2FmZym3w5K9hvs7UXXewwnN%2B58EZc6NN3ic2xXJZfbbAS%2F%2FUf3YtQAhDDB5RUYFlTkF0vbU%2FTDD9vJdic6UyFykV%2FV9ewXV0hd1sPAyCIbPi5pmmzcQ9cjCV3zIfqBME80pT%2BT7EEYYmB3E1Sss3%2BcL%2FwGSsYzMES%2FKzOw5EE8YsUy0oPcvzgVSJ3nrzkqUTCUzpC2ENJlvAdZpqdT%2BndmAd4DM1HwVfGV09WJenps9Ql4UI5KTNJBRShL4R3%2Bfl%2Fl1MO6snMQGOqUBnul0j0CNmil7BPsRy%2BdqUramB8Hm0I459CQFB8Zhk%2FCIsg2vLhipDZGLAc2YNLEeDptuio6qjQAq%2BqRODSMKkJAjzpgTa8qeNdC%2FarWb6htNn7%2BWBvz7vNCh80KZMP38StXc4PLvQ7EIdIgGdqyt%2FNx8Khorgr5KVWc1FHm%2B4szZSUBYsK1a5Y4z1qa5J6S5pOJ920V1vhWlG6Y5PRusCO6%2FNAUe&X-Amz-Signature=296562b9e8799cd1c76529c4605691ffcf8332333c66104c3cf203f904a690ce&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject"
+tags: []
+---
+
+## **프로젝트 배경**
+
+응용프로그램 배포 업무를 인수인계받아 작업하던 중 충격을 받았다. 응용프로그램 배포를 위해서는 윈도우 PC에서 압축 파일을 풀고, 새로운 응용프로그램을 넣어 다시 압축한 후 FileZilla로 윈도우 서버 FTP에 접속해서 업로드해야 했다.
+
+업무 히스토리가 궁금해서 파악해본 결과, 맥과 윈도우의 호환성 문제로 인해 윈도우 PC에서만 압축 작업이 가능했고, 윈도우 서버에는 FileZilla를 통해서만 접근할 수 있다고 했다. 이런 방식으로 몇 년 동안 진행하고 있었던 것이다!
+이런 방법은 휴먼 에러의 위험성도 크고, 무엇보다 시간이 너무 오래 걸려서 해결 방안에 대해 고민했다. 최근 바이브 코딩으로 열심히 프로젝트를 만들고 있었기에 매우 흥미로운 도전이었다.
+그래서 바로 만들어보기로 했다. 
+
+나의 목표는 수동으로 처리하던 파일 압축, 해제, 관리 작업들을 웹 인터페이스를 통해 효율적으로 처리할 수 있는 도구를 만들어, 기존 1시간 업무를 5분으로 줄이는 것이었다.
+
+## **기술 스택**
+
+- Backend: Fastify (Node.js)
+- Frontend : Vanilla JavaScript
+- 압축 라이브러리: archiver
+- 파일 전송: FTP
+- 배포: 리눅스 서버 (Docker)
+
+## **바이브 코딩은 신이다**
+
+개발을 생각보다 아주 순조로웠다. 요구사항 프롬프트를 자세히 작성하니 클로드가 예쁘게 코드를 짜줬다. 윈도우 서버의 접근하기 위해 노드의 FTP 클라이언트로 연결을 했으며,  한 두시간 만에 원하는 요구사항으로 개발이 완료되었다.
+
+로컬로 테스트를 했더니 압축과 풀기, 업로드, 재압축 모두 성공적이었다.
+
+너무 기뻐서 주변 사람들에게 로컬로 시연해주며 으쓱해있었다!
+
+그런데.. 배포를 했더니 문제가 발생하기 시작했다..
+
+## **개발 과정에서 만난 문제들과 해결 과정**
+
+### **첫 번째 고난: FTP 연결 실패**
+
+![로컬에서는 문제가 없었는데 …](https://prod-files-secure.s3.us-west-2.amazonaws.com/08186c4d-8140-450f-af44-70f5092b5ec2/e16c34ce-bfc2-4153-af99-365b38b038e6/%E1%84%8B%E1%85%A8.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466YSPXGV37%2F20250728%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250728T064929Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEF8aCXVzLXdlc3QtMiJGMEQCIB83Pv6hMke%2Fujkyw%2BJXZQcMa9CIK1U9kXfbDpJ4OIeDAiAby6AGhULQHH4asiKffi%2BBP8MYs4B06XSPDeN8WNeMUCqIBAiH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDYzNzQyMzE4MzgwNSIM%2BJ6MzYJgaxQStGAtKtwDVsZQBERxFAoJaT74X3kcSMpRQInbTkAlTFCgbTcjp11hfSuQGUWnewKpaZcErd69eA%2BDGBalneIb5%2FPLXSdzFZjgTknmfWm1OTBlUZ%2BE4tGiC07yjVLi%2BW4tocVhLm3OGVshtbk8WXbD71qutediBa48wgZlY0uWVOlmmIb9%2Fpquik9r%2BnpGvXAcncxATAb7Pftb8N9zxz7rw4wFVTaLpXQuTlklDI0eb%2BDmHQ4XUOz%2FtOFPTdAk5Fpaikic2v6Y6%2BqhPnQPe4a06TrCdklWxrVzSnmNL2PvL79pJzkHhTD6XMCW8MH8GjW%2F0qj6kdPyYQeUhwU4sr%2BW9jAwUFCbZMaWx7obvOlFD3PZY1FWdwsMFMDikT3bZTfkCiIU6n2Tjk%2BA%2FGaEHq9aj%2FuV82JvJ9ntJQx2%2Ffgqnwua4hQrgskNKIOpFOw4Z3xJbZYlU3jiCNw%2BcLpWDoaHL7qXpIy3C2AC8AUsjpsZX%2F5Ei7ZZH0O7DOJv1Br172UO%2By8BbbGmq2Ktz07bDTsjSoLi5YO6ygKZllPsfDh%2BVWNdXaGQk2kVu%2F7tHgElm26U5qLT6MZpJlinpXRqLnv8WncEkhDULaRAzTfupj6G2aDpTRD6b%2FMwmVErph5WBWWiHQkwh62cxAY6pgFDSPMPlqCLoSISirqhHCuFfsphuNN4NPXoS9cocUUrttZ3RTEMLlgC7Bxmyo7Q7YUGmUTN3wj2DR140OFhg65RL1DC9YHwuLHlvlo2ojrn%2FXs%2Bwqp3yO%2FoHVXb4O28bwKSmNOEmL5fsL3VgidUTKhu8Y8coZjry7X61H6qZTpWpFfdbHj0FnDWVEY5M3jzrn6lobkuKouiijaszgReOIMewkdnUT4B&X-Amz-Signature=b79b6d6150544a5c74d8cf00e2eacfd5c3afbbf93ed906687acf20793851d03b&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject)
+
+로컬에서는 문제가 없었는데, 이상하게 배포를 하니 FTP 연결이 실패하는 문제가 발생했다. 
+
+코드의 문제보다는 서버 쪽 보안 문제인 것 같아 이것저것 찾아보니 네트워크 방화벽 문제였다.
+
+- **원인 분석:**
+    - 로컬(맥): FTP 완벽 작동 O
+    - 리눅스 서버: 데이터 포트 차단 X
+- **원인:**
+    - 서버 방화벽에 아웃바운드 설정을 해주지 않아서 발생한 문제였다.
+- **해결:**
+    - 회사에서 사용하고 있는 클라우드 서비스 업체 설정에 아웃바운드 방화벽 포트를 추가해서 해결되었다.
+    - 이제 배포된 사이트에서 FTP 접속이 가능해졌다!
+
+### **두번째 시련: FTP 연결은 성공했지만 데이터 불러오기실패**
+
+![또 다른 문제 발생..](https://prod-files-secure.s3.us-west-2.amazonaws.com/08186c4d-8140-450f-af44-70f5092b5ec2/d7948236-6cf1-4a2b-9498-09b24ebcd95a/%E1%84%92%E1%85%A1%E1%84%82%E1%85%A1%E1%84%80%E1%85%A1%E1%84%8B%E1%85%A5%E1%86%B9%E1%84%8B%E1%85%A5%E1%84%8C%E1%85%B5%E1%84%86%E1%85%A7%E1%86%AB.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466YSPXGV37%2F20250728%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250728T064929Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEF8aCXVzLXdlc3QtMiJGMEQCIB83Pv6hMke%2Fujkyw%2BJXZQcMa9CIK1U9kXfbDpJ4OIeDAiAby6AGhULQHH4asiKffi%2BBP8MYs4B06XSPDeN8WNeMUCqIBAiH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDYzNzQyMzE4MzgwNSIM%2BJ6MzYJgaxQStGAtKtwDVsZQBERxFAoJaT74X3kcSMpRQInbTkAlTFCgbTcjp11hfSuQGUWnewKpaZcErd69eA%2BDGBalneIb5%2FPLXSdzFZjgTknmfWm1OTBlUZ%2BE4tGiC07yjVLi%2BW4tocVhLm3OGVshtbk8WXbD71qutediBa48wgZlY0uWVOlmmIb9%2Fpquik9r%2BnpGvXAcncxATAb7Pftb8N9zxz7rw4wFVTaLpXQuTlklDI0eb%2BDmHQ4XUOz%2FtOFPTdAk5Fpaikic2v6Y6%2BqhPnQPe4a06TrCdklWxrVzSnmNL2PvL79pJzkHhTD6XMCW8MH8GjW%2F0qj6kdPyYQeUhwU4sr%2BW9jAwUFCbZMaWx7obvOlFD3PZY1FWdwsMFMDikT3bZTfkCiIU6n2Tjk%2BA%2FGaEHq9aj%2FuV82JvJ9ntJQx2%2Ffgqnwua4hQrgskNKIOpFOw4Z3xJbZYlU3jiCNw%2BcLpWDoaHL7qXpIy3C2AC8AUsjpsZX%2F5Ei7ZZH0O7DOJv1Br172UO%2By8BbbGmq2Ktz07bDTsjSoLi5YO6ygKZllPsfDh%2BVWNdXaGQk2kVu%2F7tHgElm26U5qLT6MZpJlinpXRqLnv8WncEkhDULaRAzTfupj6G2aDpTRD6b%2FMwmVErph5WBWWiHQkwh62cxAY6pgFDSPMPlqCLoSISirqhHCuFfsphuNN4NPXoS9cocUUrttZ3RTEMLlgC7Bxmyo7Q7YUGmUTN3wj2DR140OFhg65RL1DC9YHwuLHlvlo2ojrn%2FXs%2Bwqp3yO%2FoHVXb4O28bwKSmNOEmL5fsL3VgidUTKhu8Y8coZjry7X61H6qZTpWpFfdbHj0FnDWVEY5M3jzrn6lobkuKouiijaszgReOIMewkdnUT4B&X-Amz-Signature=f5a9b81c635d8826563f9dd7848ddb71610c65ca618c30bad3b6ef371f98f913&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject)
+
+또 다른 문제가 발생했다.
+아웃바운드 설정으로 FTP 연결에 성공하여 모든 게 끝났다고 생각했지만, 데이터 조회가 되지 않았다. (ㅠㅠ)
+
+이 문제를 해결하기 위해서는 FTP의 동작 방식을 이해해야했다. 
+
+FTP는 다른 프로토콜과 달리 두개의 연결을 사용한다고 한다.
+
+- **제어 연결데이터 연결**
+    - 제어 연결
+    - 데이터 연결
+
+내가 1번 제어 연결을 성공했지만, 2번 데이터 연결에서 막힌것이었다.
+
+그럼 데이터 연결 포트만 아웃바운드하면 되겠다고 단순하게 생각했는데, 데이터 연결 포트는 랜덤이었다... 수백 개의 포트를 개별 등록하는 것은 비현실적이었고, 모든 데이터 포트 범위를 허용하기엔 클라우드 업체에서 단일 포트만 허용할 수 있었다. (범위 지정 불가) ㅠㅠ
+
+![실패!](https://prod-files-secure.s3.us-west-2.amazonaws.com/08186c4d-8140-450f-af44-70f5092b5ec2/cf861e56-63c3-4c3b-b6f3-a0cdd9c88f9d/b6b869b3-3b88-46ab-816c-eb3044ab8c46.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466YSPXGV37%2F20250728%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250728T064929Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEF8aCXVzLXdlc3QtMiJGMEQCIB83Pv6hMke%2Fujkyw%2BJXZQcMa9CIK1U9kXfbDpJ4OIeDAiAby6AGhULQHH4asiKffi%2BBP8MYs4B06XSPDeN8WNeMUCqIBAiH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDYzNzQyMzE4MzgwNSIM%2BJ6MzYJgaxQStGAtKtwDVsZQBERxFAoJaT74X3kcSMpRQInbTkAlTFCgbTcjp11hfSuQGUWnewKpaZcErd69eA%2BDGBalneIb5%2FPLXSdzFZjgTknmfWm1OTBlUZ%2BE4tGiC07yjVLi%2BW4tocVhLm3OGVshtbk8WXbD71qutediBa48wgZlY0uWVOlmmIb9%2Fpquik9r%2BnpGvXAcncxATAb7Pftb8N9zxz7rw4wFVTaLpXQuTlklDI0eb%2BDmHQ4XUOz%2FtOFPTdAk5Fpaikic2v6Y6%2BqhPnQPe4a06TrCdklWxrVzSnmNL2PvL79pJzkHhTD6XMCW8MH8GjW%2F0qj6kdPyYQeUhwU4sr%2BW9jAwUFCbZMaWx7obvOlFD3PZY1FWdwsMFMDikT3bZTfkCiIU6n2Tjk%2BA%2FGaEHq9aj%2FuV82JvJ9ntJQx2%2Ffgqnwua4hQrgskNKIOpFOw4Z3xJbZYlU3jiCNw%2BcLpWDoaHL7qXpIy3C2AC8AUsjpsZX%2F5Ei7ZZH0O7DOJv1Br172UO%2By8BbbGmq2Ktz07bDTsjSoLi5YO6ygKZllPsfDh%2BVWNdXaGQk2kVu%2F7tHgElm26U5qLT6MZpJlinpXRqLnv8WncEkhDULaRAzTfupj6G2aDpTRD6b%2FMwmVErph5WBWWiHQkwh62cxAY6pgFDSPMPlqCLoSISirqhHCuFfsphuNN4NPXoS9cocUUrttZ3RTEMLlgC7Bxmyo7Q7YUGmUTN3wj2DR140OFhg65RL1DC9YHwuLHlvlo2ojrn%2FXs%2Bwqp3yO%2FoHVXb4O28bwKSmNOEmL5fsL3VgidUTKhu8Y8coZjry7X61H6qZTpWpFfdbHj0FnDWVEY5M3jzrn6lobkuKouiijaszgReOIMewkdnUT4B&X-Amz-Signature=585291031ddc3449c1cac8d17ade93e286f5430ac6bf7b7be4d9eeda3681ca50&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject)
+
+결과는 .. 실패!
+
+다른 방법으로는 윈도우 서버 포트를 고정하는 것이었는데, 이는 다소 위험 부담이 있었다. (포트를 고정해버리면 보안상 취약할 것 같았다.)
+
+FTP는 정말 구식 프로토콜었다. 포트 구조도 복잡하고 방화벽에 친화적이지도 않았다...
+
+이렇게 포기해야하나 싶었는데 팀장님이 힌트를 주셨다. 'SFTP'를 찾아보라고 !
+
+### **세번째, FTP -> SFTP 전환하기, 'SFTP'가 뭘까?** 🤔
+
+우선 FTP와 SFTP의 차이점을 찾아보았다.
+
+1. **FTP**
+
+> 💡 포트: 21번(제어) + 랜덤 포트(데이터) ← 문제의 원인!  
+> 보안: 평문 전송  
+>   
+> 연결: 이중 연결 구조
+
+1. **SFTP**
+
+> 💡 포트: 22번 하나만  
+> 보안: SSH 암호화 통신  
+>   
+> 연결: 단일 연결 구조
+
+포트 하나만 사용한다고" 이거다!
+
+랜덤 포트 문제 완전 해결할 수 있었다.  22번 포트 하나만 아웃바운드 요청하면 되는 것!
+
+### **SFTP로 바꿔보자.**
+
+1. **라이브러리 교체**
+
+기존 fpt 라이브러리를 제거하고 **ssh2-sftp-client**를 깔았다.
+
+2. 연결 설졍 변경
+
+```javascript
+// Before: FTP
+const FtpClient = require('ftp');
+const client = new FtpClient();
+
+client.connect({
+    host: 'windows-server.com',
+    port: 21,
+    user: 'username',
+    password: 'password'
+});
+
+// After: SFTP
+const SftpClient = require('ssh2-sftp-client');
+const sftp = new SftpClient();
+
+await sftp.connect({
+    host: 'windows-server.com',
+    port: 22,  // 단일 포트!
+    username: 'username',
+    password: 'password'
+});
+```
+
+3. api 메서드 변경
+
+```javascript
+// Before: FTP
+client.list('/', (err, list) => {
+    client.put(localFile, remoteFile, callback);
+});
+
+// After: SFTP  
+const fileList = await sftp.list('/');
+await sftp.put(localFile, remoteFile);
+```
+
+### **네 번째: 데이터 불러오기는 성공했지만... 파일 업로드 실패**
+
+![눈물이슈](https://prod-files-secure.s3.us-west-2.amazonaws.com/08186c4d-8140-450f-af44-70f5092b5ec2/7a1fa586-812b-4990-8ca5-3c3eea6d1246/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2025-07-28_15.00.56.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466YSPXGV37%2F20250728%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250728T064929Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEF8aCXVzLXdlc3QtMiJGMEQCIB83Pv6hMke%2Fujkyw%2BJXZQcMa9CIK1U9kXfbDpJ4OIeDAiAby6AGhULQHH4asiKffi%2BBP8MYs4B06XSPDeN8WNeMUCqIBAiH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDYzNzQyMzE4MzgwNSIM%2BJ6MzYJgaxQStGAtKtwDVsZQBERxFAoJaT74X3kcSMpRQInbTkAlTFCgbTcjp11hfSuQGUWnewKpaZcErd69eA%2BDGBalneIb5%2FPLXSdzFZjgTknmfWm1OTBlUZ%2BE4tGiC07yjVLi%2BW4tocVhLm3OGVshtbk8WXbD71qutediBa48wgZlY0uWVOlmmIb9%2Fpquik9r%2BnpGvXAcncxATAb7Pftb8N9zxz7rw4wFVTaLpXQuTlklDI0eb%2BDmHQ4XUOz%2FtOFPTdAk5Fpaikic2v6Y6%2BqhPnQPe4a06TrCdklWxrVzSnmNL2PvL79pJzkHhTD6XMCW8MH8GjW%2F0qj6kdPyYQeUhwU4sr%2BW9jAwUFCbZMaWx7obvOlFD3PZY1FWdwsMFMDikT3bZTfkCiIU6n2Tjk%2BA%2FGaEHq9aj%2FuV82JvJ9ntJQx2%2Ffgqnwua4hQrgskNKIOpFOw4Z3xJbZYlU3jiCNw%2BcLpWDoaHL7qXpIy3C2AC8AUsjpsZX%2F5Ei7ZZH0O7DOJv1Br172UO%2By8BbbGmq2Ktz07bDTsjSoLi5YO6ygKZllPsfDh%2BVWNdXaGQk2kVu%2F7tHgElm26U5qLT6MZpJlinpXRqLnv8WncEkhDULaRAzTfupj6G2aDpTRD6b%2FMwmVErph5WBWWiHQkwh62cxAY6pgFDSPMPlqCLoSISirqhHCuFfsphuNN4NPXoS9cocUUrttZ3RTEMLlgC7Bxmyo7Q7YUGmUTN3wj2DR140OFhg65RL1DC9YHwuLHlvlo2ojrn%2FXs%2Bwqp3yO%2FoHVXb4O28bwKSmNOEmL5fsL3VgidUTKhu8Y8coZjry7X61H6qZTpWpFfdbHj0FnDWVEY5M3jzrn6lobkuKouiijaszgReOIMewkdnUT4B&X-Amz-Signature=9022bd4acbc69a40c946d3da705a0d9f2871665981caa1f9958091b97f3b5b7e&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject)
+
+SFTP 접속과 데이터 조회까지는 성공했는데 또 다른 문제가 발생했다.
+
+파일을 업로드했더니 파일 생성은 되지만 0byte로 만들어지면서 "Write stream error: Permission denied" 에러가 떠버렸다.
+
+윈도우 서버에 파일 권한 설정이 읽기 전용으로 되어있어서, 모든 권한을 허용하여 해결했다.
+
+### **다섯 번째: nginx 파일 업로드 사이즈 문제**
+
+배포까지 완료되고 본격적으로 사용하기 전 업로드 테스트 중에, 100MB 이상인 파일을 업로드했더니 413 에러를 뱉었다.
+
+이 문제는 따로 포스팅 했다! 참고바란다.
+
+[https://blog.naver.com/hblee-/223935845082](https://blog.naver.com/hblee-/223935845082)
+
+### **최종 결과**
+
+FTP의 복잡한 포트 문제를 SFTP의 단일 포트(22번) 사용으로 깔끔하게 해결할 수 있었고, 더 안정적인 시스템을 구축할 수 있었다!
+
+## **핵심 구현 기능들**
+
+- SFTP 연결 및 인증
+- 파일 업로드/다운로드 - 대용량 파일 처리 가능
+- 서버 파일 조회
+- 파일 존재 확인 - 중복 업로드 방지
+- 파일 삭제 - 서버 파일 관리
+
+## **운영팀과 회의**
+
+![행복^~^](https://prod-files-secure.s3.us-west-2.amazonaws.com/08186c4d-8140-450f-af44-70f5092b5ec2/0371d551-920d-4971-bd19-7f928f028063/%E1%84%8B%E1%85%B5%E1%84%80%E1%85%A6%E1%84%92%E1%85%A2%E1%86%BC%E1%84%87%E1%85%A9%E1%86%A8.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466YSPXGV37%2F20250728%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250728T064930Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEF8aCXVzLXdlc3QtMiJGMEQCIB83Pv6hMke%2Fujkyw%2BJXZQcMa9CIK1U9kXfbDpJ4OIeDAiAby6AGhULQHH4asiKffi%2BBP8MYs4B06XSPDeN8WNeMUCqIBAiH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDYzNzQyMzE4MzgwNSIM%2BJ6MzYJgaxQStGAtKtwDVsZQBERxFAoJaT74X3kcSMpRQInbTkAlTFCgbTcjp11hfSuQGUWnewKpaZcErd69eA%2BDGBalneIb5%2FPLXSdzFZjgTknmfWm1OTBlUZ%2BE4tGiC07yjVLi%2BW4tocVhLm3OGVshtbk8WXbD71qutediBa48wgZlY0uWVOlmmIb9%2Fpquik9r%2BnpGvXAcncxATAb7Pftb8N9zxz7rw4wFVTaLpXQuTlklDI0eb%2BDmHQ4XUOz%2FtOFPTdAk5Fpaikic2v6Y6%2BqhPnQPe4a06TrCdklWxrVzSnmNL2PvL79pJzkHhTD6XMCW8MH8GjW%2F0qj6kdPyYQeUhwU4sr%2BW9jAwUFCbZMaWx7obvOlFD3PZY1FWdwsMFMDikT3bZTfkCiIU6n2Tjk%2BA%2FGaEHq9aj%2FuV82JvJ9ntJQx2%2Ffgqnwua4hQrgskNKIOpFOw4Z3xJbZYlU3jiCNw%2BcLpWDoaHL7qXpIy3C2AC8AUsjpsZX%2F5Ei7ZZH0O7DOJv1Br172UO%2By8BbbGmq2Ktz07bDTsjSoLi5YO6ygKZllPsfDh%2BVWNdXaGQk2kVu%2F7tHgElm26U5qLT6MZpJlinpXRqLnv8WncEkhDULaRAzTfupj6G2aDpTRD6b%2FMwmVErph5WBWWiHQkwh62cxAY6pgFDSPMPlqCLoSISirqhHCuFfsphuNN4NPXoS9cocUUrttZ3RTEMLlgC7Bxmyo7Q7YUGmUTN3wj2DR140OFhg65RL1DC9YHwuLHlvlo2ojrn%2FXs%2Bwqp3yO%2FoHVXb4O28bwKSmNOEmL5fsL3VgidUTKhu8Y8coZjry7X61H6qZTpWpFfdbHj0FnDWVEY5M3jzrn6lobkuKouiijaszgReOIMewkdnUT4B&X-Amz-Signature=46f7a757717dcde7f9a94c102cce76b488429046d01e3b0532e0e0fb5d4da333&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject)
+
+웹 사이트 가이드를 만들어 전달했고, 긍정적인 반응을 받았다 ! 과정은 힘들었지만, 또 이런맛에 개발하는 거지..
+
+운영팀에서 더 필요한 피드백을 받아서 기능 추가를 할 계획이다!
+
+## 회고
+
+자동화하려는 목표는 상당 부분 달성했지만, 네트워크 환경과 보안 정책의 제약으로 완벽한 해결책을 찾기는 어려웠다.
+
+특히 FTP 프로토콜의 복잡성과 보안, 호스팅 업체의 방화벽 정책 등이 가장 큰 걸림돌이었다.
+
+이런 네트워크 문제는 아직 바이브 코딩으로 해결할 수 없다! 그러니 네트워크 CS 지식의 기본기를 탄탄히 해야겠다고 다짐했다.
+
+배포 과정에서 삽질이 많았지만 이 과정에서 다양한 네트워크 프로토콜, 배포  그리고 보안 정책에 대해 원리를 생각해볼 수 있었다.
+
+개발은 문제 해결의 연속이며, 그 과정에서 짜릿함을 느끼는 것 같다.
+
+때로는 기술적 완벽함보다 현실적 제약 안에서의 최선의 선택이 더 중요하다는 것을 다시금 느낄 수 있었다 !
+
+그래도 힘들었지만 재미있는 사이드 프로젝트였다 ㅎㅎ
