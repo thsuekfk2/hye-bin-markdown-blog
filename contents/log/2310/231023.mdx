@@ -13,9 +13,9 @@ tags: []
 
 자바스크립트에서 소수점 숫자 연산을 하면, 생각지도 못한 오류가 발생한다. 아래처럼 콘솔창에 0.1 + 0.2를 입력하면, 0.3이 아니라 0.30000000000000004 가 나오는 걸 확인해볼 수 있다.
 
-![image](https://github.com/thsuekfk2/hye-bin-markdown-blog/assets/76821963/eea35e5f-9389-47ce-b73d-be1dac3917d5)
+![image](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2310/231023-1.png)
 
-![image](https://github.com/thsuekfk2/hye-bin-markdown-blog/assets/76821963/3c209bcd-c88a-472b-b444-111555649a56)
+![image](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2310/231023-2.png)
 
 ## 원인
 
@@ -87,11 +87,9 @@ const formattedResult = formatResult(calcResult);
 - Math.pow는 2^3 = 8 과 같은 거듭 제곱을 나타낼 때 자바스크립트에서는 `Math.pow(2, 3)`와 같은 객체및 메서드를 사용한다. 앞 자리 숫자는 밑, 뒷 자리 숫자는 지수를 의미한다.
 
   ```jsx
-
   // 간단한 예
 
   Math.pow(2, 3); // 8
-
   ```
 
 **Math.round ?**
