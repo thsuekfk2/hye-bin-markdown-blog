@@ -6,7 +6,7 @@ export default function Home() {
     <div className="h-full w-full items-center justify-center text-center">
       <div className="flex flex-col">
         <Image
-          src="/jump.webp"
+          src="https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/jump.webp"
           width={850}
           height={300}
           className="max-md:hidden"

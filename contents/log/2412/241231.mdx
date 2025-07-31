@@ -28,31 +28,31 @@ tags: []
 - 최상위 요소부터 타겟 요소까지 이벤트가 전파 된 후 (이벤트 캡쳐링)
 - 타겟요소부터 이벤트가 전파되어 최상위 요소까지 올라갑니다. (이벤트 버블링)
 
-![이벤트 버블링과 캡쳐링](/log/2412/1.png)
+![이벤트 버블링과 캡쳐링](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2412/1.png)
 
 ### 이벤트 발생 흐름 파악하기
 
 span 태그를 클릭했을 때 이벤트 발생 흐름을 파악해 봅시다.
 
-![span 태그를 클릭했을 때 이벤트 버블링과 캡쳐링](/log/2412/2.png)
+![span 태그를 클릭했을 때 이벤트 버블링과 캡쳐링](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2412/2.png)
 
 - span태그에 클릭을 하면, html 최상위 요소부터 자식 태그까지 이벤트가 타고 올라갑니다. (캡쳐링)
 - span요소의 이벤트가 실행되면 반대로 부모요소를 타고 내려가며 전파됩니다. (버블링)
 
 ### 자바스크립트 addEventListener()는 기본적으로 버블링으로 동작
 
-![버블링 동작](/log/2412/3.png)
+![버블링 동작](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2412/3.png)
 
 ### addEventListener에 세번째 파라미터로 true를 넣어주면 캡쳐링으로 동작
 
-![캡처링 동작](/log/2412/4.png)
+![캡처링 동작](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2412/4.png)
 
 - 세번째 파라미터는 디폴트는 false로 버블링으로 되어있습니다.
 - 세번째 파라미터에 ture를 넣어주면 캡쳐링으로 동작합니다.
 
 ### Event.eventPhase로 이벤트 흐름 단계 파악
 
-![Event.eventPhase로 이벤트 흐름 파악 가능](/log/2412/5.png)
+![Event.eventPhase로 이벤트 흐름 파악 가능](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2412/5.png)
 
 - 부모에서 자식까지 내려갈때 ( 캡쳐링될 때 ) `1`
 - 현재 타겟에 도착했을 때 `2`

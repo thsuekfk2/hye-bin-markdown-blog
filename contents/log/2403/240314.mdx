@@ -45,7 +45,7 @@ tags: []
 
 위 방법대로 궁금해서 .git 파일을 찾아보았다. (숨겨진 파일 찾기 : Mac의 경우 Finder 또는 데스크탑에서 shift +command + . 키를 누르면 숨겨진 파일 .git 을 찾을 수 있다. )
 
-![post](/log/2403/oing.png)
+![post](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2403/oing.png)
 
 오잉? 이미 있네 ?
 
@@ -55,7 +55,7 @@ tags: []
 
 오키 ~ 한번 테스트 해보자.커밋을 해보니 엥 ? 후크가 실행 가능하도록 설정되어있지 않다고 에러가 발생했다. 🤔
 
-![post](/log/2403/1.png)
+![post](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2403/1.png)
 
 ```bash
 hint: The '.git/hooks/pre-commit' hook was ignored because it's not set as executable.
@@ -101,11 +101,11 @@ fi
 
 - 에러 발생
 
-  ![post](/log/2403/2.png)
+  ![post](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2403/2.png)
 
 - 성공
 
-  ![post](/log/2403/3.png)
+  ![post](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2403/3.png)
 
 잘 동작한다 😁
 
@@ -134,17 +134,17 @@ exit 0
 
 - 에러 발생
 
-  ![post](/log/2403/4.png)
+  ![post](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2403/4.png)
 
 - 성공
 
   - test 브랜치에서는 성공적으로 push 된다!
 
-    ![post](/log/2403/5.png)
+    ![post](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2403/5.png)
 
 ### Git Hooks의 문제점
 
-![post](/log/2403/6.png)
+![post](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2403/6.png)
 
 혼자 개발하는 경우에는 이러한 방법이 나쁘지 않을 수도 있겠지만, 여럿이 개발에 참여하는 경우 아래와 같은 문제가 발생할 수 있다. `.git` 디렉토리는 버전 관리 대상이 아니므로 레포에 올가가지 않는다. Git 체계 하에서는 **Git Hooks** 를 공유할 수 없다는 뜻이다.
 
@@ -153,7 +153,7 @@ exit 0
 
 ## 그래서 Husky가 나왔다!
 
-![post](/log/2403/7.png)
+![post](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2403/7.png)
 
 Husky는 git hook 설정을 도와주는 npm package로 번거로운 git hook 설정이 편하다.
 
@@ -236,11 +236,11 @@ exit 1
 
 - 에러발생
 
-  ![post](/log/2403/8.png)
+  ![post](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2403/8.png)
 
 - 성공
 
-  ![post](/log/2403/9.png)
+  ![post](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2403/9.png)
 
   그냥 husky 아래에다가 넣어 주면 끝.. 너무 쉽다!
 

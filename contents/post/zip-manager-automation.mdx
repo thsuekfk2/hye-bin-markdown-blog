@@ -3,7 +3,7 @@ title: "사내 프로젝트 ZIP 파일 관리 자동화 도구 (feat. 노가다 
 slug: "zip-manager-automation"
 date: "2025-07-28"
 description: "나의 목표는 수동으로 처리하던 파일 압축, 해제, 관리 작업들을 웹 인터페이스를 통해 효율적으로 처리할 수 있는 도구를 만들어, 기존에 1시간 업무를 5분으로 줄이는 것을 목표로 잡았다."
-thumbnail: "/post/zip-manager-automation/2.jpg"
+thumbnail: "https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/post/zip-manager-automation/2.jpg"
 tags: []
 ---
 
@@ -39,7 +39,7 @@ tags: []
 
 ### **첫 번째 고난: FTP 연결 실패**
 
-![로컬에서는 문제가 없었는데 …](/post/zip-manager-automation/1.jpg)
+![로컬에서는 문제가 없었는데 …](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/post/zip-manager-automation/1.jpg)
 
 로컬에서는 문제가 없었는데, 이상하게 배포를 하니 FTP 연결이 실패하는 문제가 발생했다. 
 
@@ -56,7 +56,7 @@ tags: []
 
 ### **두번째 시련: FTP 연결은 성공했지만 데이터 불러오기실패**
 
-![또 다른 문제 발생..](/post/zip-manager-automation/2.jpg)
+![또 다른 문제 발생..](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/post/zip-manager-automation/2.jpg)
 
 또 다른 문제가 발생했다.
 아웃바운드 설정으로 FTP 연결에 성공하여 모든 게 끝났다고 생각했지만, 데이터 조회가 되지 않았다. (ㅠㅠ)
@@ -73,7 +73,7 @@ FTP는 다른 프로토콜과 달리 두개의 연결을 사용한다고 한다.
 
 그럼 데이터 연결 포트만 아웃바운드하면 되겠다고 단순하게 생각했는데, 데이터 연결 포트는 랜덤이었다... 수백 개의 포트를 개별 등록하는 것은 비현실적이었고, 모든 데이터 포트 범위를 허용하기엔 클라우드 업체에서 단일 포트만 허용할 수 있었다. (범위 지정 불가) ㅠㅠ
 
-![실패!](/post/zip-manager-automation/3.jpg)
+![실패!](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/post/zip-manager-automation/3.jpg)
 
 결과는 .. 실패!
 
@@ -152,7 +152,7 @@ await sftp.put(localFile, remoteFile);
 
 ### **네 번째: 데이터 불러오기는 성공했지만... 파일 업로드 실패**
 
-![눈물이슈](/post/zip-manager-automation/4.jpg)
+![눈물이슈](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/post/zip-manager-automation/4.jpg)
 
 SFTP 접속과 데이터 조회까지는 성공했는데 또 다른 문제가 발생했다.
 
@@ -182,7 +182,7 @@ FTP의 복잡한 포트 문제를 SFTP의 단일 포트(22번) 사용으로 깔�
 
 ## **운영팀과 회의**
 
-![행복^~^](/post/zip-manager-automation/5.jpg)
+![행복^~^](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/post/zip-manager-automation/5.jpg)
 
 웹 사이트 가이드를 만들어 전달했고, 긍정적인 반응을 받았다 ! 과정은 힘들었지만, 또 이런맛에 개발하는 거지..
 

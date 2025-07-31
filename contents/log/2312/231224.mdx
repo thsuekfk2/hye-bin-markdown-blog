@@ -45,7 +45,7 @@ tags: []
 
 간단하게 웹워커를 사용한것과 사용하지 않은 것을 구현해보며 비교해보자.
 
-![post](/log/2312/1.png)
+![post](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2312/1.png)
 
 일단 두개의 버튼을 만들어 보았다. `count+1` 버튼을 누르면 count가 1씩 증가되고 , `answer+100` 버튼을 누르면 answer이 100씩 증가한다.
 
@@ -88,13 +88,13 @@ export const NonWorker = () => {
 };
 ```
 
-![gif](/log/2312/non-worker.gif)
+![gif](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2312/non-worker.gif)
 
 `answer+100` 버튼을 누르자 500000000번의 루프가 다 돌때까지 coun+1의 버튼을 마구 눌러도, UI의 반응이 없었다. 그리고 루프가 끝나면 count의 값이 한번에 바뀌는 현상이 나타났다.
 
 이벤트 루프를 살펴보자.
 
-![post](/log/2312/event-1.png)
+![post](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2312/event-1.png)
 
 getAnswer함수가 오랜시간 걸리기때문에, 이벤트 루프에서는 이 함수가 끝날 때 까지 다른 이벤트의 작업을 처리하지 못하고 큐에 쌓이게 된다. 즉, 이 함수의 작업이 끝날 때까지 메인 스레드는 다른 이벤트나 작업을 처리하지 못하고 기다려서 UI 업데이트나 이벤트 응답과 같은 작업들이 블로킹된것.
 
@@ -159,15 +159,15 @@ Worker() 생성자를 호출하여 워커 스레드에서 실행할 스크립트
 - `worker.postMessage("start")` : 메인 스레드는 워커에게 "start" 메시지를 보낸다.
 - `worker.onmessage = (event) => setAnswer((prev) => prev + event.data)` **:** 웹워커로 부터 메세지를 받아 메인 스레드의 상태를 업데이트한다.
 
-![gif](/log/2312/worker.gif)
+![gif](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2312/worker.gif)
 
 answer + 100 버튼을 눌러도 count+1 버튼이 눌리면서 UI또한 즉각적으로 바뀌는것을 볼 수 있다.
 
 이벤트 루프를 살펴보자.
 
-![post](/log/2312/event-2.png)
+![post](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2312/event-2.png)
 
-![post](/log/2312/event-3.png)
+![post](https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/log/2312/event-3.png)
 
 answer+100 버튼을 눌렀을 때, WebWork API에게 메세지를 보내고 스택은 비워지게 된다.
 

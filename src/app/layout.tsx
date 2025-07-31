@@ -43,7 +43,12 @@ export default function RootLayout({
               <Analytics />
               <Link href="/">
                 <div className="flex items-center gap-2">
-                  <Image src="/cat.png" alt="고양이" width={20} height={20} />
+                  <Image
+                    src="https://hyebin-markdown-blog.s3.ap-northeast-2.amazonaws.com/cat.png"
+                    alt="고양이"
+                    width={20}
+                    height={20}
+                  />
                   <span className="transition-all delay-75 hover:underline">
                     hyebin
                   </span>
