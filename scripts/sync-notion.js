@@ -313,9 +313,9 @@ async function processImagesInBlocks(blocks, category, slug) {
       const originalUrl = block.parent;
       if (originalUrl && (originalUrl.includes('notion.so') || originalUrl.includes('prod-files-secure'))) {
         try {
-          console.log(`   📸 이미지 처리 중: ${imageCounter}.jpg`);
+          console.log(`   📸 이미지 처리 중: ${slug}-${imageCounter}.jpg`);
           
-          const s3Key = `${category}/${slug}/${imageCounter}.jpg`;
+          const s3Key = `${category}/${slug}/${slug}-${imageCounter}.jpg`;
           const s3Url = `${S3_BASE_URL}/${s3Key}`;
           
           // S3에 이미 존재하는지 확인
