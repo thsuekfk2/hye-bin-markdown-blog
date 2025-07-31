@@ -1,0 +1,24 @@
+name: Blog Deployment Notification
+
+on:
+  push:
+    branches: [main]
+  # sync-notion 워크플로우 완료 후 실행
+  workflow_run:
+    workflows: ["Sync Notion to MDX"]
+    types:
+      - completed
+
+jobs:
+  notify-deployment:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+            
+      - name: Deployment notification
+        run: |
+          echo "🚀 Blog deployment triggered!"
+          echo "📝 MDX files updated with S3 images"
+          echo "🌐 Vercel will automatically deploy the changes"

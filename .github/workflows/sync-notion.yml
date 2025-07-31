@@ -25,15 +25,24 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Sync Notion to MDX
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Sync Notion to MDX with S3 Images
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: yarn sync-notion
 
       - name: Commit changes
         run: |
-          git config --local user.email "action@github.com"
+          git config --local user.email "thsuekfk@naver.com"
           git config --local user.name "GitHub Action"
           git add .
           if git diff --staged --quiet; then
