@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const crypto = require('crypto');
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, HeadObjectCommand } = require('@aws-sdk/client-s3');
 
 // 환경변수 로드
 function loadEnv() {
@@ -249,16 +249,24 @@ async function processImage(imageBlock, slug, category, imageCounter) {
 
     if (!imageUrl) return null;
 
-    console.log(`   📸 이미지 처리 중: ${imageCounter}.jpg`);
+    const s3Key = `${category}/${slug}/${imageCounter}.jpg`;
+    const s3Url = `${S3_BASE_URL}/${s3Key}`;
+
+    // S3에 이미 존재하는지 확인
+    const exists = await checkS3ObjectExists(s3Key);
+    if (exists) {
+      console.log(`   ♻️  이미지 재사용: ${s3Key} (이미 존재함)`);
+      return s3Url;
+    }
+
+    console.log(`   📸 새 이미지 처리 중: ${imageCounter}.jpg`);
     
     // 이미지 다운로드
     const imageBuffer = await downloadImage(imageUrl);
     
     // S3에 업로드
-    const s3Key = `${category}/${slug}/${imageCounter}.jpg`;
     await uploadToS3(imageBuffer, s3Key);
     
-    const s3Url = `${S3_BASE_URL}/${s3Key}`;
     console.log(`   ✅ S3 업로드 완료: ${s3Url}`);
     
     return s3Url;
@@ -288,6 +296,23 @@ async function downloadImage(url) {
       reject(error);
     });
   });
+}
+
+async function checkS3ObjectExists(key) {
+  try {
+    const command = new HeadObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: key,
+    });
+    
+    await s3Client.send(command);
+    return true; // 객체가 존재함
+  } catch (error) {
+    if (error.name === 'NotFound') {
+      return false; // 객체가 존재하지 않음
+    }
+    throw error; // 다른 에러는 다시 throw
+  }
 }
 
 async function uploadToS3(buffer, key) {
