@@ -72,15 +72,14 @@ function saveHashCache(cache) {
   fs.writeFileSync(HASH_CACHE_FILE, JSON.stringify(cache, null, 2));
 }
 
-async function syncNotionToMDX() {
+async function syncNotionToMDX(targetSlug = null) {
   try {
     console.log("🚀 노션에서 데이터를 가져오는 중...");
 
     // 해시 캐시 로드
     const hashCache = loadHashCache();
 
-    // 노션 데이터베이스에서 모든 글 가져오기 (테스트용)
-    const response = await notion.databases.query({
+    let query = {
       database_id: DATABASE_ID,
       sorts: [
         {
@@ -88,12 +87,30 @@ async function syncNotionToMDX() {
           direction: "descending",
         },
       ],
-    });
+    };
+
+    // 특정 slug가 지정된 경우 필터 추가
+    if (targetSlug) {
+      console.log(`🎯 특정 글만 동기화: "${targetSlug}"`);
+      query.filter = {
+        property: "Slug",
+        rich_text: {
+          equals: targetSlug,
+        },
+      };
+    }
+
+    const response = await notion.databases.query(query);
+
+    if (targetSlug && response.results.length === 0) {
+      console.log(`❌ "${targetSlug}" slug를 가진 글을 찾을 수 없습니다.`);
+      return;
+    }
 
     console.log(`📝 ${response.results.length}개의 글을 찾았습니다.`);
 
     for (const page of response.results) {
-      await processPage(page, hashCache);
+      await processPage(page, hashCache, targetSlug !== null);
     }
 
     // 해시 캐시 저장
@@ -105,7 +122,7 @@ async function syncNotionToMDX() {
   }
 }
 
-async function processPage(page, hashCache) {
+async function processPage(page, hashCache, forceProcess = false) {
   try {
     // 페이지 속성 추출
     const properties = page.properties;
@@ -135,11 +152,24 @@ async function processPage(page, hashCache) {
       return;
     }
 
-    // 마크다운 변환 및 이미지 처리
+    // 마크다운 변환
     const mdblocks = await n2m.pageToMarkdown(page.id);
     
-    // 이미지 URL을 S3 URL로 변환
-    await processImagesInBlocks(mdblocks, category, slug);
+    // 파일 경로 결정 (이미지 처리 전에 파일 존재 여부 확인용)
+    const filePath = getFilePath(category, slug, date);
+    const isNewFile = !fs.existsSync(filePath);
+    
+    // 새 파일이거나 강제 처리인 경우 이미지 S3 처리
+    if (isNewFile || forceProcess) {
+      if (forceProcess) {
+        console.log(`🎯 특정 글 업데이트로 이미지를 S3로 처리합니다.`);
+      } else {
+        console.log(`📸 새 글이므로 이미지를 S3로 처리합니다.`);
+      }
+      await processImagesInBlocks(mdblocks, category, slug);
+    } else {
+      console.log(`📄 기존 글이므로 이미지 처리를 건너뜁니다.`);
+    }
     
     const mdString = n2m.toMarkdownString(mdblocks);
 
@@ -166,8 +196,7 @@ async function processPage(page, hashCache) {
       .trim();
     const mdxContent = `${frontmatter}\n\n${cleanedMarkdown}`;
 
-    // 파일 경로 결정
-    const filePath = getFilePath(category, slug, date);
+    // 파일 경로는 이미 위에서 결정됨
 
     // 새로운 내용의 해시 생성
     const newContentHash = crypto
@@ -364,7 +393,16 @@ async function uploadToS3(buffer, key) {
 
 // 스크립트 실행
 if (require.main === module) {
-  syncNotionToMDX();
+  // 명령줄 인자에서 slug 가져오기
+  const targetSlug = process.argv[2];
+  
+  if (targetSlug) {
+    console.log(`🎯 특정 slug 동기화 모드: "${targetSlug}"`);
+  } else {
+    console.log(`📚 전체 동기화 모드`);
+  }
+  
+  syncNotionToMDX(targetSlug);
 }
 
 module.exports = { syncNotionToMDX };

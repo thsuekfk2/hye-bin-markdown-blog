@@ -1,8 +1,14 @@
 name: Sync Notion to MDX
 
 on:
-  # 수동 실행 가능
+  # 수동 실행 가능 (slug 입력 옵션 추가)
   workflow_dispatch:
+    inputs:
+      slug:
+        description: '동기화할 특정 글의 slug (비워두면 전체 동기화)'
+        required: false
+        default: ''
+        type: string
 
   # 메인 브랜치에 푸시될 때 실행 (선택사항)
   # push:
@@ -43,7 +49,14 @@ jobs:
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: npm run sync-notion
+        run: |
+          if [ -n "${{ github.event.inputs.slug }}" ]; then
+            echo "🎯 특정 slug 동기화: ${{ github.event.inputs.slug }}"
+            npm run sync-notion "${{ github.event.inputs.slug }}"
+          else
+            echo "📚 전체 동기화"
+            npm run sync-notion
+          fi
 
       - name: Commit changes
         run: |
