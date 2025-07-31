@@ -3,6 +3,8 @@ const { NotionToMarkdown } = require("notion-to-md");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const https = require("https");
+const { S3Client, PutObjectCommand, HeadObjectCommand } = require("@aws-sdk/client-s3");
 
 // 환경변수 수동 로드
 function loadEnv() {
@@ -32,6 +34,18 @@ const n2m = new NotionToMarkdown({
     convertImagesToBase64: false,
   },
 });
+
+// S3 클라이언트 설정
+const s3Client = new S3Client({
+  region: "ap-northeast-2",
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
+
+const S3_BUCKET = "hyebin-markdown-blog";
+const S3_BASE_URL = `https://${S3_BUCKET}.s3.ap-northeast-2.amazonaws.com`;
 
 // 노션 데이터베이스 ID (환경변수에서 설정)
 const DATABASE_ID = process.env.NOTION_DATABASE_ID;
@@ -121,8 +135,12 @@ async function processPage(page, hashCache) {
       return;
     }
 
-    // 마크다운 변환
+    // 마크다운 변환 및 이미지 처리
     const mdblocks = await n2m.pageToMarkdown(page.id);
+    
+    // 이미지 URL을 S3 URL로 변환
+    await processImagesInBlocks(mdblocks, category, slug);
+    
     const mdString = n2m.toMarkdownString(mdblocks);
 
     // frontmatter 생성
@@ -255,6 +273,93 @@ function getFilePath(category, slug, date) {
     // 포스트는 슬러그 기반
     return path.join(CONTENTS_DIR, "post", `${slug}.mdx`);
   }
+}
+
+// S3 이미지 처리 함수들
+async function processImagesInBlocks(blocks, category, slug) {
+  let imageCounter = 1;
+  
+  for (const block of blocks) {
+    if (block.type === 'image') {
+      const originalUrl = block.parent;
+      if (originalUrl && (originalUrl.includes('notion.so') || originalUrl.includes('prod-files-secure'))) {
+        try {
+          console.log(`   📸 이미지 처리 중: ${imageCounter}.jpg`);
+          
+          const s3Key = `${category}/${slug}/${imageCounter}.jpg`;
+          const s3Url = `${S3_BASE_URL}/${s3Key}`;
+          
+          // S3에 이미 존재하는지 확인
+          const exists = await checkS3ObjectExists(s3Key);
+          if (exists) {
+            console.log(`   ♻️  이미지 재사용: ${s3Key} (이미 존재함)`);
+            block.parent = s3Url;
+          } else {
+            // 이미지 다운로드 및 S3 업로드
+            const imageBuffer = await downloadImage(originalUrl);
+            await uploadToS3(imageBuffer, s3Key);
+            
+            console.log(`   ✅ S3 업로드 완료: ${s3Url}`);
+            block.parent = s3Url;
+          }
+          
+          imageCounter++;
+        } catch (error) {
+          console.error(`   ❌ 이미지 처리 실패:`, error.message);
+        }
+      }
+    }
+  }
+}
+
+async function checkS3ObjectExists(key) {
+  try {
+    const command = new HeadObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: key,
+    });
+    
+    await s3Client.send(command);
+    return true;
+  } catch (error) {
+    if (error.name === "NotFound") {
+      return false;
+    }
+    throw error;
+  }
+}
+
+async function downloadImage(url) {
+  return new Promise((resolve, reject) => {
+    https.get(url, (response) => {
+      const chunks = [];
+      
+      response.on('data', (chunk) => {
+        chunks.push(chunk);
+      });
+      
+      response.on('end', () => {
+        resolve(Buffer.concat(chunks));
+      });
+      
+      response.on('error', (error) => {
+        reject(error);
+      });
+    }).on('error', (error) => {
+      reject(error);
+    });
+  });
+}
+
+async function uploadToS3(buffer, key) {
+  const command = new PutObjectCommand({
+    Bucket: S3_BUCKET,
+    Key: key,
+    Body: buffer,
+    ContentType: 'image/jpeg',
+  });
+
+  await s3Client.send(command);
 }
 
 // 스크립트 실행

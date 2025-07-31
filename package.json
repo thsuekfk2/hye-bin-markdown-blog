@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next build && next start",
     "lint": "next lint",
-    "sync-notion": "node scripts/notion-to-mdx.js"
+    "sync-notion": "node scripts/sync-notion.js"
   },
   "dependencies": {
     "postcss": "8.4.26",
