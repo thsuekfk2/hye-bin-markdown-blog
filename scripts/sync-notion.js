@@ -4,7 +4,11 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const https = require("https");
-const { S3Client, PutObjectCommand, HeadObjectCommand } = require("@aws-sdk/client-s3");
+const {
+  S3Client,
+  PutObjectCommand,
+  HeadObjectCommand,
+} = require("@aws-sdk/client-s3");
 
 // 환경변수 수동 로드
 function loadEnv() {
@@ -75,7 +79,9 @@ function saveHashCache(cache) {
 async function syncNotionToMDX(targetSlug) {
   try {
     if (!targetSlug) {
-      console.error("❌ slug 파라미터가 필요합니다. 사용법: node sync-notion.js <slug>");
+      console.error(
+        "❌ slug 파라미터가 필요합니다. 사용법: node sync-notion.js <slug>",
+      );
       process.exit(1);
     }
 
@@ -154,11 +160,11 @@ async function processPage(page, hashCache, forceProcess = false) {
 
     // 마크다운 변환
     const mdblocks = await n2m.pageToMarkdown(page.id);
-    
+
     // 파일 경로 결정 (이미지 처리 전에 파일 존재 여부 확인용)
     const filePath = getFilePath(category, slug, date);
     const isNewFile = !fs.existsSync(filePath);
-    
+
     // 새 파일이거나 강제 처리인 경우 이미지 S3 처리
     if (isNewFile || forceProcess) {
       if (forceProcess) {
@@ -170,7 +176,7 @@ async function processPage(page, hashCache, forceProcess = false) {
     } else {
       console.log(`📄 기존 글이므로 이미지 처리를 건너뜁니다.`);
     }
-    
+
     const mdString = n2m.toMarkdownString(mdblocks);
 
     // frontmatter 생성
@@ -209,18 +215,20 @@ async function processPage(page, hashCache, forceProcess = false) {
       const fileStats = fs.statSync(filePath);
       const cacheKey = filePath;
       const cachedData = hashCache[cacheKey];
-      
+
       // 캐시 데이터 구조: { hash, size, mtime }
-      const newSize = Buffer.byteLength(mdxContent, 'utf8');
-      
+      const newSize = Buffer.byteLength(mdxContent, "utf8");
+
       // 캐시된 데이터가 있고, 크기가 같고, 해시도 같으면 건너뛰기
-      if (cachedData && 
-          cachedData.size === newSize && 
-          cachedData.hash === newContentHash) {
+      if (
+        cachedData &&
+        cachedData.size === newSize &&
+        cachedData.hash === newContentHash
+      ) {
         console.log(`⏭️  변경사항 없음: "${title}" - 건너뛰기`);
         return;
       }
-      
+
       // 캐시된 데이터가 없거나 크기가 다르면 파일을 읽어서 확인
       if (!cachedData || cachedData.size !== newSize) {
         const existingContent = fs.readFileSync(filePath, "utf8");
@@ -235,7 +243,7 @@ async function processPage(page, hashCache, forceProcess = false) {
           hashCache[cacheKey] = {
             hash: newContentHash,
             size: newSize,
-            mtime: fileStats.mtime.getTime()
+            mtime: fileStats.mtime.getTime(),
           };
           return;
         }
@@ -250,15 +258,15 @@ async function processPage(page, hashCache, forceProcess = false) {
 
     // 파일 쓰기
     fs.writeFileSync(filePath, mdxContent, "utf8");
-    
+
     // 캐시에 새 데이터 저장
     const fileStats = fs.statSync(filePath);
     hashCache[filePath] = {
       hash: newContentHash,
-      size: Buffer.byteLength(mdxContent, 'utf8'),
-      mtime: fileStats.mtime.getTime()
+      size: Buffer.byteLength(mdxContent, "utf8"),
+      mtime: fileStats.mtime.getTime(),
     };
-    
+
     console.log(`✅ 업데이트됨: ${filePath}`);
   } catch (error) {
     console.error(`페이지 처리 실패 (${page.id}):`, error);
@@ -307,17 +315,34 @@ function getFilePath(category, slug, date) {
 // S3 이미지 처리 함수들
 async function processImagesInBlocks(blocks, category, slug) {
   let imageCounter = 1;
-  
+
   for (const block of blocks) {
-    if (block.type === 'image') {
-      const originalUrl = block.parent;
-      if (originalUrl && (originalUrl.includes('notion.so') || originalUrl.includes('prod-files-secure'))) {
+    if (block.type === "image") {
+      // 마크다운에서 실제 URL 추출
+      let originalUrl = block.parent;
+
+      // 마크다운 이미지 형식인 경우 URL 추출
+      if (originalUrl && originalUrl.startsWith("![")) {
+        const urlMatch = originalUrl.match(/!\[.*?\]\((.*?)\)/);
+        if (urlMatch && urlMatch[1]) {
+          originalUrl = urlMatch[1];
+        }
+      }
+
+      console.log(`   🔍 이미지 블록 분석: ${JSON.stringify(block, null, 2)}`);
+
+      if (
+        originalUrl &&
+        (originalUrl.includes("notion.so") ||
+          originalUrl.includes("prod-files-secure"))
+      ) {
         try {
           console.log(`   📸 이미지 처리 중: ${slug}-${imageCounter}.jpg`);
-          
+          console.log(`   🔗 원본 URL: ${originalUrl}`);
+
           const s3Key = `${category}/${slug}/${slug}-${imageCounter}.jpg`;
           const s3Url = `${S3_BASE_URL}/${s3Key}`;
-          
+
           // S3에 이미 존재하는지 확인
           const exists = await checkS3ObjectExists(s3Key);
           if (exists) {
@@ -327,14 +352,15 @@ async function processImagesInBlocks(blocks, category, slug) {
             // 이미지 다운로드 및 S3 업로드
             const imageBuffer = await downloadImage(originalUrl);
             await uploadToS3(imageBuffer, s3Key);
-            
+
             console.log(`   ✅ S3 업로드 완료: ${s3Url}`);
             block.parent = s3Url;
           }
-          
+
           imageCounter++;
         } catch (error) {
           console.error(`   ❌ 이미지 처리 실패:`, error.message);
+          console.error(`   📍 URL: ${originalUrl}`);
         }
       }
     }
@@ -347,7 +373,7 @@ async function checkS3ObjectExists(key) {
       Bucket: S3_BUCKET,
       Key: key,
     });
-    
+
     await s3Client.send(command);
     return true;
   } catch (error) {
@@ -358,24 +384,69 @@ async function checkS3ObjectExists(key) {
   }
 }
 
+function isValidUrl(urlString) {
+  try {
+    const url = new URL(urlString);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch (error) {
+    return false;
+  }
+}
+
 async function downloadImage(url) {
   return new Promise((resolve, reject) => {
-    https.get(url, (response) => {
+    // URL 유효성 검사
+    if (!isValidUrl(url)) {
+      return reject(new Error(`Invalid URL format: ${url}`));
+    }
+
+    const options = {
+      timeout: 30000,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; NotionSync/1.0)",
+      },
+    };
+
+    const request = https.get(url, options, (response) => {
+      // 리다이렉트 처리
+      if (
+        response.statusCode >= 300 &&
+        response.statusCode < 400 &&
+        response.headers.location
+      ) {
+        return downloadImage(response.headers.location)
+          .then(resolve)
+          .catch(reject);
+      }
+
+      if (response.statusCode !== 200) {
+        return reject(
+          new Error(`HTTP ${response.statusCode}: ${response.statusMessage}`),
+        );
+      }
+
       const chunks = [];
-      
-      response.on('data', (chunk) => {
+
+      response.on("data", (chunk) => {
         chunks.push(chunk);
       });
-      
-      response.on('end', () => {
+
+      response.on("end", () => {
         resolve(Buffer.concat(chunks));
       });
-      
-      response.on('error', (error) => {
+
+      response.on("error", (error) => {
         reject(error);
       });
-    }).on('error', (error) => {
-      reject(error);
+    });
+
+    request.on("error", (error) => {
+      reject(new Error(`Request failed: ${error.message}`));
+    });
+
+    request.on("timeout", () => {
+      request.destroy();
+      reject(new Error("Request timeout"));
     });
   });
 }
@@ -385,7 +456,7 @@ async function uploadToS3(buffer, key) {
     Bucket: S3_BUCKET,
     Key: key,
     Body: buffer,
-    ContentType: 'image/jpeg',
+    ContentType: "image/jpeg",
   });
 
   await s3Client.send(command);
@@ -395,7 +466,7 @@ async function uploadToS3(buffer, key) {
 if (require.main === module) {
   // 명령줄 인자에서 slug 가져오기
   const targetSlug = process.argv[2];
-  
+
   syncNotionToMDX(targetSlug);
 }
 
