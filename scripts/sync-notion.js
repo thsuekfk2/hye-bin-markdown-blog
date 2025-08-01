@@ -72,9 +72,14 @@ function saveHashCache(cache) {
   fs.writeFileSync(HASH_CACHE_FILE, JSON.stringify(cache, null, 2));
 }
 
-async function syncNotionToMDX(targetSlug = null) {
+async function syncNotionToMDX(targetSlug) {
   try {
-    console.log("🚀 노션에서 데이터를 가져오는 중...");
+    if (!targetSlug) {
+      console.error("❌ slug 파라미터가 필요합니다. 사용법: node sync-notion.js <slug>");
+      process.exit(1);
+    }
+
+    console.log(`🎯 특정 글만 동기화: "${targetSlug}"`);
 
     // 해시 캐시 로드
     const hashCache = loadHashCache();
@@ -87,22 +92,17 @@ async function syncNotionToMDX(targetSlug = null) {
           direction: "descending",
         },
       ],
-    };
-
-    // 특정 slug가 지정된 경우 필터 추가
-    if (targetSlug) {
-      console.log(`🎯 특정 글만 동기화: "${targetSlug}"`);
-      query.filter = {
+      filter: {
         property: "Slug",
         rich_text: {
           equals: targetSlug,
         },
-      };
-    }
+      },
+    };
 
     const response = await notion.databases.query(query);
 
-    if (targetSlug && response.results.length === 0) {
+    if (response.results.length === 0) {
       console.log(`❌ "${targetSlug}" slug를 가진 글을 찾을 수 없습니다.`);
       return;
     }
@@ -110,7 +110,7 @@ async function syncNotionToMDX(targetSlug = null) {
     console.log(`📝 ${response.results.length}개의 글을 찾았습니다.`);
 
     for (const page of response.results) {
-      await processPage(page, hashCache, targetSlug !== null);
+      await processPage(page, hashCache, true);
     }
 
     // 해시 캐시 저장
@@ -395,12 +395,6 @@ async function uploadToS3(buffer, key) {
 if (require.main === module) {
   // 명령줄 인자에서 slug 가져오기
   const targetSlug = process.argv[2];
-  
-  if (targetSlug) {
-    console.log(`🎯 특정 slug 동기화 모드: "${targetSlug}"`);
-  } else {
-    console.log(`📚 전체 동기화 모드`);
-  }
   
   syncNotionToMDX(targetSlug);
 }

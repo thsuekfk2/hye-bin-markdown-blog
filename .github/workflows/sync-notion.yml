@@ -5,9 +5,9 @@ on:
   workflow_dispatch:
     inputs:
       slug:
-        description: '동기화할 특정 글의 slug (비워두면 전체 동기화)'
-        required: false
-        default: ''
+        description: "동기화할 특정 글의 slug"
+        required: true
+        default: ""
         type: string
 
   # 메인 브랜치에 푸시될 때 실행 (선택사항)
