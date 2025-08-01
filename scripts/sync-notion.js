@@ -172,7 +172,7 @@ async function processPage(page, hashCache, forceProcess = false) {
       } else {
         console.log(`📸 새 글이므로 이미지를 S3로 처리합니다.`);
       }
-      await processImagesInBlocks(mdblocks, category, slug);
+      await processImagesInBlocks(mdblocks, category, slug, date);
     } else {
       console.log(`📄 기존 글이므로 이미지 처리를 건너뜁니다.`);
     }
@@ -313,7 +313,7 @@ function getFilePath(category, slug, date) {
 }
 
 // S3 이미지 처리 함수들
-async function processImagesInBlocks(blocks, category, slug) {
+async function processImagesInBlocks(blocks, category, slug, date) {
   let imageCounter = 1;
 
   for (const block of blocks) {
@@ -340,7 +340,20 @@ async function processImagesInBlocks(blocks, category, slug) {
           console.log(`   📸 이미지 처리 중: ${slug}-${imageCounter}.jpg`);
           console.log(`   🔗 원본 URL: ${originalUrl}`);
 
-          const s3Key = `${category}/${slug}/${slug}-${imageCounter}.jpg`;
+          // S3 키 생성 (카테고리별로 다른 경로)
+          let s3Key;
+          if (category === "log") {
+            // log인 경우: log/YYMM/slug-숫자.jpg
+            const dateObj = new Date(date);
+            const year = dateObj.getFullYear().toString().slice(-2);
+            const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+            const folderName = `${year}${month}`;
+            s3Key = `${category}/${folderName}/${slug}-${imageCounter}.jpg`;
+          } else {
+            // post인 경우: post/slug/slug-숫자.jpg
+            s3Key = `${category}/${slug}/${slug}-${imageCounter}.jpg`;
+          }
+          
           const s3Url = `${S3_BASE_URL}/${s3Key}`;
 
           // S3에 이미 존재하는지 확인
