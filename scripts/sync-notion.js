@@ -360,14 +360,14 @@ async function processImagesInBlocks(blocks, category, slug, date) {
           const exists = await checkS3ObjectExists(s3Key);
           if (exists) {
             console.log(`   ♻️  이미지 재사용: ${s3Key} (이미 존재함)`);
-            block.parent = s3Url;
+            block.parent = `![image](${s3Url})`;
           } else {
             // 이미지 다운로드 및 S3 업로드
             const imageBuffer = await downloadImage(originalUrl);
             await uploadToS3(imageBuffer, s3Key);
 
             console.log(`   ✅ S3 업로드 완료: ${s3Url}`);
-            block.parent = s3Url;
+            block.parent = `![image](${s3Url})`;
           }
 
           imageCounter++;
