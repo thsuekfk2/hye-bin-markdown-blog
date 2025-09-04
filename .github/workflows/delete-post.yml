@@ -1,0 +1,49 @@
+name: 블로그 포스트 삭제
+
+on:
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: "삭제할 포스트의 slug (예: my-post 또는 241027). ⚠️ 로컬 MDX만 삭제되고 노션 데이터는 보존됩니다."
+        required: true
+        type: string
+
+jobs:
+  delete-post:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Delete post by slug
+        run: |
+          echo "🗑️ 로컬 MDX 파일 삭제: ${{ github.event.inputs.slug }}"
+          echo "⚠️ 노션 데이터베이스는 건드리지 않습니다 (안전함)"
+          npm run clean-posts "${{ github.event.inputs.slug }}"
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "thsuekfk@naver.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🗑️ 포스트 삭제: ${{ github.event.inputs.slug }}"
+            git push
+          fi
