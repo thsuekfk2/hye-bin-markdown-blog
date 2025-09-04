@@ -1,11 +1,11 @@
-name: Blog Deployment Notification
+name: 배포 알림
 
 on:
   push:
     branches: [main]
   # sync-notion 워크플로우 완료 후 실행
   workflow_run:
-    workflows: ["Sync Notion to MDX"]
+    workflows: ["노션 블로그 동기화"]
     types:
       - completed
 

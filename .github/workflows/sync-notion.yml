@@ -1,4 +1,4 @@
-name: Sync Notion to MDX
+name: 노션 블로그 동기화
 
 on:
   # 수동 실행 가능 (slug 입력 옵션 추가)
