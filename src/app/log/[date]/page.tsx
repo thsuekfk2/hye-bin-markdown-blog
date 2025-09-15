@@ -62,7 +62,7 @@ export default async function Page({ params }: { params: { date: string } }) {
     <div className="flex w-full flex-col">
       <div>
         <div className="mb-[70px] mt-[40px] text-center font-bold">
-          <div className="text-[36px]">{post.title}</div>
+          <div className="text-[25px]">{post.title}</div>
           <div className="text-sm">
             {format(parseISO(post.date), "LLLL d, yyyy")}
           </div>

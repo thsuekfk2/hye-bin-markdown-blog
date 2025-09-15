@@ -37,7 +37,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={inter.className}>
-        <div className="h-full bg-[#222222] text-[#F9FAFB]">
+        <div className="h-full bg-[#222222] text-[#dbdbdb]">
           <div className="flex h-[8%] justify-center">
             <header className="ml-2 mr-2 flex w-full max-w-[800px] items-center justify-between">
               <Analytics />

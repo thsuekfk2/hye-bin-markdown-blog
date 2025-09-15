@@ -10,9 +10,7 @@ export const generateStaticParams = async () => {
 };
 
 export const generateMetadata = ({ params }: { params: { slug: string } }) => {
-  const post = allPosts.find(
-    (post: Post) => post.slug === params.slug,
-  );
+  const post = allPosts.find((post: Post) => post.slug === params.slug);
 
   const defaultDescription = "이혜빈의 개발블로그";
   const description = post?.description || defaultDescription;
@@ -46,9 +44,7 @@ export const generateMetadata = ({ params }: { params: { slug: string } }) => {
 };
 
 export default async function Page({ params }: { params: { slug: string } }) {
-  const post = allPosts.find(
-    (post) => post.slug === params.slug,
-  );
+  const post = allPosts.find((post) => post.slug === params.slug);
   let MDXContent;
 
   if (!post) {
@@ -63,27 +59,27 @@ export default async function Page({ params }: { params: { slug: string } }) {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "headline": post.title,
-    "description": post.description,
-    "datePublished": post.date,
-    "dateModified": post.date,
-    "author": {
+    headline: post.title,
+    description: post.description,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: {
       "@type": "Person",
-      "name": "이혜빈",
-      "url": "https://www.hyebin.me"
+      name: "이혜빈",
+      url: "https://www.hyebin.me",
     },
-    "publisher": {
-      "@type": "Person", 
-      "name": "이혜빈",
-      "url": "https://www.hyebin.me"
+    publisher: {
+      "@type": "Person",
+      name: "이혜빈",
+      url: "https://www.hyebin.me",
     },
-    "url": `${process.env.NEXT_PUBLIC_BASE_URL}/post/${params.slug}`,
-    "image": post.thumbnail,
-    "mainEntityOfPage": {
+    url: `${process.env.NEXT_PUBLIC_BASE_URL}/post/${params.slug}`,
+    image: post.thumbnail,
+    mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${process.env.NEXT_PUBLIC_BASE_URL}/post/${params.slug}`
+      "@id": `${process.env.NEXT_PUBLIC_BASE_URL}/post/${params.slug}`,
     },
-    "inLanguage": "ko"
+    inLanguage: "ko",
   };
 
   return (
@@ -91,32 +87,32 @@ export default async function Page({ params }: { params: { slug: string } }) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(structuredData)
+          __html: JSON.stringify(structuredData),
         }}
       />
       <div className="ml-3 mr-3 flex w-full flex-col">
-      <div>
-        <div className="mb-[50px] mt-[40px] text-center font-bold">
-          <div className="text-[36px]">{post.title}</div>
-          <div className="text-sm">
-            {format(parseISO(post.date), "LLLL d, yyyy")}
+        <div>
+          <div className="mb-[50px] mt-[40px] text-center font-bold">
+            <div className="text-[25px]">{post.title}</div>
+            <div className="text-sm">
+              {format(parseISO(post.date), "LLLL d, yyyy")}
+            </div>
           </div>
+          <article>
+            <div className="relative">
+              <Toc />
+              <MDXContent />
+            </div>
+          </article>
+          <PrevNextPagination
+            posts={allPosts}
+            prevPage={`${postName - 1}`}
+            nextPage={`${postName + 1}`}
+            postIndex={postIndex}
+          />
+          <Giscus />
         </div>
-        <article>
-          <div className="relative">
-            <Toc />
-            <MDXContent />
-          </div>
-        </article>
-        <PrevNextPagination
-          posts={allPosts}
-          prevPage={`${postName - 1}`}
-          nextPage={`${postName + 1}`}
-          postIndex={postIndex}
-        />
-        <Giscus />
       </div>
-    </div>
     </>
   );
 }
