@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import DatePicker from "react-datepicker";
-import { Ref, forwardRef, useEffect, useMemo, useState } from "react";
+import { Ref, forwardRef, useEffect, useMemo, useState, useCallback } from "react";
 import { ko } from "date-fns/esm/locale";
 import { format } from "date-fns";
 import { allLogs } from "contentlayer/generated";
@@ -26,13 +26,19 @@ export const Calendar = () => {
     }
   }, [date]);
 
-  const isLogAvailable = (date: Date) => {
+  const availableDates = useMemo(() => {
+    const dateSet = new Set<string>();
+    allLogs.forEach((log) => {
+      const formatDate = format(new Date(log.date), "yyMMdd");
+      dateSet.add(formatDate);
+    });
+    return dateSet;
+  }, []);
+
+  const isLogAvailable = useCallback((date: Date) => {
     const formatDate = format(date, "yyMMdd");
-    const isFindLog = allLogs.find(
-      (log) => formatDate === format(new Date(log.date), "yyMMdd"),
-    );
-    return !!isFindLog;
-  };
+    return availableDates.has(formatDate);
+  }, [availableDates]);
 
   const CustomInput = forwardRef(
     (
@@ -52,7 +58,7 @@ export const Calendar = () => {
 
   CustomInput.displayName = "CustomInput";
 
-  const renderCustomHeader = ({
+  const renderCustomHeader = useCallback(({
     date,
     decreaseMonth,
     increaseMonth,
@@ -74,8 +80,8 @@ export const Calendar = () => {
         </button>
       </div>
     );
-  };
-  const renderDayContents = (day: number, date: Date) => {
+  }, []);
+  const renderDayContents = useCallback((day: number, date: Date) => {
     const formatDate = format(date, "yyMMdd");
     const isFindLog = isLogAvailable(date);
 
@@ -93,7 +99,7 @@ export const Calendar = () => {
         </Link>
       </div>
     );
-  };
+  }, [isLogAvailable]);
 
   return (
     <DatePicker

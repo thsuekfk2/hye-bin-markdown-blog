@@ -5,7 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Analytics } from "@/components/Analytics";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ 
+  subsets: ["latin"],
+  display: 'swap',
+  preload: true 
+});
 
 export const metadata: Metadata = {
   title: "이혜빈 | 프론트엔드 개발자",
@@ -48,6 +52,7 @@ export default function RootLayout({
                     alt="고양이"
                     width={20}
                     height={20}
+                    priority
                   />
                   <span className="transition-all delay-75 hover:underline">
                     hyebin
