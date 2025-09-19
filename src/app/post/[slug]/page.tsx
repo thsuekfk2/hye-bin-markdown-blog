@@ -53,8 +53,8 @@ export default async function Page({ params }: { params: { slug: string } }) {
     MDXContent = getMDXComponent(post!.body.code);
   }
 
-  const postName = Number(post._raw.sourceFileName.split(".")[0]);
-  const postIndex = postName - 1;
+  const sortedPosts = allPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const postIndex = sortedPosts.findIndex(p => p.slug === post.slug);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -105,9 +105,9 @@ export default async function Page({ params }: { params: { slug: string } }) {
             </div>
           </article>
           <PrevNextPagination
-            posts={allPosts}
-            prevPage={`${postName - 1}`}
-            nextPage={`${postName + 1}`}
+            posts={sortedPosts}
+            prevPage={sortedPosts[postIndex - 1]?.slug ? `/post/${sortedPosts[postIndex - 1]?.slug}` : ""}
+            nextPage={sortedPosts[postIndex + 1]?.slug ? `/post/${sortedPosts[postIndex + 1]?.slug}` : ""}
             postIndex={postIndex}
           />
           <Giscus />
