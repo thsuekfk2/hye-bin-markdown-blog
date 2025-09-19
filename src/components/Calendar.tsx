@@ -5,7 +5,6 @@ import DatePicker from "react-datepicker";
 import { Ref, forwardRef, useEffect, useMemo, useState, useCallback } from "react";
 import { ko } from "date-fns/esm/locale";
 import { format } from "date-fns";
-import { allLogs } from "contentlayer/generated";
 import "react-datepicker/dist/react-datepicker.css";
 import { CalendarIcon } from "./Icons/CalendarIcon";
 import { ArrowLeftIcon, ArrowRightIcon } from "./Icons/ArrowIcons";
@@ -26,13 +25,36 @@ export const Calendar = () => {
     }
   }, [date]);
 
-  const availableDates = useMemo(() => {
-    const dateSet = new Set<string>();
-    allLogs.forEach((log) => {
-      const formatDate = format(new Date(log.date), "yyMMdd");
-      dateSet.add(formatDate);
-    });
-    return dateSet;
+  // 노션에서 실제 로그 날짜를 가져와서 캘린더에 표시
+  const [availableDates, setAvailableDates] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const fetchAvailableDates = async () => {
+      try {
+        // API 라우트를 통해 로그 날짜 가져오기
+        const response = await fetch('/api/logs');
+        if (!response.ok) {
+          throw new Error('Failed to fetch logs');
+        }
+        
+        const logs = await response.json();
+        const dateSet = new Set<string>();
+        
+        logs.forEach((log: any) => {
+          if (log.date) {
+            const formatDate = format(new Date(log.date), "yyMMdd");
+            dateSet.add(formatDate);
+          }
+        });
+        
+        setAvailableDates(dateSet);
+      } catch (error) {
+        console.error('Error fetching calendar dates:', error);
+        setAvailableDates(new Set());
+      }
+    };
+    
+    fetchAvailableDates();
   }, []);
 
   const isLogAvailable = useCallback((date: Date) => {
@@ -81,6 +103,7 @@ export const Calendar = () => {
       </div>
     );
   }, []);
+  
   const renderDayContents = useCallback((day: number, date: Date) => {
     const formatDate = format(date, "yyMMdd");
     const isFindLog = isLogAvailable(date);

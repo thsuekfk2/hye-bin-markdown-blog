@@ -5,10 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { Analytics } from "@/components/Analytics";
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ["latin"],
-  display: 'swap',
-  preload: true 
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -59,7 +59,7 @@ export default function RootLayout({
                   </span>
                 </div>
               </Link>
-              <div className="flex gap-6 text-sm">
+              <div className="flex gap-4 text-sm">
                 <Link
                   href="/post"
                   className="flex w-[50px] justify-center transition-all delay-75 hover:rounded-full hover:bg-[#444]"

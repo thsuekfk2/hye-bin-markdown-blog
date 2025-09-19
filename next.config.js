@@ -1,7 +1,5 @@
-const { withContentlayer } = require("next-contentlayer");
-
-module.exports = withContentlayer({
-  swcMinify: false,
+module.exports = {
+  swcMinify: true,
   images: {
     remotePatterns: [
       {
@@ -35,4 +33,4 @@ module.exports = withContentlayer({
     optimizePackageImports: ["date-fns", "react-datepicker"],
   },
   compress: true,
-});
+};

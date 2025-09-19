@@ -1,24 +1,27 @@
-"use client";
-
 import { ListItem } from "@/components/ListItem";
 import { Pagination } from "@/components/Pagination";
-import { allLogs } from "contentlayer/generated";
+import { getNotionLogs } from "@/lib/notion";
+import { getRevalidateTime } from "@/lib/config";
 import { compareDesc } from "date-fns";
-import { useSearchParams } from "next/navigation";
 
-export default function LogsPage() {
+interface LogsPageProps {
+  searchParams: { page?: string };
+}
+
+export const revalidate = getRevalidateTime('LOGS');
+
+export default async function LogsPage({ searchParams }: LogsPageProps) {
   const LOGS_PER_PAGE = 11;
 
-  const searchParams = useSearchParams();
-  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  const currentPage = parseInt(searchParams.page || "1", 10);
 
-  const getSortedLogs = () => {
-    return allLogs.sort((a, b) =>
-      compareDesc(new Date(a.date), new Date(b.date)),
-    );
-  };
+  // 노션에서 로그 데이터 가져오기 (ISR 사용)
+  const allLogs = await getNotionLogs();
 
-  const sortedLogs = getSortedLogs();
+  const sortedLogs = allLogs.sort((a, b) =>
+    compareDesc(new Date(a.date), new Date(b.date)),
+  );
+
   const pageCount = Math.ceil(sortedLogs.length / LOGS_PER_PAGE);
   const currentLogs = sortedLogs.slice(
     (currentPage - 1) * LOGS_PER_PAGE,
@@ -31,17 +34,17 @@ export default function LogsPage() {
         <div>TIL</div>
         <div className="text-xs">* Today I Learned.</div>
       </header>
-      <div className="flex min-h-[calc(100vh-200px)] sm:h-[calc(100vh-200px)] w-full flex-col">
-        <div className="flex flex-1 sm:h-[calc(100%-80px)] w-full flex-col overflow-y-auto">
-          {currentLogs.map((post, idx) => (
+      <div className="flex min-h-[calc(100vh-200px)] w-full flex-col sm:h-[calc(100vh-200px)]">
+        <div className="flex w-full flex-1 flex-col overflow-y-auto sm:h-[calc(100%-80px)]">
+          {currentLogs.map((log, idx) => (
             <ListItem
               key={idx}
-              date={post._raw.sourceFileName.split(".")[0]}
-              title={post.title}
+              date={log.slug} // slug를 date로 사용 (250801 형식)
+              title={log.title}
             />
           ))}
         </div>
-        <div className="flex h-[80px] items-center justify-center flex-shrink-0">
+        <div className="flex h-[80px] flex-shrink-0 items-center justify-center">
           <Pagination
             route="log"
             pageCount={pageCount}

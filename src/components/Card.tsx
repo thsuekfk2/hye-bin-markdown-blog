@@ -9,8 +9,8 @@ export const Card = ({
   title,
 }: {
   href: string;
-  thumbnail: string;
-  description: string;
+  thumbnail?: string;
+  description?: string;
   title: string;
 }) => {
   return (
@@ -22,15 +22,15 @@ export const Card = ({
         <div className="relative cursor-pointer">
           <div className="z-1 absolute h-full w-full cursor-pointer opacity-40 transition-all hover:bg-black"></div>
           <div className="z-2 absolute bottom-2 left-2 transition duration-300">
-            {description}
+            {description || ''}
           </div>
           <Image
             width={300}
             height={250}
-            alt="점프하는 공룡"
+            alt={title}
             placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg==" // 추가
-            src={thumbnail}
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg=="
+            src={thumbnail || "/jump.webp"}
             className="h-[200px] w-full rounded-md object-cover"
           />
         </div>

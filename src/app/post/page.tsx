@@ -1,42 +1,49 @@
-"use client";
-
 import { Card } from "@/components/Card";
 import { Pagination } from "@/components/Pagination";
-import { allPosts } from "contentlayer/generated";
+import { getNotionPosts } from "@/lib/notion";
+import { getRevalidateTime } from "@/lib/config";
 import { compareDesc } from "date-fns";
-import { useSearchParams } from "next/navigation";
+import { Metadata } from "next";
 
-export default function page() {
-  const LOGS_PER_PAGE = 4;
+export const metadata: Metadata = {
+  title: "포스트 | 이혜빈",
+  description: "노션에서 직접 불러온 최신 포스트들",
+};
 
-  const searchParams = useSearchParams();
-  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+// ISR 설정 - 전역 설정 사용
+export const revalidate = getRevalidateTime('POSTS');
 
-  const getSortedPosts = () => {
-    return allPosts.sort((a, b) =>
-      compareDesc(new Date(a.date), new Date(b.date)),
-    );
-  };
+export default async function PostsPage({
+  searchParams,
+}: {
+  searchParams: { page?: string };
+}) {
+  const POSTS_PER_PAGE = 4;
+  const currentPage = parseInt(searchParams.page ?? "1", 10);
 
-  const sortedLogs = getSortedPosts();
-  const pageCount = Math.ceil(sortedLogs.length / LOGS_PER_PAGE);
-  const currentLogs = sortedLogs.slice(
-    (currentPage - 1) * LOGS_PER_PAGE,
-    currentPage * LOGS_PER_PAGE,
+  const posts = await getNotionPosts();
+  const sortedPosts = posts.sort((a, b) =>
+    compareDesc(new Date(a.date), new Date(b.date)),
+  );
+
+  const pageCount = Math.ceil(sortedPosts.length / POSTS_PER_PAGE);
+  const currentPosts = sortedPosts.slice(
+    (currentPage - 1) * POSTS_PER_PAGE,
+    currentPage * POSTS_PER_PAGE,
   );
 
   return (
-    <div className="h-full w-full items-center justify-center">
+    <div className="items-center justify-center w-full h-full">
       <div className="flex flex-col justify-center pb-10 text-center">
-        <div>기록</div>
+        <div>포스트</div>
       </div>
       <div className="flex min-h-[calc(100vh-160px)] flex-col sm:h-[calc(100vh-200px)]">
         <div className="flex flex-1 flex-wrap content-start justify-center gap-6 overflow-y-auto sm:h-[calc(100%-50px)]">
-          {currentLogs.map((post, key) => (
+          {currentPosts.map((post, key) => (
             <Card
               key={key}
               href={`post/${post.slug}`}
-              thumbnail={post.thumbnail ?? ""}
+              thumbnail={post.thumbnail}
               description={post.description}
               title={post.title}
             />
