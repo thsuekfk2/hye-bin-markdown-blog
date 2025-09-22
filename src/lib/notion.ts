@@ -13,6 +13,7 @@ export interface NotionPost {
   description?: string;
   thumbnail?: string;
   published: boolean;
+  category?: string;
 }
 
 // 데이터베이스에서 로그 목록 가져오기 (날짜 기반)
@@ -40,10 +41,11 @@ export async function getNotionLogs(): Promise<NotionPost[]> {
         page.properties.Thumbnail?.files?.[0]?.external?.url ||
         "",
       published: page.properties.Status?.checkbox || true,
+      category: page.properties.Category?.select?.name || "",
     }));
 
-    // slug가 6자리 숫자인 것들만 로그로 간주 (YYMMDD 형식)
-    return logs.filter((log) => /^\d{6}$/.test(log.slug));
+    // 카테고리가 'log'인 것들만 로그로 간주 + published만 표시
+    return logs.filter((log) => log.category?.toLowerCase() === 'log' && log.published);
   } catch (error) {
     console.error("Error fetching notion logs:", error);
     return [];
@@ -75,10 +77,11 @@ export async function getNotionPosts(): Promise<NotionPost[]> {
         page.properties.Thumbnail?.files?.[0]?.external?.url ||
         "",
       published: page.properties.Status?.checkbox || true,
+      category: page.properties.Category?.select?.name || "",
     }));
 
-    // slug가 6자리 숫자가 아닌 것들만 포스트로 간주 (로그 제외)
-    return posts.filter((post) => !/^\d{6}$/.test(post.slug));
+    // 카테고리가 'post'인 것들만 포스트로 간주 + published만 표시
+    return posts.filter((post) => post.category?.toLowerCase() === 'post' && post.published);
   } catch (error) {
     console.error("Error fetching notion posts:", error);
     return [];
