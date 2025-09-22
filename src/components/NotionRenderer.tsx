@@ -182,7 +182,7 @@ function NotionBlock({ block }: { block: NotionBlock }) {
 
     case "quote":
       return (
-        <blockquote className="mb-4 rounded-r border-l-4 border-blue-400 bg-[#333] py-2 pl-4 italic text-[#dbdbdb]">
+        <blockquote className="mb-4 rounded-r border border-l-4 border-blue-400 bg-[#333] py-2 pl-4 text-xs italic text-[#dbdbdb]">
           <RichText text={block.quote?.rich_text || []} />
         </blockquote>
       );
@@ -190,23 +190,10 @@ function NotionBlock({ block }: { block: NotionBlock }) {
     case "callout":
       const calloutIcon = block.callout?.icon?.emoji || "💡";
 
-      // 아이콘에 따른 색상 테마
-      const getCalloutTheme = (icon: string) => {
-        if (icon.includes("💡") || icon.includes("ℹ️")) {
-          return "bg-blue-900/20 border-blue-500/30 text-blue-200";
-        } else if (icon.includes("⚠️") || icon.includes("⚡")) {
-          return "bg-yellow-900/20 border-yellow-500/30 text-yellow-200";
-        } else if (icon.includes("❌") || icon.includes("🚨")) {
-          return "bg-red-900/20 border-red-500/30 text-red-200";
-        } else if (icon.includes("✅") || icon.includes("🎉")) {
-          return "bg-green-900/20 border-green-500/30 text-green-200";
-        } else {
-          return "bg-purple-900/20 border-purple-500/30 text-purple-200";
-        }
-      };
-
       return (
-        <div className={`${getCalloutTheme(calloutIcon)} blockquote`}>
+        <div
+          className={`border-0 border-l-4 border-solid border-[#818df8] bg-[#818df814] px-[30px] py-[20px] text-xs text-[#dbdbdb]`}
+        >
           <div className="flex items-start gap-3">
             <span className="mt-0.5 flex-shrink-0 text-xl">{calloutIcon}</span>
             <div className="flex-1 leading-relaxed">
@@ -221,16 +208,15 @@ function NotionBlock({ block }: { block: NotionBlock }) {
       const caption = block.image?.caption?.[0]?.plain_text || "";
 
       return (
-        <figure className="mb-6">
+        <figure className="mb-6 flex flex-col items-center">
           {imageUrl && (
-            <div className="relative w-full h-96">
-              <Image
-                src={imageUrl}
-                alt={caption || "Image"}
-                fill
-                className="object-contain rounded-lg"
-              />
-            </div>
+            <Image
+              src={imageUrl}
+              alt={caption || "Image"}
+              width={800}
+              height={600}
+              className="h-auto w-full max-w-2xl rounded-lg"
+            />
           )}
           {caption && (
             <figcaption className="mt-2 text-xs text-center text-gray-300">
@@ -315,6 +301,21 @@ function NotionBlock({ block }: { block: NotionBlock }) {
       // table_row는 table 내부에서 처리되므로 개별적으로는 렌더링하지 않음
       return null;
 
+    case "column_list":
+      return (
+        <div className="flex flex-col gap-4 mb-6 md:flex-row">
+          {block.children?.map((column: any) => (
+            <div key={column.id} className="flex-1">
+              <NotionRenderer blocks={column.children || []} />
+            </div>
+          ))}
+        </div>
+      );
+
+    case "column":
+      // column은 column_list 내부에서 처리되므로 개별적으로는 렌더링하지 않음
+      return null;
+
     default:
       return (
         <div className="mb-2 rounded border border-gray-600 bg-[#333] p-2 text-sm text-gray-400">
@@ -358,7 +359,7 @@ function RichText({ text }: { text: any[] }) {
           element = (
             <code
               key={index}
-              className="rounded border border-gray-600 bg-[#2a2a2a] px-1 py-0.5 text-sm text-[#ff6b6b]"
+              className="rounded border border-gray-600 bg-[#2a2a2a] px-1 py-0.5 text-xs text-[#ff6b6b]"
             >
               {element}
             </code>
