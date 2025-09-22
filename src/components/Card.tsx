@@ -28,7 +28,7 @@ export const Card = ({
         className="flex flex-col text-xs text-transparent hover:text-white"
       >
         <div className="relative cursor-pointer overflow-hidden rounded-md shadow-lg transition-shadow duration-300 group-hover:shadow-2xl">
-          <div className="absolute z-10 h-full w-full cursor-pointer bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-60"></div>
+          <div className="absolute z-10 h-full w-full cursor-pointer bg-black bg-gradient-to-t via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-60"></div>
           <div className="absolute bottom-2 left-2 z-20 translate-y-4 transform opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
             <span className="rounded bg-black/20 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
               {description || ""}

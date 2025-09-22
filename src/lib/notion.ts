@@ -14,6 +14,7 @@ export interface NotionPost {
   thumbnail?: string;
   published: boolean;
   category?: string;
+  blocks?: any[]; // 블록 데이터는 getNotionPost에서만 사용됨
 }
 
 function mapNotionPageToPost(page: any): NotionPost {
