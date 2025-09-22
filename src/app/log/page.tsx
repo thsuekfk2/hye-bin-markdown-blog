@@ -15,7 +15,7 @@ export default async function LogsPage({ searchParams }: LogsPageProps) {
 
   const currentPage = parseInt(searchParams.page || "1", 10);
 
-  // 노션에서 로그 데이터 가져오기 (ISR 사용)
+  // 노션에서 로그 데이터 가져오기
   const allLogs = await getNotionLogs();
 
   const sortedLogs = allLogs.sort((a, b) =>
@@ -38,7 +38,7 @@ export default async function LogsPage({ searchParams }: LogsPageProps) {
           {currentLogs.map((log, idx) => (
             <ListItem
               key={`${currentPage}-${idx}`}
-              date={log.slug}
+              slug={log.slug}
               title={log.title}
               index={idx}
             />
