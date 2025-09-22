@@ -1,16 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getRecentPosts, getRecentLogs } from "@/lib/notion";
+import { getRecentPosts, getRecentLogs, getAllTags } from "@/lib/notion";
 import { Card } from "@/components/Card";
 import { ListItem } from "@/components/ListItem";
+import { TagList } from "@/components/TagList";
 import { ISR_TIME } from "@/lib/config";
 
 export const revalidate = ISR_TIME;
 
 export default async function Home() {
-  const [recentPosts, recentLogs] = await Promise.all([
+  const [recentPosts, recentLogs, allTags] = await Promise.all([
     getRecentPosts(4),
     getRecentLogs(4),
+    getAllTags(),
   ]);
 
   return (
@@ -43,6 +45,11 @@ export default async function Home() {
         </div>
       </div>
 
+      {/* 태그 목록 섹션 */}
+      {allTags.length > 0 && (
+        <TagList tags={allTags} title="태그 모음" limit={10} />
+      )}
+
       {/* Recent Posts Section */}
       <section className="mx-5">
         <div className="max-w-6xl">
@@ -64,6 +71,7 @@ export default async function Home() {
                 description={post.description}
                 title={post.title}
                 index={index}
+                tags={post.tags}
               />
             ))}
           </div>

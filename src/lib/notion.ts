@@ -14,6 +14,7 @@ export interface NotionPost {
   thumbnail?: string;
   published: boolean;
   category?: string;
+  tags?: string[]; // 태그 배열
   blocks?: any[]; // 블록 데이터는 getNotionPost에서만 사용됨
 }
 
@@ -30,6 +31,7 @@ function mapNotionPageToPost(page: any): NotionPost {
       "",
     published: page.properties.Status?.select?.name === "발행" || false,
     category: page.properties.Category?.select?.name || "",
+    tags: page.properties.Tags?.multi_select?.map((tag: any) => tag.name) || [],
   };
 }
 
@@ -40,7 +42,8 @@ function filterByCategory(
   limit?: number,
 ): NotionPost[] {
   const filtered = posts.filter(
-    (post) => post.category?.toLowerCase() === category && post.published,
+    (post) =>
+      post.category?.toLowerCase() === category && post.published && post.slug,
   );
   return limit ? filtered.slice(0, limit) : filtered;
 }
@@ -64,7 +67,7 @@ async function queryNotionDatabase(): Promise<NotionPost[]> {
   }
 }
 
-// 데이터베이스에서 로그 목록 가져오기
+// 데이터베이스에서 로그 목록 가져오기 (이미 날짜순 정렬됨)
 export async function getNotionLogs(): Promise<NotionPost[]> {
   const posts = await queryNotionDatabase();
   return filterByCategory(posts, "log");
@@ -82,10 +85,29 @@ export async function getRecentLogs(limit: number = 4): Promise<NotionPost[]> {
   return filterByCategory(posts, "log", limit);
 }
 
-// 데이터베이스에서 포스트 목록 가져오기
+// 데이터베이스에서 포스트 목록 가져오기 (이미 날짜순 정렬됨)
 export async function getNotionPosts(): Promise<NotionPost[]> {
   const posts = await queryNotionDatabase();
   return filterByCategory(posts, "post");
+}
+
+// 모든 태그 가져오기
+export async function getAllTags(): Promise<string[]> {
+  const posts = await queryNotionDatabase();
+  const allTags = posts
+    .filter((post) => post.published && post.slug)
+    .flatMap((post) => post.tags || []);
+
+  // 중복 제거 및 알파벳 순 정렬
+  return Array.from(new Set(allTags)).sort();
+}
+
+// 태그별 포스트 가져오기 (포스트와 로그 모두 포함)
+export async function getPostsByTag(tag: string): Promise<NotionPost[]> {
+  const allPosts = await queryNotionDatabase();
+  return allPosts.filter(
+    (post) => post.published && post.slug && post.tags?.includes(tag),
+  );
 }
 
 // 특정 포스트 가져오기
