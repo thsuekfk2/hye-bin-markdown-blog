@@ -33,7 +33,7 @@ export default async function PostsPage({
       pageCount={pageCount}
       route="post"
     >
-      <div className="flex flex-1 flex-wrap content-start justify-center gap-6 overflow-y-auto">
+      <div className="flex flex-1 flex-wrap content-start justify-center gap-6 overflow-y-auto p-4">
         {currentPosts.map((post, key) => (
           <Card
             key={`${currentPage}-${key}`}

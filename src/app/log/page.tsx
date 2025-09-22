@@ -27,14 +27,16 @@ export default async function LogsPage({ searchParams }: LogsPageProps) {
       pageCount={pageCount}
       route="log"
     >
-      {currentLogs.map((log, idx) => (
-        <ListItem
-          key={`${currentPage}-${idx}`}
-          slug={log.slug}
-          title={log.title}
-          index={idx}
-        />
-      ))}
+      <div className="flex flex-col px-4 py-2">
+        {currentLogs.map((log, idx) => (
+          <ListItem
+            key={`${currentPage}-${idx}`}
+            slug={log.slug}
+            title={log.title}
+            index={idx}
+          />
+        ))}
+      </div>
     </PaginatedLayout>
   );
 }
