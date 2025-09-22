@@ -1,7 +1,7 @@
 import { getNotionPost, getNotionPosts } from "@/lib/notion";
 import { NotionRenderer } from "@/components/NotionRenderer";
 import { NotionToc } from "@/components/NotionToc";
-import { getRevalidateTime } from "@/lib/config";
+import { ISR_TIME } from "@/lib/config";
 import { format, parseISO } from "date-fns";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -53,7 +53,7 @@ export async function generateMetadata({
 }
 
 // ISR 설정 - 전역 설정 사용
-export const revalidate = getRevalidateTime("POST_DETAIL");
+export const revalidate = ISR_TIME;
 
 export default async function PostPage({ params }: PostPageProps) {
   const decodedSlug = decodeURIComponent(params.slug);
@@ -100,7 +100,7 @@ export default async function PostPage({ params }: PostPageProps) {
           __html: JSON.stringify(structuredData),
         }}
       />
-      <div className="flex flex-col w-full ml-3 mr-3">
+      <div className="ml-3 mr-3 flex w-full flex-col">
         <div>
           {/* 헤더 */}
           <div className="mb-[50px] mt-[40px] text-center font-bold">
@@ -119,7 +119,7 @@ export default async function PostPage({ params }: PostPageProps) {
           </article>
 
           {/* 이전/다음 네비게이션 */}
-          <div className="flex flex-col justify-between gap-8 my-16 md:flex-row">
+          <div className="my-16 flex flex-col justify-between gap-8 md:flex-row">
             <div>
               {posts[postIndex - 1] && (
                 <a href={`/post/${posts[postIndex - 1].slug}`}>

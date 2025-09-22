@@ -1,7 +1,7 @@
 import { Card } from "@/components/Card";
 import { Pagination } from "@/components/Pagination";
 import { getNotionPosts } from "@/lib/notion";
-import { getRevalidateTime } from "@/lib/config";
+import { ISR_TIME } from "@/lib/config";
 import { compareDesc } from "date-fns";
 import { Metadata } from "next";
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 // ISR 설정 - 전역 설정 사용
-export const revalidate = getRevalidateTime("POSTS");
+export const revalidate = ISR_TIME;
 
 export default async function PostsPage({
   searchParams,

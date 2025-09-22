@@ -1,14 +1,14 @@
 import { ListItem } from "@/components/ListItem";
 import { Pagination } from "@/components/Pagination";
 import { getNotionLogs } from "@/lib/notion";
-import { getRevalidateTime } from "@/lib/config";
+import { ISR_TIME } from "@/lib/config";
 import { compareDesc } from "date-fns";
 
 interface LogsPageProps {
   searchParams: { page?: string };
 }
 
-export const revalidate = getRevalidateTime("LOGS");
+export const revalidate = ISR_TIME;
 
 export default async function LogsPage({ searchParams }: LogsPageProps) {
   const LOGS_PER_PAGE = 11;
