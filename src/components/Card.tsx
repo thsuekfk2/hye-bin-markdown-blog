@@ -7,22 +7,32 @@ export const Card = ({
   thumbnail,
   description,
   title,
+  index = 0,
 }: {
   href: string;
   thumbnail?: string;
   description?: string;
   title: string;
+  index?: number;
 }) => {
   return (
-    <div className="flex w-[80%] h-[260px] flex-col sm:w-[300px]">
+    <div
+      className="animate-slide-up group flex h-[260px] w-[80%] transform flex-col opacity-0 transition-all duration-300 hover:-translate-y-2 hover:scale-105 sm:w-[300px]"
+      style={{
+        animationDelay: `${index * 100 + 100}ms`,
+        animationFillMode: "forwards",
+      }}
+    >
       <Link
         href={href}
         className="flex flex-col text-xs text-transparent hover:text-white"
       >
-        <div className="relative cursor-pointer">
-          <div className="z-1 absolute h-full w-full cursor-pointer opacity-40 transition-all hover:bg-black"></div>
-          <div className="z-2 absolute bottom-2 left-2 transition duration-300">
-            {description || ''}
+        <div className="relative cursor-pointer overflow-hidden rounded-md shadow-lg transition-shadow duration-300 group-hover:shadow-2xl">
+          <div className="absolute z-10 h-full w-full cursor-pointer bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-60"></div>
+          <div className="absolute bottom-2 left-2 z-20 translate-y-4 transform opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+            <span className="rounded bg-black/20 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+              {description || ""}
+            </span>
           </div>
           <Image
             width={300}
@@ -31,11 +41,13 @@ export const Card = ({
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg=="
             src={thumbnail || "/jump.webp"}
-            className="h-[200px] w-full rounded-md object-cover"
+            className="h-[170px] w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         </div>
       </Link>
-      <span className="text-sm font-thin mt-2 line-clamp-2 h-[40px] overflow-hidden">{title}</span>
+      <span className="mt-2 line-clamp-2 h-[40px] overflow-hidden text-sm font-thin transition-colors duration-300 group-hover:text-white">
+        {title}
+      </span>
     </div>
   );
 };

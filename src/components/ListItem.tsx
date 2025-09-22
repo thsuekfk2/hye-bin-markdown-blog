@@ -1,14 +1,25 @@
 import Link from "next/link";
 import React from "react";
 
-export const ListItem = ({ date, title }: { date: string; title: string }) => {
+export const ListItem = ({
+  date,
+  title,
+  index = 0,
+}: {
+  date: string;
+  title: string;
+  index?: number;
+}) => {
   return (
     <Link
       href={`log/${date}`}
-      className="flex h-[20px] w-[100%] items-center justify-between break-words rounded-lg p-5 text-xs font-normal transition duration-300 hover:font-bold"
+      className="animate-slide-up flex h-[20px] w-[100%] items-center justify-between break-words rounded-lg p-5 text-xs font-normal opacity-0 transition duration-300 hover:font-bold"
+      style={{
+        animationDelay: `${index * 50 + 100}ms`,
+        animationFillMode: "forwards",
+      }}
     >
       <div>{title}</div>
-      <div className="text-[#3c3c3c]">{date}</div>
     </Link>
   );
 };

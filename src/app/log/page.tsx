@@ -8,7 +8,7 @@ interface LogsPageProps {
   searchParams: { page?: string };
 }
 
-export const revalidate = getRevalidateTime('LOGS');
+export const revalidate = getRevalidateTime("LOGS");
 
 export default async function LogsPage({ searchParams }: LogsPageProps) {
   const LOGS_PER_PAGE = 11;
@@ -29,18 +29,18 @@ export default async function LogsPage({ searchParams }: LogsPageProps) {
   );
 
   return (
-    <div className="h-full">
-      <header className="flex flex-col justify-center pb-10 text-center">
-        <div>TIL</div>
-        <div className="text-xs">* Today I Learned.</div>
-      </header>
-      <div className="flex min-h-[calc(100vh-200px)] w-full flex-col sm:h-[calc(100vh-200px)]">
-        <div className="flex w-full flex-1 flex-col overflow-y-auto sm:h-[calc(100%-80px)]">
+    <div className="flex h-full flex-col justify-between">
+      <div className="flex h-[60px] flex-col justify-center text-center">
+        TIL
+      </div>
+      <div className="flex flex-col sm:h-[calc(100vh-170px)]">
+        <div className="flex w-full flex-1 flex-col overflow-y-auto">
           {currentLogs.map((log, idx) => (
             <ListItem
-              key={idx}
-              date={log.slug} // slug를 date로 사용 (250801 형식)
+              key={`${currentPage}-${idx}`}
+              date={log.slug}
               title={log.title}
+              index={idx}
             />
           ))}
         </div>

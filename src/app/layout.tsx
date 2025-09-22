@@ -76,7 +76,9 @@ export default function RootLayout({
             </header>
           </div>
           <main className="flex h-[92%] justify-center overflow-auto">
-            <div className="flex w-full max-w-[800px]">{children}</div>
+            <div className="flex w-full max-w-[800px] justify-center">
+              {children}
+            </div>
           </main>
         </div>
       </body>

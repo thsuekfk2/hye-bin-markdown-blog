@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 // ISR 설정 - 전역 설정 사용
-export const revalidate = getRevalidateTime('POSTS');
+export const revalidate = getRevalidateTime("POSTS");
 
 export default async function PostsPage({
   searchParams,
@@ -33,23 +33,26 @@ export default async function PostsPage({
   );
 
   return (
-    <div className="items-center justify-center w-full h-full">
-      <div className="flex flex-col justify-center pb-10 text-center">
-        <div>포스트</div>
+    <div className="flex h-full flex-col justify-between">
+      <div className="flex h-[60px] flex-col justify-center text-center">
+        포스트
       </div>
-      <div className="flex min-h-[calc(100vh-160px)] flex-col sm:h-[calc(100vh-200px)]">
-        <div className="flex flex-1 flex-wrap content-start justify-center gap-6 overflow-y-auto sm:h-[calc(100%-50px)]">
-          {currentPosts.map((post, key) => (
-            <Card
-              key={key}
-              href={`post/${post.slug}`}
-              thumbnail={post.thumbnail}
-              description={post.description}
-              title={post.title}
-            />
-          ))}
+      <div className="flex flex-col sm:h-[calc(100vh-170px)]">
+        <div className="flex w-full flex-1 flex-col overflow-y-auto">
+          <div className="flex flex-1 flex-wrap content-start justify-center gap-6 overflow-y-auto">
+            {currentPosts.map((post, key) => (
+              <Card
+                key={`${currentPage}-${key}`}
+                href={`post/${post.slug}`}
+                thumbnail={post.thumbnail}
+                description={post.description}
+                title={post.title}
+                index={key}
+              />
+            ))}
+          </div>
         </div>
-        <div className="flex h-[45px] flex-shrink-0 items-center justify-center">
+        <div className="flex h-[80px] flex-shrink-0 items-center justify-center">
           <Pagination
             route="post"
             pageCount={pageCount}
