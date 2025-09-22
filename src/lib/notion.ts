@@ -16,8 +16,35 @@ export interface NotionPost {
   category?: string;
 }
 
-// 데이터베이스에서 로그 목록 가져오기 (날짜 기반)
-export async function getNotionLogs(): Promise<NotionPost[]> {
+function mapNotionPageToPost(page: any): NotionPost {
+  return {
+    id: page.id,
+    title: page.properties["이름"]?.title?.[0]?.plain_text || "Untitled",
+    slug: page.properties.Slug?.rich_text?.[0]?.plain_text || "",
+    date: page.properties.Date?.date?.start || "",
+    description: page.properties.Description?.rich_text?.[0]?.plain_text || "",
+    thumbnail:
+      page.properties.Thumbnail?.files?.[0]?.file?.url ||
+      page.properties.Thumbnail?.files?.[0]?.external?.url ||
+      "",
+    published: page.properties.Status?.select?.name === "발행" || false,
+    category: page.properties.Category?.select?.name || "",
+  };
+}
+
+// 카테고리별 필터링 함수
+function filterByCategory(
+  posts: NotionPost[],
+  category: "post" | "log",
+  limit?: number,
+): NotionPost[] {
+  const filtered = posts.filter(
+    (post) => post.category?.toLowerCase() === category && post.published,
+  );
+  return limit ? filtered.slice(0, limit) : filtered;
+}
+
+async function queryNotionDatabase(): Promise<NotionPost[]> {
   try {
     const response = await notion.databases.query({
       database_id: process.env.NOTION_DATABASE_ID!,
@@ -29,145 +56,35 @@ export async function getNotionLogs(): Promise<NotionPost[]> {
       ],
     });
 
-    const logs = response.results.map((page: any) => ({
-      id: page.id,
-      title: page.properties["이름"]?.title?.[0]?.plain_text || "Untitled",
-      slug: page.properties.Slug?.rich_text?.[0]?.plain_text || "",
-      date: page.properties.Date?.date?.start || "",
-      description:
-        page.properties.Description?.rich_text?.[0]?.plain_text || "",
-      thumbnail:
-        page.properties.Thumbnail?.files?.[0]?.file?.url ||
-        page.properties.Thumbnail?.files?.[0]?.external?.url ||
-        "",
-      published: page.properties.Status?.checkbox || true,
-      category: page.properties.Category?.select?.name || "",
-    }));
-
-    // 카테고리가 'log'인 것들만 로그로 간주 + published만 표시
-    return logs.filter(
-      (log) => log.category?.toLowerCase() === "log" && log.published,
-    );
+    return response.results.map(mapNotionPageToPost);
   } catch (error) {
-    console.error("Error fetching notion logs:", error);
+    console.error("Error querying notion database:", error);
     return [];
   }
+}
+
+// 데이터베이스에서 로그 목록 가져오기
+export async function getNotionLogs(): Promise<NotionPost[]> {
+  const posts = await queryNotionDatabase();
+  return filterByCategory(posts, "log");
 }
 
 // 최근 포스트 가져오기
 export async function getRecentPosts(limit: number = 4): Promise<NotionPost[]> {
-  try {
-    const response = await notion.databases.query({
-      database_id: process.env.NOTION_DATABASE_ID!,
-      sorts: [
-        {
-          property: "Date",
-          direction: "descending",
-        },
-      ],
-    });
-
-    const posts = response.results.map((page: any) => ({
-      id: page.id,
-      title: page.properties["이름"]?.title?.[0]?.plain_text || "Untitled",
-      slug: page.properties.Slug?.rich_text?.[0]?.plain_text || "",
-      date: page.properties.Date?.date?.start || "",
-      description:
-        page.properties.Description?.rich_text?.[0]?.plain_text || "",
-      thumbnail:
-        page.properties.Thumbnail?.files?.[0]?.file?.url ||
-        page.properties.Thumbnail?.files?.[0]?.external?.url ||
-        "",
-      published: page.properties.Status?.checkbox || true,
-      category: page.properties.Category?.select?.name || "",
-    }));
-
-    // 카테고리가 'post'인 것들만 포스트로 간주 + published만 표시
-    return posts
-      .filter(
-        (post) => post.category?.toLowerCase() === "post" && post.published,
-      )
-      .slice(0, limit);
-  } catch (error) {
-    console.error("Error fetching recent posts:", error);
-    return [];
-  }
+  const posts = await queryNotionDatabase();
+  return filterByCategory(posts, "post", limit);
 }
 
-// 최근 로그 가져오기 (limit 추가)
+// 최근 로그 가져오기
 export async function getRecentLogs(limit: number = 4): Promise<NotionPost[]> {
-  try {
-    const response = await notion.databases.query({
-      database_id: process.env.NOTION_DATABASE_ID!,
-      sorts: [
-        {
-          property: "Date",
-          direction: "descending",
-        },
-      ],
-    });
-
-    const logs = response.results.map((page: any) => ({
-      id: page.id,
-      title: page.properties["이름"]?.title?.[0]?.plain_text || "Untitled",
-      slug: page.properties.Slug?.rich_text?.[0]?.plain_text || "",
-      date: page.properties.Date?.date?.start || "",
-      description:
-        page.properties.Description?.rich_text?.[0]?.plain_text || "",
-      thumbnail:
-        page.properties.Thumbnail?.files?.[0]?.file?.url ||
-        page.properties.Thumbnail?.files?.[0]?.external?.url ||
-        "",
-      published: page.properties.Status?.checkbox || true,
-      category: page.properties.Category?.select?.name || "",
-    }));
-
-    // 카테고리가 'log'인 것들만 로그로 간주 + published만 표시
-    return logs
-      .filter((log) => log.category?.toLowerCase() === "log" && log.published)
-      .slice(0, limit);
-  } catch (error) {
-    console.error("Error fetching recent logs:", error);
-    return [];
-  }
+  const posts = await queryNotionDatabase();
+  return filterByCategory(posts, "log", limit);
 }
 
 // 데이터베이스에서 포스트 목록 가져오기
 export async function getNotionPosts(): Promise<NotionPost[]> {
-  try {
-    const response = await notion.databases.query({
-      database_id: process.env.NOTION_DATABASE_ID!,
-      sorts: [
-        {
-          property: "Date",
-          direction: "descending",
-        },
-      ],
-    });
-
-    const posts = response.results.map((page: any) => ({
-      id: page.id,
-      title: page.properties["이름"]?.title?.[0]?.plain_text || "Untitled",
-      slug: page.properties.Slug?.rich_text?.[0]?.plain_text || "",
-      date: page.properties.Date?.date?.start || "",
-      description:
-        page.properties.Description?.rich_text?.[0]?.plain_text || "",
-      thumbnail:
-        page.properties.Thumbnail?.files?.[0]?.file?.url ||
-        page.properties.Thumbnail?.files?.[0]?.external?.url ||
-        "",
-      published: page.properties.Status?.checkbox || true,
-      category: page.properties.Category?.select?.name || "",
-    }));
-
-    // 카테고리가 'post'인 것들만 포스트로 간주 + published만 표시
-    return posts.filter(
-      (post) => post.category?.toLowerCase() === "post" && post.published,
-    );
-  } catch (error) {
-    console.error("Error fetching notion posts:", error);
-    return [];
-  }
+  const posts = await queryNotionDatabase();
+  return filterByCategory(posts, "post");
 }
 
 // 특정 포스트 가져오기
@@ -194,16 +111,7 @@ export async function getNotionPost(slug: string) {
     const blocks = await getPageBlocks(pageId);
 
     return {
-      id: pageId,
-      title: page.properties["이름"]?.title?.[0]?.plain_text || "Untitled",
-      slug: page.properties.Slug?.rich_text?.[0]?.plain_text || "",
-      date: page.properties.Date?.date?.start || "",
-      description:
-        page.properties.Description?.rich_text?.[0]?.plain_text || "",
-      thumbnail:
-        page.properties.Thumbnail?.files?.[0]?.file?.url ||
-        page.properties.Thumbnail?.files?.[0]?.external?.url ||
-        "",
+      ...mapNotionPageToPost(page),
       blocks: blocks,
     };
   } catch (error) {
