@@ -44,8 +44,8 @@ export default async function Home() {
       </div>
 
       {/* Recent Posts Section */}
-      <section>
-        <div className="mx-auto max-w-6xl">
+      <section className="mx-5">
+        <div className="max-w-6xl">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-2xl font-bold">최근 포스트</h2>
             <Link
@@ -71,7 +71,7 @@ export default async function Home() {
       </section>
 
       {/* Recent Logs Section */}
-      <section className="min-h-[400px]">
+      <section className="mx-5 min-h-[400px]">
         <div className="mx-auto max-w-4xl">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-2xl font-bold">최근 로그</h2>
@@ -86,7 +86,7 @@ export default async function Home() {
             {recentLogs.map((log, index) => (
               <ListItem
                 key={log.id}
-                date={log.date}
+                slug={log.slug}
                 title={log.title}
                 index={index}
               />

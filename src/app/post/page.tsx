@@ -37,7 +37,7 @@ export default async function PostsPage({
       <div className="flex h-[60px] flex-col justify-center text-center">
         포스트
       </div>
-      <div className="flex flex-col sm:h-[calc(100vh-170px)]">
+      <div className="flex h-[calc(100vh-170px)] flex-col">
         <div className="flex w-full flex-1 flex-col overflow-y-auto">
           <div className="flex flex-1 flex-wrap content-start justify-center gap-6 overflow-y-auto">
             {currentPosts.map((post, key) => (

@@ -17,7 +17,7 @@ export const Card = ({
 }) => {
   return (
     <div
-      className="animate-slide-up group flex h-[260px] w-[80%] transform flex-col opacity-0 transition-all duration-300 hover:-translate-y-2 hover:scale-105 sm:w-[300px]"
+      className="animate-slide-up group flex h-[260px] w-[80vw] transform flex-col opacity-0 transition-all duration-300 hover:-translate-y-2 hover:scale-105 sm:w-[300px]"
       style={{
         animationDelay: `${index * 100 + 100}ms`,
         animationFillMode: "forwards",
