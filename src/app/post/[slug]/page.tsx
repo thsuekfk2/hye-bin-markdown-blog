@@ -46,13 +46,5 @@ export default async function PostPage({ params }: PostPageProps) {
 
   const posts = await getNotionPosts();
 
-  return (
-    <div className="ml-3 mr-3">
-      <ArticleLayout
-        article={post}
-        articles={posts}
-        type="post"
-      />
-    </div>
-  );
+  return <ArticleLayout article={post} articles={posts} type="post" />;
 }

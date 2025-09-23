@@ -9,3 +9,13 @@
   background-color: rgb(0, 0, 0) !important;
   color: white !important;
 }
+
+.react-datepicker__day--keyboard-selected {
+  background-color: #ffffff !important;
+}
+.react-datepicker__month-text--keyboard-selected,
+.react-datepicker__quarter-text--keyboard-selected,
+.react-datepicker__year-text--keyboard-selected {
+  background-color: #ffffff !important;
+  color: rgb(0, 0, 0) !important;
+}

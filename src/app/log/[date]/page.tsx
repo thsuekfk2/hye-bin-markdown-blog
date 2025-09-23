@@ -43,11 +43,5 @@ export default async function LogPage({ params }: LogPageProps) {
 
   const logs = await getNotionLogs();
 
-  return (
-    <ArticleLayout
-      article={log}
-      articles={logs}
-      type="log"
-    />
-  );
+  return <ArticleLayout article={log} articles={logs} type="log" />;
 }

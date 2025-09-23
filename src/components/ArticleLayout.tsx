@@ -48,32 +48,31 @@ export function ArticleLayout({ article, articles, type }: ArticleLayoutProps) {
           __html: JSON.stringify(structuredData),
         }}
       />
-      <div className="flex w-full flex-col">
-        <div>
-          {/* 헤더 */}
-          <ArticleHeader
-            title={article.title}
-            date={article.date}
-            tags={article.tags}
-          />
 
-          {/* 노션 콘텐츠 */}
-          <article>
-            <div className="relative">
-              <NotionToc blocks={article.blocks || []} />
-              <NotionRenderer blocks={article.blocks || []} />
-            </div>
-          </article>
+      <div className="ml-3 mr-3 flex w-full flex-col">
+        {/* 헤더 */}
+        <ArticleHeader
+          title={article.title}
+          date={article.date}
+          tags={article.tags}
+        />
 
-          {/* 이전/다음 네비게이션 */}
-          <ArticleNavigation
-            articles={articles}
-            currentIndex={articleIndex}
-            type={type}
-          />
+        {/* 노션 콘텐츠 */}
+        <article>
+          <div className="relative">
+            <NotionToc blocks={article.blocks || []} />
+            <NotionRenderer blocks={article.blocks || []} />
+          </div>
+        </article>
 
-          <Giscus />
-        </div>
+        {/* 이전/다음 네비게이션 */}
+        <ArticleNavigation
+          articles={articles}
+          currentIndex={articleIndex}
+          type={type}
+        />
+
+        <Giscus />
       </div>
     </>
   );

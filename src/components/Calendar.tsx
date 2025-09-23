@@ -1,21 +1,40 @@
 "use client";
 
-import Link from "next/link";
 import DatePicker from "react-datepicker";
-import { Ref, forwardRef, useEffect, useMemo, useState, useCallback } from "react";
+import { Ref, forwardRef, useEffect, useMemo, useState } from "react";
 import { ko } from "date-fns/esm/locale";
-import { format } from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
 import { CalendarIcon } from "./Icons/CalendarIcon";
-import { ArrowLeftIcon, ArrowRightIcon } from "./Icons/ArrowIcons";
 import { useParams } from "next/navigation";
 import { parseDateStringToDate } from "@/utils/date";
+import { useCalendarData } from "@/hooks/useCalendarData";
+import { format } from "date-fns";
+import { ArrowLeftIcon, ArrowRightIcon } from "./Icons/ArrowIcons";
+import Link from "next/link";
 
-export const Calendar = () => {
-  const { date } = useParams() as { date?: string }; //231023
+interface CalendarProps {
+  filterType?: "post" | "log" | "all";
+}
+
+const CalendarButton = forwardRef<
+  HTMLButtonElement,
+  { onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void }
+>(({ onClick, ...rest }, ref) => (
+  <button onClick={onClick} ref={ref} {...rest}>
+    <CalendarIcon />
+  </button>
+));
+
+CalendarButton.displayName = "CalendarButton";
+
+export const Calendar = ({ filterType = "all" }: CalendarProps) => {
+  const { date } = useParams() as { date?: string };
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const minDate = useMemo(() => new Date("2023-10-09"), []);
   const today = useMemo(() => new Date(), []);
+
+  const { getArticlesForDate, isArticleAvailable } =
+    useCalendarData(filterType);
 
   useEffect(() => {
     if (date) {
@@ -25,104 +44,57 @@ export const Calendar = () => {
     }
   }, [date]);
 
-  // 노션에서 실제 로그 날짜를 가져와서 캘린더에 표시
-  const [availableDates, setAvailableDates] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    const fetchAvailableDates = async () => {
-      try {
-        // API 라우트를 통해 로그 날짜 가져오기
-        const response = await fetch('/api/logs');
-        if (!response.ok) {
-          throw new Error('Failed to fetch logs');
-        }
-        
-        const logs = await response.json();
-        const dateSet = new Set<string>();
-        
-        logs.forEach((log: any) => {
-          if (log.date) {
-            const formatDate = format(new Date(log.date), "yyMMdd");
-            dateSet.add(formatDate);
-          }
-        });
-        
-        setAvailableDates(dateSet);
-      } catch (error) {
-        console.error('Error fetching calendar dates:', error);
-        setAvailableDates(new Set());
-      }
-    };
-    
-    fetchAvailableDates();
-  }, []);
-
-  const isLogAvailable = useCallback((date: Date) => {
-    const formatDate = format(date, "yyMMdd");
-    return availableDates.has(formatDate);
-  }, [availableDates]);
-
-  const CustomInput = forwardRef(
-    (
-      {
-        onClick,
-        ...rest
-      }: {
-        onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-      },
-      ref: Ref<HTMLButtonElement>,
-    ) => (
-      <button className="" onClick={onClick} ref={ref} {...rest}>
-        <CalendarIcon />
-      </button>
-    ),
-  );
-
-  CustomInput.displayName = "CustomInput";
-
-  const renderCustomHeader = useCallback(({
-    date,
-    decreaseMonth,
-    increaseMonth,
-  }: {
+  const renderCustomHeader = ({ date, decreaseMonth, increaseMonth }: {
     date: Date;
     decreaseMonth: () => void;
     increaseMonth: () => void;
-  }) => {
-    return (
-      <div className="flex items-center justify-between">
-        <button onClick={decreaseMonth}>
-          <ArrowLeftIcon />
-        </button>
-        <div className="mb-3 text-sm font-bold">
-          {format(date, "yyyy년 MM월")}
-        </div>
-        <button onClick={increaseMonth}>
-          <ArrowRightIcon />
-        </button>
+  }) => (
+    <div className="flex items-center justify-between">
+      <button onClick={decreaseMonth}>
+        <ArrowLeftIcon />
+      </button>
+      <div className="mb-3 text-sm font-bold">
+        {format(date, "yyyy년 MM월")}
       </div>
-    );
-  }, []);
-  
-  const renderDayContents = useCallback((day: number, date: Date) => {
-    const formatDate = format(date, "yyMMdd");
-    const isFindLog = isLogAvailable(date);
+      <button onClick={increaseMonth}>
+        <ArrowRightIcon />
+      </button>
+    </div>
+  );
 
-    if (!isFindLog) {
+  const renderDayContents = (day: number, date: Date) => {
+    const articles = getArticlesForDate(date);
+    
+    if (articles.length === 0) {
       return (
         <div className="flex h-full w-full">
           <div className="h-full w-full">{day}</div>
         </div>
       );
     }
+
+    const primaryArticle = articles[0];
+    const hasMultiple = articles.length > 1;
+
     return (
-      <div className="flex h-full w-full">
-        <Link className="h-full w-full" href={`/log/${formatDate}`}>
+      <div className="relative flex h-full w-full">
+        <Link
+          className="flex h-full w-full items-center justify-center"
+          href={`/${primaryArticle.type}/${primaryArticle.slug}`}
+          title={
+            hasMultiple
+              ? `${articles.length}개 항목: ${articles.map((a) => a.title).join(", ")}`
+              : primaryArticle.title
+          }
+        >
           {day}
         </Link>
+        {hasMultiple && (
+          <div className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-blue-500"></div>
+        )}
       </div>
     );
-  }, [isLogAvailable]);
+  };
 
   return (
     <DatePicker
@@ -132,10 +104,10 @@ export const Calendar = () => {
       shouldCloseOnSelect
       minDate={minDate}
       maxDate={today}
-      filterDate={(date) => isLogAvailable(date)}
+      filterDate={isArticleAvailable}
       selected={selectedDate}
-      onChange={(date) => setSelectedDate(date)}
-      customInput={<CustomInput />}
+      onChange={setSelectedDate}
+      customInput={<CalendarButton />}
       renderCustomHeader={renderCustomHeader}
       renderDayContents={renderDayContents}
     />

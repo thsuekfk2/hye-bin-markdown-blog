@@ -26,6 +26,7 @@ export default async function LogsPage({ searchParams }: LogsPageProps) {
       currentPage={currentPage}
       pageCount={pageCount}
       route="log"
+      calendarType="log"
     >
       <div className="flex flex-col px-4 py-2">
         {currentLogs.map((log, idx) => (
@@ -33,6 +34,7 @@ export default async function LogsPage({ searchParams }: LogsPageProps) {
             key={`${currentPage}-${idx}`}
             slug={log.slug}
             title={log.title}
+            date={log.date}
             index={idx}
           />
         ))}

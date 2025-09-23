@@ -93,6 +93,7 @@ export default async function Home() {
               key={log.id}
               slug={log.slug}
               title={log.title}
+              date={log.date}
               index={index}
             />
           ))}
