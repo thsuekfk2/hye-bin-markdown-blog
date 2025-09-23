@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -35,6 +37,15 @@ export const Card = ({
               {description || ""}
             </span>
           </div>
+          {/* 백그라운드 이미지 */}
+          <Image
+            width={300}
+            height={250}
+            alt="loading"
+            src="/jump.webp"
+            className="absolute h-[170px] w-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+          {/* 실제 썸네일 이미지 */}
           <Image
             width={300}
             height={250}
@@ -42,7 +53,15 @@ export const Card = ({
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg=="
             src={thumbnail || "/jump.webp"}
-            className="h-[170px] w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="relative z-10 h-[170px] w-full object-cover opacity-0 transition-all duration-500 group-hover:scale-110"
+            onLoad={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.opacity = "1";
+            }}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.opacity = "0";
+            }}
           />
         </div>
       </Link>
