@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React from "react";
+import { TagGroup } from "./TagGroup";
 
 export const Card = ({
   href,
@@ -19,12 +20,6 @@ export const Card = ({
   index?: number;
   tags?: string[];
 }) => {
-  const [visibleTags, setVisibleTags] = useState(3);
-
-  const showMoreTags = () => {
-    setVisibleTags((prev) => Math.min(prev + 3, tags.length));
-  };
-
   return (
     <div
       className="animate-slide-up group flex min-h-[250px] w-[80vw] flex-col transition-all duration-300 md:w-[350px]"
@@ -74,24 +69,8 @@ export const Card = ({
 
       {/* 태그 표시 */}
       {tags.length > 0 && (
-        <div className="mt-1 flex flex-wrap gap-1">
-          {tags.slice(0, visibleTags).map((tag) => (
-            <Link
-              key={tag}
-              href={`/tag/${encodeURIComponent(tag)}`}
-              className="rounded-full bg-gray-700 px-2 py-1 text-[11px] text-gray-300 transition-colors hover:bg-gray-600 hover:text-white"
-            >
-              #{tag}
-            </Link>
-          ))}
-          {tags.length > visibleTags && (
-            <button
-              onClick={showMoreTags}
-              className="rounded-full bg-gray-700 px-2 py-1 text-xs text-gray-300 transition-colors hover:bg-gray-600 hover:text-white"
-            >
-              +{tags.length - visibleTags}
-            </button>
-          )}
+        <div className="mt-1">
+          <TagGroup tags={tags} expandable={true} initialLimit={3} expandStep={3} />
         </div>
       )}
     </div>

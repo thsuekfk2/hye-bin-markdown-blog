@@ -46,12 +46,10 @@ export default async function Home() {
       </div>
 
       {/* 태그 목록 섹션 */}
-      {allTags.length > 0 && (
-        <TagList tags={allTags} title="태그 모음" limit={10} />
-      )}
+      {allTags.length > 0 && <TagList tags={allTags} limit={10} />}
 
       {/* Recent Posts Section */}
-      <section className="mx-5">
+      <section className="mx-5 mb-10">
         <div className="max-w-6xl">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-2xl font-bold">최근 포스트</h2>
@@ -79,9 +77,9 @@ export default async function Home() {
       </section>
 
       {/* Recent Logs Section */}
-      <section className="mx-5 min-h-[400px]">
+      <section className="mx-5 min-h-[350px]">
         <div className="mx-auto max-w-4xl">
-          <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">최근 로그</h2>
             <Link
               href="/log"
@@ -90,16 +88,14 @@ export default async function Home() {
               전체 보기 →
             </Link>
           </div>
-          <div className="space-y-2">
-            {recentLogs.map((log, index) => (
-              <ListItem
-                key={log.id}
-                slug={log.slug}
-                title={log.title}
-                index={index}
-              />
-            ))}
-          </div>
+          {recentLogs.map((log, index) => (
+            <ListItem
+              key={log.id}
+              slug={log.slug}
+              title={log.title}
+              index={index}
+            />
+          ))}
         </div>
       </section>
     </div>

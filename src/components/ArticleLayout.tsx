@@ -3,6 +3,7 @@ import { format, parseISO } from "date-fns";
 import { Giscus } from "@/components/Giscus";
 import { NotionPost } from "@/lib/notion";
 import { NotionRenderer } from "./notion/NotionRenderer";
+import { TagGroup } from "./TagGroup";
 
 interface ArticleLayoutProps {
   article: NotionPost;
@@ -50,7 +51,11 @@ export function ArticleLayout({ article, articles, type }: ArticleLayoutProps) {
       <div className="flex w-full flex-col">
         <div>
           {/* 헤더 */}
-          <ArticleHeader title={article.title} date={article.date} />
+          <ArticleHeader
+            title={article.title}
+            date={article.date}
+            tags={article.tags}
+          />
 
           {/* 노션 콘텐츠 */}
           <article>
@@ -77,15 +82,23 @@ export function ArticleLayout({ article, articles, type }: ArticleLayoutProps) {
 interface ArticleHeaderProps {
   title: string;
   date: string;
+  tags?: string[];
 }
 
-function ArticleHeader({ title, date }: ArticleHeaderProps) {
+function ArticleHeader({ title, date, tags }: ArticleHeaderProps) {
   return (
     <div className="mb-[70px] mt-[40px] text-center font-bold">
       <div className="text-[25px]">{title}</div>
       <div className="text-sm">
         {date && format(parseISO(date), "LLLL d, yyyy")}
       </div>
+
+      {/* 태그 표시 */}
+      {tags && tags.length > 0 && (
+        <div className="mt-4">
+          <TagGroup tags={tags} layout="center" size="md" />
+        </div>
+      )}
     </div>
   );
 }
