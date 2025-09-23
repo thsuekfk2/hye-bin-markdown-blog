@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 
 export const Card = ({
   href,
@@ -19,21 +19,24 @@ export const Card = ({
   index?: number;
   tags?: string[];
 }) => {
+  const [visibleTags, setVisibleTags] = useState(3);
+
+  const showMoreTags = () => {
+    setVisibleTags((prev) => Math.min(prev + 3, tags.length));
+  };
+
   return (
     <div
-      className="animate-slide-up group flex h-[270px] w-[80vw] transform flex-col transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] md:w-[350px]"
+      className="animate-slide-up group flex min-h-[250px] w-[80vw] flex-col transition-all duration-300 md:w-[350px]"
       style={{
         animationDelay: `${index * 100 + 100}ms`,
       }}
     >
-      <Link
-        href={href}
-        className="flex flex-col text-xs text-transparent hover:text-white"
-      >
-        <div className="relative cursor-pointer overflow-hidden rounded-md shadow-lg transition-shadow duration-300 group-hover:shadow-2xl">
-          <div className="absolute z-10 h-full w-full cursor-pointer bg-black bg-gradient-to-t via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-60"></div>
-          <div className="absolute bottom-2 left-2 z-20 translate-y-4 transform opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-            <span className="rounded bg-black/20 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+      <Link href={href} className="flex flex-col">
+        <div className="relative h-[170px] overflow-hidden rounded-md duration-300">
+          <div className="absolute z-20 h-full w-full bg-black opacity-0 transition-opacity duration-500 group-hover:opacity-60"></div>
+          <div className="absolute bottom-2 left-2 z-20 translate-y-4 leading-tight opacity-0 transition-all duration-500 group-hover:opacity-100">
+            <span className="rounded px-2 py-1 text-xs text-white backdrop-blur-sm">
               {description || ""}
             </span>
           </div>
@@ -43,7 +46,7 @@ export const Card = ({
             height={250}
             alt="loading"
             src="/jump.webp"
-            className="absolute h-[170px] w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="absolute h-[170px] w-full object-cover transition-transform duration-500"
           />
           {/* 실제 썸네일 이미지 */}
           <Image
@@ -53,7 +56,7 @@ export const Card = ({
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg=="
             src={thumbnail || "/jump.webp"}
-            className="relative z-10 h-[170px] w-full object-cover opacity-0 transition-all duration-500 group-hover:scale-110"
+            className="relative z-10 h-[170px] w-full object-cover opacity-0 transition-all duration-500"
             onLoad={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.opacity = "1";
@@ -65,26 +68,29 @@ export const Card = ({
           />
         </div>
       </Link>
-      <span className="mt-2 line-clamp-2 h-[40px] overflow-hidden text-sm font-thin transition-colors duration-300 group-hover:text-white">
+      <span className="my-1 line-clamp-2 block min-h-[40px] w-full text-sm font-thin transition-colors duration-300 group-hover:text-white">
         {title}
       </span>
 
       {/* 태그 표시 */}
       {tags.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1">
-          {tags.slice(0, 3).map((tag) => (
+        <div className="mt-1 flex flex-wrap gap-1">
+          {tags.slice(0, visibleTags).map((tag) => (
             <Link
               key={tag}
               href={`/tag/${encodeURIComponent(tag)}`}
-              className="rounded-full bg-gray-700 px-2 py-1 text-xs text-gray-300 transition-colors hover:bg-gray-600 hover:text-white"
+              className="rounded-full bg-gray-700 px-2 py-1 text-[11px] text-gray-300 transition-colors hover:bg-gray-600 hover:text-white"
             >
               #{tag}
             </Link>
           ))}
-          {tags.length > 3 && (
-            <span className="rounded-full bg-gray-700 px-2 py-1 text-xs text-gray-300">
-              +{tags.length - 3}
-            </span>
+          {tags.length > visibleTags && (
+            <button
+              onClick={showMoreTags}
+              className="rounded-full bg-gray-700 px-2 py-1 text-xs text-gray-300 transition-colors hover:bg-gray-600 hover:text-white"
+            >
+              +{tags.length - visibleTags}
+            </button>
           )}
         </div>
       )}
