@@ -61,8 +61,8 @@ export function NotionToc({ blocks }: NotionTocProps) {
 
   return (
     <div className="fixed right-8 top-[100px] hidden w-64 max-w-[220px] transform xl:block">
-      <div className="max-h-[80vh] overflow-y-auto rounded-lg border border-gray-600 bg-[#2a2a2a] p-4">
-        <ul className="space-y-2">
+      <div className="max-h-[80vh] overflow-y-auto rounded-lg border border-gray-600 bg-[#2a2a2a]">
+        <ul className="space-y-1">
           {tocItems.map((item) => (
             <div key={item.id}>
               <button

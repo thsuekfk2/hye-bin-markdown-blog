@@ -52,6 +52,7 @@ export function ArticleLayout({ article, articles, type }: ArticleLayoutProps) {
       <div className="ml-3 mr-3 flex w-full flex-col">
         {/* 헤더 */}
         <ArticleHeader
+          thumbnail={article.thumbnail || "/jump.webp"}
           title={article.title}
           date={article.date}
           tags={article.tags}
@@ -82,14 +83,21 @@ interface ArticleHeaderProps {
   title: string;
   date: string;
   tags?: string[];
+  thumbnail: string;
 }
 
-function ArticleHeader({ title, date, tags }: ArticleHeaderProps) {
+function ArticleHeader({ title, date, tags, thumbnail }: ArticleHeaderProps) {
   return (
-    <div className="mb-[70px] mt-[40px] text-center font-bold">
-      <div className="text-[25px]">{title}</div>
-      <div className="text-sm">
-        {date && format(parseISO(date), "LLLL d, yyyy")}
+    <div className="relative mt-[40px] text-center font-bold">
+      <img
+        src={thumbnail}
+        className="z-1 h-[200px] w-full object-cover opacity-20"
+      />
+      <div className="absolute top-0 flex h-full w-full flex-col items-center justify-center">
+        <div className="text-[25px]">{title}</div>
+        <div className="text-sm">
+          {date && format(parseISO(date), "LLLL d, yyyy")}
+        </div>
       </div>
 
       {/* 태그 표시 */}
