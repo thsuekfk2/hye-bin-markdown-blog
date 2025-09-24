@@ -6,7 +6,7 @@ interface ImageBlockProps {
 }
 
 export function ImageBlock({ block }: ImageBlockProps) {
-  const imageUrl = block.image?.file?.url || block.image?.external?.url;
+  const imageUrl = block.image?.external?.url || block.image?.file?.url;
   const caption = block.image?.caption?.[0]?.plain_text || "";
 
   return (

@@ -26,8 +26,8 @@ function mapNotionPageToPost(page: any): NotionPost {
     date: page.properties.Date?.date?.start || "",
     description: page.properties.Description?.rich_text?.[0]?.plain_text || "",
     thumbnail:
-      page.properties.Thumbnail?.files?.[0]?.file?.url ||
       page.properties.Thumbnail?.files?.[0]?.external?.url ||
+      page.properties.Thumbnail?.files?.[0]?.file?.url ||
       "",
     published: page.properties.Status?.select?.name === "발행" || false,
     category: page.properties.Category?.select?.name || "",
