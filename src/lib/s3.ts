@@ -48,10 +48,10 @@ function normalizeNotionUrl(url: string): string {
 /**
  * URL 해시로 고유한 파일명 생성
  */
-function generateFileName(originalUrl: string, slug?: string): string {
-  const normalizedUrl = normalizeNotionUrl(originalUrl);
+function generateFileName(notionUrl: string, slug?: string): string {
+  const normalizedUrl = normalizeNotionUrl(notionUrl);
   const hash = crypto.createHash("md5").update(normalizedUrl).digest("hex");
-  const ext = getFileExtension(originalUrl);
+  const ext = getFileExtension(notionUrl);
 
   if (slug) {
     return `notion-images/${slug}/${hash}.${ext}`;
@@ -80,16 +80,15 @@ async function fileExists(key: string): Promise<boolean> {
 /**
  * S3 URL만 생성 (업로드는 런타임에 지연 처리)
  */
-export function generateS3Url(originalUrl: string, slug?: string): string {
+export function generateS3Url(notionUrl: string, slug?: string): string {
   // S3 설정이 없으면 fallback
   if (!BUCKET_NAME || !process.env.AWS_ACCESS_KEY_ID) {
     return "/jump.webp";
   }
 
-  const fileName = generateFileName(originalUrl, slug);
+  const fileName = generateFileName(notionUrl, slug);
   return `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
 }
-
 
 export async function uploadNotionImageToS3(
   notionImageUrl: string,

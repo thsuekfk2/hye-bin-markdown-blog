@@ -186,23 +186,38 @@ export async function getNotionPost(slug: string) {
 // 이미지 블록 처리 함수
 async function processImageBlock(block: any, slug?: string): Promise<any> {
   if (block.type === "image" && block.image) {
-    const originalUrl = block.image.external?.url || block.image.file?.url;
+    const notionUrl = block.image.external?.url || block.image.file?.url;
 
     if (
-      originalUrl &&
-      (originalUrl.includes("amazonaws.com") ||
-        originalUrl.includes("notion.so"))
+      notionUrl &&
+      (notionUrl.includes("amazonaws.com") || notionUrl.includes("notion.so"))
     ) {
-      // S3 URL 직접 생성
-      const s3Url = generateS3Url(originalUrl, slug);
+      try {
+        // S3 URL 직접 생성
+        const s3Url = generateS3Url(notionUrl, slug);
 
-      // S3 URL로 교체
-      if (block.image.external?.url) {
-        block.image.external.url = s3Url;
-      } else if (block.image.file?.url) {
-        delete block.image.file;
-        block.image.external = { url: s3Url };
+        // 원본 URL을 보존
+        (block as any).originalImageUrl = notionUrl;
+
+        // S3 URL로 교체
+        if (block.image.external?.url) {
+          block.image.external.url = s3Url;
+        } else if (block.image.file?.url) {
+          delete block.image.file;
+          block.image.external = { url: s3Url };
+        }
+      } catch (error) {
+        console.error("Error processing image block:", error);
+        // fallback 이미지로 교체
+        if (block.image.external?.url) {
+          block.image.external.url = "/jump.webp";
+        } else if (block.image.file?.url) {
+          delete block.image.file;
+          block.image.external = { url: "/jump.webp" };
+        }
       }
+    } else if (!notionUrl) {
+      block.image.external = { url: "/jump.webp" };
     }
   }
   return block;

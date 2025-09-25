@@ -1,47 +1,81 @@
 "use client";
 
+import Image from "next/image";
+
 interface FallbackImageProps {
   src: string;
   alt: string;
   className?: string;
-  originalUrl?: string; // 원본 Notion URL
+  notionUrl?: string; // 원본 Notion URL
 }
 
-export function FallbackImage({ src, alt, className, originalUrl }: FallbackImageProps) {
-  const handleError = async (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const target = e.target as HTMLImageElement;
-    const failedSrc = target.src;
-    
-    // S3 URL이 실패하고 원본 URL이 있으면 업로드 시도
-    if (failedSrc.includes('.s3.') && failedSrc.includes('amazonaws.com') && originalUrl) {
-      try {
-        console.log('S3 image not found, attempting upload:', failedSrc);
-        
-        // S3에 업로드 요청
-        const response = await fetch('/api/upload-image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            notionUrl: originalUrl,
-            s3Url: failedSrc
-          })
-        });
-        
-        if (response.ok) {
-          // 업로드 성공하면 다시 시도
-          target.src = failedSrc;
-          return;
-        }
-      } catch (error) {
-        console.error('Failed to upload image:', error);
-      }
+export function FallbackImage({
+  src,
+  alt,
+  className,
+  notionUrl,
+}: FallbackImageProps) {
+  const checkImageValidity = async (imageUrl: string) => {
+    try {
+      const response = await fetch(imageUrl, { method: "HEAD" });
+      return response.ok;
+    } catch (error) {
+      return false;
     }
-    
-    // 최종 fallback
-    target.src = "/jump.webp";
+  };
+
+  const validateAndUpload = async () => {
+    console.log("Checking image validity:", src);
+
+    const isValid = await checkImageValidity(src);
+    console.log("Image validity result:", isValid);
+
+    if (!isValid) {
+      console.log("Image is invalid, checking upload conditions");
+
+      // S3 URL이고 원본 URL이 있으며, 아직 업로드를 시도하지 않은 경우
+      if (src.includes(".s3.") && src.includes("amazonaws.com") && notionUrl) {
+        console.log("Attempting upload with notionUrl:", notionUrl);
+
+        try {
+          const response = await fetch("/api/upload-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              notionUrl,
+              s3Url: src.split("?")[0],
+            }),
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            console.log("Upload result:", result);
+
+            if (result.uploadedUrl && result.uploadedUrl !== "/jump.webp") {
+              console.log("Setting new image URL:", result.uploadedUrl);
+              return result.uploadedUrl;
+            }
+          }
+        } catch (error) {
+          console.error("Failed to upload image:", error);
+        }
+      }
+      console.log("Using fallback image");
+      return "/jump.webp";
+    } else {
+      console.log("Image is valid, using original src");
+      return src;
+    }
   };
 
   return (
-    <img src={src} alt={alt} className={className} onError={handleError} />
+    <Image
+      src={src}
+      alt={alt}
+      className={className}
+      onError={() => validateAndUpload()}
+      width={800}
+      height={300}
+    />
   );
 }

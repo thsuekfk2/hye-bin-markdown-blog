@@ -11,20 +11,28 @@ export async function POST(request: NextRequest) {
 
     console.log(`Uploading missing image: ${notionUrl} -> ${s3Url}`);
 
-    // S3에 업로드
-    const uploadedUrl = await uploadNotionImageToS3(notionUrl);
-    
-    return NextResponse.json({ 
-      success: true, 
-      uploadedUrl,
-      message: "Image uploaded successfully" 
-    });
+    // S3 URL에서 slug 추출
+    let slug;
+    if (s3Url && s3Url.includes("/notion-images/")) {
+      const pathParts = s3Url.split("/notion-images/")[1]?.split("/");
+      if (pathParts && pathParts.length > 1) {
+        slug = decodeURIComponent(pathParts[0]);
+      }
+    }
 
+    // S3에 업로드
+    const uploadedUrl = await uploadNotionImageToS3(notionUrl, slug);
+
+    return NextResponse.json({
+      success: true,
+      uploadedUrl,
+      message: "Image uploaded successfully",
+    });
   } catch (error) {
     console.error("Image upload error:", error);
     return NextResponse.json(
-      { error: "Failed to upload image" }, 
-      { status: 500 }
+      { error: "Failed to upload image" },
+      { status: 500 },
     );
   }
 }

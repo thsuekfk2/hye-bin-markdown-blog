@@ -103,7 +103,7 @@ function ArticleHeader({
         src={thumbnail}
         alt={title}
         className="z-1 h-[200px] w-full object-cover opacity-20"
-        originalUrl={originalThumbnail}
+        notionUrl={originalThumbnail}
       />
       <div className="absolute top-0 flex h-full w-full flex-col items-center justify-center">
         <div className="text-[25px]">{title}</div>

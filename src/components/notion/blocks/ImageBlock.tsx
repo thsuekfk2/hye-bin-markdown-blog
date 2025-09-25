@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { ImageBlock as ImageBlockType } from "@/types/notion";
+import { FallbackImage } from "@/components/FallbackImage";
 
 interface ImageBlockProps {
   block: ImageBlockType;
@@ -8,16 +8,16 @@ interface ImageBlockProps {
 export function ImageBlock({ block }: ImageBlockProps) {
   const imageUrl = block.image?.external?.url || block.image?.file?.url;
   const caption = block.image?.caption?.[0]?.plain_text || "";
+  const originalImageUrl = (block as any)?.originalImageUrl;
 
   return (
     <figure className="mb-6 flex flex-col items-center">
       {imageUrl && (
-        <Image
+        <FallbackImage
           src={imageUrl}
           alt={caption || "Image"}
-          width={800}
-          height={600}
           className="h-auto w-full max-w-2xl rounded-lg"
+          notionUrl={originalImageUrl}
         />
       )}
       {caption && (
