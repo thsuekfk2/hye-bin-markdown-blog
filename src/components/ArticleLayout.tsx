@@ -4,6 +4,7 @@ import { Giscus } from "@/components/Giscus";
 import { NotionPost } from "@/lib/notion";
 import { NotionRenderer } from "./notion/NotionRenderer";
 import { TagGroup } from "./TagGroup";
+import { FallbackImage } from "./FallbackImage";
 
 interface ArticleLayoutProps {
   article: NotionPost;
@@ -56,6 +57,7 @@ export function ArticleLayout({ article, articles, type }: ArticleLayoutProps) {
           title={article.title}
           date={article.date}
           tags={article.tags}
+          originalThumbnail={article.originalThumbnail}
         />
 
         {/* 노션 콘텐츠 */}
@@ -84,14 +86,17 @@ interface ArticleHeaderProps {
   date: string;
   tags?: string[];
   thumbnail: string;
+  originalThumbnail?: string;
 }
 
-function ArticleHeader({ title, date, tags, thumbnail }: ArticleHeaderProps) {
+function ArticleHeader({ title, date, tags, thumbnail, originalThumbnail }: ArticleHeaderProps) {
   return (
     <div className="relative mt-[40px] text-center font-bold">
-      <img
+      <FallbackImage
         src={thumbnail}
+        alt={title}
         className="z-1 h-[200px] w-full object-cover opacity-20"
+        originalUrl={originalThumbnail}
       />
       <div className="absolute top-0 flex h-full w-full flex-col items-center justify-center">
         <div className="text-[25px]">{title}</div>

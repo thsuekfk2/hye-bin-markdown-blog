@@ -1,6 +1,6 @@
 import { Client } from "@notionhq/client";
-import { uploadNotionImageToS3 } from "./s3";
 import { cache } from "react";
+import { generateS3Url } from "./s3";
 
 // Notion 공식 API 클라이언트
 const notion = new Client({
@@ -14,6 +14,7 @@ export interface NotionPost {
   date: string;
   description?: string;
   thumbnail?: string;
+  originalThumbnail?: string;
   published: boolean;
   category?: string;
   tags?: string[]; // 태그 배열
@@ -27,15 +28,10 @@ async function mapNotionPageToPost(page: any): Promise<NotionPost> {
     page.properties.Thumbnail?.files?.[0]?.file?.url ||
     "";
 
-  // Notion 이미지인 경우 S3에 업로드
+  // S3 URL 직접 생성
   let thumbnail = originalThumbnail;
   if (originalThumbnail && originalThumbnail.includes("amazonaws.com")) {
-    try {
-      thumbnail = await uploadNotionImageToS3(originalThumbnail, slug);
-    } catch (error) {
-      console.error("Failed to upload thumbnail to S3:", error);
-      thumbnail = originalThumbnail; // 실패 시 원본 사용
-    }
+    thumbnail = generateS3Url(originalThumbnail, slug);
   }
 
   return {
@@ -45,6 +41,7 @@ async function mapNotionPageToPost(page: any): Promise<NotionPost> {
     date: page.properties.Date?.date?.start || "",
     description: page.properties.Description?.rich_text?.[0]?.plain_text || "",
     thumbnail,
+    originalThumbnail,
     published: page.properties.Status?.select?.name === "발행" || false,
     category: page.properties.Category?.select?.name || "",
     tags: page.properties.Tags?.multi_select?.map((tag: any) => tag.name) || [],
@@ -196,19 +193,15 @@ async function processImageBlock(block: any, slug?: string): Promise<any> {
       (originalUrl.includes("amazonaws.com") ||
         originalUrl.includes("notion.so"))
     ) {
-      try {
-        const s3Url = await uploadNotionImageToS3(originalUrl, slug);
+      // S3 URL 직접 생성
+      const s3Url = generateS3Url(originalUrl, slug);
 
-        // S3 URL로 교체
-        if (block.image.external?.url) {
-          block.image.external.url = s3Url;
-        } else if (block.image.file?.url) {
-          // external 형태로 변경하여 영구 URL 보장
-          delete block.image.file;
-          block.image.external = { url: s3Url };
-        }
-      } catch (error) {
-        console.error("Failed to upload block image to S3:", error);
+      // S3 URL로 교체
+      if (block.image.external?.url) {
+        block.image.external.url = s3Url;
+      } else if (block.image.file?.url) {
+        delete block.image.file;
+        block.image.external = { url: s3Url };
       }
     }
   }

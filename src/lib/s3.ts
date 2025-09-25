@@ -78,39 +78,18 @@ async function fileExists(key: string): Promise<boolean> {
 }
 
 /**
- * Notion 이미지를 S3에 업로드하고 URL 반환
+ * S3 URL만 생성 (업로드는 런타임에 지연 처리)
  */
-/**
- * URL 만료 여부 체크
- */
-function isUrlExpired(url: string): boolean {
-  if (!url.includes("X-Amz-Expires") || !url.includes("X-Amz-Date")) {
-    return false; // 만료 정보가 없으면 만료되지 않은 것으로 간주
+export function generateS3Url(originalUrl: string, slug?: string): string {
+  // S3 설정이 없으면 fallback
+  if (!BUCKET_NAME || !process.env.AWS_ACCESS_KEY_ID) {
+    return "/jump.webp";
   }
 
-  try {
-    const urlObj = new URL(url);
-    const expiresParam = urlObj.searchParams.get("X-Amz-Expires");
-    const dateParam = urlObj.searchParams.get("X-Amz-Date");
-
-    if (expiresParam && dateParam) {
-      const expiresSeconds = parseInt(expiresParam);
-      const issueDate = new Date(
-        dateParam.replace(
-          /(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z/,
-          "$1-$2-$3T$4:$5:$6Z",
-        ),
-      );
-      const expiryDate = new Date(issueDate.getTime() + expiresSeconds * 1000);
-
-      return new Date() > expiryDate;
-    }
-  } catch (error) {
-    console.error("Error checking URL expiry:", error);
-  }
-
-  return false;
+  const fileName = generateFileName(originalUrl, slug);
+  return `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
 }
+
 
 export async function uploadNotionImageToS3(
   notionImageUrl: string,
@@ -122,25 +101,17 @@ export async function uploadNotionImageToS3(
     return "/jump.webp";
   }
 
-  // 만료 체크
-  if (!isUrlExpired(notionImageUrl)) {
-    console.log("URL not expired, using original URL");
-    return notionImageUrl;
-  }
-
-  // console.log("URL expired, checking S3 cache...");
-
   try {
     const fileName = generateFileName(notionImageUrl, slug);
 
-    // 만료된 경우만 S3 확인
+    // S3에 파일이 이미 존재하는지 확인
     const exists = await fileExists(fileName);
     if (exists) {
       console.log(`Using cached S3 file: ${fileName}`);
-      return `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+      return generateS3Url(notionImageUrl, slug);
     }
 
-    console.log(`Uploading expired image to S3: ${fileName}`);
+    console.log(`Uploading image to S3: ${fileName}`);
 
     // Notion에서 이미지 다운로드
     const response = await fetch(notionImageUrl);
@@ -172,7 +143,7 @@ export async function uploadNotionImageToS3(
       }),
     );
 
-    return `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+    return generateS3Url(notionImageUrl, slug);
   } catch (error) {
     console.error("Error uploading image to S3:", error);
 
