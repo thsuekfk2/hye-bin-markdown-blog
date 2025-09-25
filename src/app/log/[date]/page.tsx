@@ -1,4 +1,8 @@
-import { getNotionPost, getNotionLogs } from "@/lib/notion";
+import {
+  getNotionPost,
+  getNotionLogs,
+  getNotionPostMetadata,
+} from "@/lib/notion";
 import { ArticleLayout } from "@/components/ArticleLayout";
 import { generateArticleMetadata } from "@/lib/metadata";
 import { ISR_TIME } from "@/lib/config";
@@ -21,7 +25,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: LogPageProps): Promise<Metadata> {
-  const log = await getNotionPost(params.date);
+  const log = await getNotionPostMetadata(params.date);
 
   return generateArticleMetadata({
     article: log,

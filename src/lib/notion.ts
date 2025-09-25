@@ -125,6 +125,31 @@ export async function getPostsByTag(tag: string): Promise<NotionPost[]> {
   );
 }
 
+// 메타데이터용 포스트 정보만 가져오기
+export async function getNotionPostMetadata(slug: string) {
+  try {
+    const response = await notion.databases.query({
+      database_id: process.env.NOTION_DATABASE_ID!,
+      filter: {
+        property: "Slug",
+        rich_text: {
+          equals: slug,
+        },
+      },
+    });
+
+    if (response.results.length === 0) {
+      return null;
+    }
+
+    const page = response.results[0] as any;
+    return await mapNotionPageToPost(page);
+  } catch (error) {
+    console.error("Error fetching notion post metadata:", error);
+    return null;
+  }
+}
+
 // 특정 포스트 가져오기
 export async function getNotionPost(slug: string) {
   try {

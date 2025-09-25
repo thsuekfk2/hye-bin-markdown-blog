@@ -1,4 +1,8 @@
-import { getNotionPost, getNotionPosts } from "@/lib/notion";
+import {
+  getNotionPost,
+  getNotionPosts,
+  getNotionPostMetadata,
+} from "@/lib/notion";
 import { ArticleLayout } from "@/components/ArticleLayout";
 import { generateArticleMetadata } from "@/lib/metadata";
 import { ISR_TIME } from "@/lib/config";
@@ -22,7 +26,7 @@ export async function generateMetadata({
   params,
 }: PostPageProps): Promise<Metadata> {
   const decodedSlug = decodeURIComponent(params.slug);
-  const post = await getNotionPost(decodedSlug);
+  const post = await getNotionPostMetadata(decodedSlug);
 
   return generateArticleMetadata({
     article: post,
