@@ -1,5 +1,6 @@
 import { Client } from "@notionhq/client";
 import { uploadNotionImageToS3 } from "./s3";
+import { cache } from "react";
 
 // Notion 공식 API 클라이언트
 const notion = new Client({
@@ -63,7 +64,7 @@ function filterByCategory(
   return limit ? filtered.slice(0, limit) : filtered;
 }
 
-async function queryNotionDatabase(): Promise<NotionPost[]> {
+const queryNotionDatabase = cache(async (): Promise<NotionPost[]> => {
   try {
     const response = await notion.databases.query({
       database_id: process.env.NOTION_DATABASE_ID!,
@@ -80,7 +81,7 @@ async function queryNotionDatabase(): Promise<NotionPost[]> {
     console.error("Error querying notion database:", error);
     return [];
   }
-}
+});
 
 // 데이터베이스에서 로그 목록 가져오기 (이미 날짜순 정렬됨)
 export async function getNotionLogs(): Promise<NotionPost[]> {
