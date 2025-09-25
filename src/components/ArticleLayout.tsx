@@ -5,6 +5,7 @@ import { NotionPost } from "@/lib/notion";
 import { NotionRenderer } from "./notion/NotionRenderer";
 import { TagGroup } from "./TagGroup";
 import { FallbackImage } from "./FallbackImage";
+import Link from "next/link";
 
 interface ArticleLayoutProps {
   article: NotionPost;
@@ -89,7 +90,13 @@ interface ArticleHeaderProps {
   originalThumbnail?: string;
 }
 
-function ArticleHeader({ title, date, tags, thumbnail, originalThumbnail }: ArticleHeaderProps) {
+function ArticleHeader({
+  title,
+  date,
+  tags,
+  thumbnail,
+  originalThumbnail,
+}: ArticleHeaderProps) {
   return (
     <div className="relative mt-[40px] text-center font-bold">
       <FallbackImage
@@ -130,18 +137,24 @@ function ArticleNavigation({
     <div className="my-16 flex flex-col justify-between gap-8 md:flex-row">
       <div>
         {articles[currentIndex - 1] && (
-          <a href={`/${type}/${articles[currentIndex - 1].slug}`}>
+          <Link
+            href={`/${type}/${articles[currentIndex - 1].slug}`}
+            className="block transition-opacity hover:opacity-80"
+          >
             <p>이전 {type === "post" ? "포스트" : "로그"}</p>
             <p className="font-bold">{articles[currentIndex - 1].title}</p>
-          </a>
+          </Link>
         )}
       </div>
       <div className="text-right">
         {articles[currentIndex + 1] && (
-          <a href={`/${type}/${articles[currentIndex + 1].slug}`}>
+          <Link
+            href={`/${type}/${articles[currentIndex + 1].slug}`}
+            className="block transition-opacity hover:opacity-80"
+          >
             <p>다음 {type === "post" ? "포스트" : "로그"}</p>
             <p className="font-bold">{articles[currentIndex + 1].title}</p>
-          </a>
+          </Link>
         )}
       </div>
     </div>
