@@ -12,6 +12,7 @@
     "node": ">=22.0.0"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.896.0",
     "@types/react-syntax-highlighter": "^15.5.13",
     "postcss": "8.4.26",
     "prettier": "^3.3.3",
