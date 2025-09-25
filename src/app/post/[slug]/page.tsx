@@ -13,14 +13,6 @@ interface PostPageProps {
   params: { slug: string };
 }
 
-// 정적 경로 생성
-export async function generateStaticParams() {
-  const posts = await getNotionPosts();
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
-}
-
 // 메타데이터 생성
 export async function generateMetadata({
   params,

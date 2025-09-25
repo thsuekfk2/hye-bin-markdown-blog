@@ -13,14 +13,6 @@ interface LogPageProps {
   params: { date: string };
 }
 
-// 정적 경로 생성
-export async function generateStaticParams() {
-  const logs = await getNotionLogs();
-  return logs.map((log) => ({
-    date: log.slug,
-  }));
-}
-
 // 메타데이터 생성
 export async function generateMetadata({
   params,

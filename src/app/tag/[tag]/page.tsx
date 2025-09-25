@@ -1,18 +1,10 @@
-import { getPostsByTag, getAllTags } from "@/lib/notion";
+import { getPostsByTag } from "@/lib/notion";
 import { Card } from "@/components/Card";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
 interface TagPageProps {
   params: { tag: string };
-}
-
-// 정적 경로 생성
-export async function generateStaticParams() {
-  const tags = await getAllTags();
-  return tags.map((tag) => ({
-    tag: tag,
-  }));
 }
 
 // 메타데이터 생성
