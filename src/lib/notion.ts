@@ -1,4 +1,5 @@
 import { Client } from "@notionhq/client";
+import { uploadNotionImageToS3 } from "./s3";
 
 // Notion 공식 API 클라이언트
 const notion = new Client({
@@ -18,17 +19,31 @@ export interface NotionPost {
   blocks?: any[]; // 블록 데이터는 getNotionPost에서만 사용됨
 }
 
-function mapNotionPageToPost(page: any): NotionPost {
+async function mapNotionPageToPost(page: any): Promise<NotionPost> {
+  const slug = page.properties.Slug?.rich_text?.[0]?.plain_text || "";
+  const originalThumbnail =
+    page.properties.Thumbnail?.files?.[0]?.external?.url ||
+    page.properties.Thumbnail?.files?.[0]?.file?.url ||
+    "";
+
+  // Notion 이미지인 경우 S3에 업로드
+  let thumbnail = originalThumbnail;
+  if (originalThumbnail && originalThumbnail.includes("amazonaws.com")) {
+    try {
+      thumbnail = await uploadNotionImageToS3(originalThumbnail, slug);
+    } catch (error) {
+      console.error("Failed to upload thumbnail to S3:", error);
+      thumbnail = originalThumbnail; // 실패 시 원본 사용
+    }
+  }
+
   return {
     id: page.id,
     title: page.properties["이름"]?.title?.[0]?.plain_text || "Untitled",
     slug: page.properties.Slug?.rich_text?.[0]?.plain_text || "",
     date: page.properties.Date?.date?.start || "",
     description: page.properties.Description?.rich_text?.[0]?.plain_text || "",
-    thumbnail:
-      page.properties.Thumbnail?.files?.[0]?.external?.url ||
-      page.properties.Thumbnail?.files?.[0]?.file?.url ||
-      "",
+    thumbnail,
     published: page.properties.Status?.select?.name === "발행" || false,
     category: page.properties.Category?.select?.name || "",
     tags: page.properties.Tags?.multi_select?.map((tag: any) => tag.name) || [],
@@ -60,7 +75,7 @@ async function queryNotionDatabase(): Promise<NotionPost[]> {
       ],
     });
 
-    return response.results.map(mapNotionPageToPost);
+    return Promise.all(response.results.map(mapNotionPageToPost));
   } catch (error) {
     console.error("Error querying notion database:", error);
     return [];
@@ -129,12 +144,14 @@ export async function getNotionPost(slug: string) {
 
     const page = response.results[0] as any;
     const pageId = page.id;
+    const pageSlug = page.properties.Slug?.rich_text?.[0]?.plain_text || slug;
 
     // 페이지 블록 가져오기
-    const blocks = await getPageBlocks(pageId);
+    const blocks = await getPageBlocks(pageId, pageSlug);
 
+    const post = await mapNotionPageToPost(page);
     return {
-      ...mapNotionPageToPost(page),
+      ...post,
       blocks: blocks,
     };
   } catch (error) {
@@ -143,8 +160,37 @@ export async function getNotionPost(slug: string) {
   }
 }
 
+// 이미지 블록 처리 함수
+async function processImageBlock(block: any, slug?: string): Promise<any> {
+  if (block.type === "image" && block.image) {
+    const originalUrl = block.image.external?.url || block.image.file?.url;
+
+    if (
+      originalUrl &&
+      (originalUrl.includes("amazonaws.com") ||
+        originalUrl.includes("notion.so"))
+    ) {
+      try {
+        const s3Url = await uploadNotionImageToS3(originalUrl, slug);
+
+        // S3 URL로 교체
+        if (block.image.external?.url) {
+          block.image.external.url = s3Url;
+        } else if (block.image.file?.url) {
+          // external 형태로 변경하여 영구 URL 보장
+          delete block.image.file;
+          block.image.external = { url: s3Url };
+        }
+      } catch (error) {
+        console.error("Failed to upload block image to S3:", error);
+      }
+    }
+  }
+  return block;
+}
+
 // 페이지 블록 가져오기 (재귀적으로 모든 블록)
-async function getPageBlocks(pageId: string): Promise<any[]> {
+async function getPageBlocks(pageId: string, slug?: string): Promise<any[]> {
   try {
     const blocks = [];
     let cursor: string | undefined;
@@ -156,15 +202,20 @@ async function getPageBlocks(pageId: string): Promise<any[]> {
         page_size: 100,
       });
 
-      blocks.push(...response.results);
+      // 각 블록을 처리
+      const processedBlocks = await Promise.all(
+        response.results.map((block) => processImageBlock(block, slug)),
+      );
+
+      blocks.push(...processedBlocks);
       cursor = response.has_more
         ? response.next_cursor || undefined
         : undefined;
 
       // 자식 블록이 있는 경우 재귀적으로 가져오기
-      for (const block of response.results) {
+      for (const block of processedBlocks) {
         if ((block as any).has_children) {
-          const childBlocks = await getPageBlocks(block.id);
+          const childBlocks = await getPageBlocks(block.id, slug);
           (block as any).children = childBlocks;
         }
       }

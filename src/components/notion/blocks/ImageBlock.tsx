@@ -21,7 +21,7 @@ export function ImageBlock({ block }: ImageBlockProps) {
         />
       )}
       {caption && (
-        <figcaption className="mt-2 text-xs text-center text-gray-300">
+        <figcaption className="mt-2 text-center text-xs text-gray-300">
           {caption}
         </figcaption>
       )}
