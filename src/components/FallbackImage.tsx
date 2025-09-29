@@ -27,22 +27,7 @@ export function FallbackImage({
   height = 300,
 }: FallbackImageProps) {
   const [currentSrc, setCurrentSrc] = useState(src);
-
-  const checkImageValidity = useCallback(
-    async (imageUrl: string): Promise<boolean> => {
-      try {
-        const response = await fetch(imageUrl, { method: "HEAD" });
-        return response.ok;
-      } catch {
-        return false;
-      }
-    },
-    [],
-  );
-
-  const isS3Url = useCallback((url: string): boolean => {
-    return url.includes(".s3.") && url.includes("amazonaws.com");
-  }, []);
+  const [isUploading, setIsUploading] = useState(true);
 
   const uploadImage = useCallback(
     async (notionUrl: string, s3Url: string): Promise<string | null> => {
@@ -71,12 +56,9 @@ export function FallbackImage({
   );
 
   const handleImageError = useCallback(async () => {
-    const isValid = await checkImageValidity(currentSrc);
-
-    if (isValid) return;
-
-    if (isS3Url(currentSrc) && notionUrl) {
+    if (notionUrl && !isUploading) {
       const uploadedUrl = await uploadImage(notionUrl, currentSrc);
+      setIsUploading(false);
       if (uploadedUrl) {
         setCurrentSrc(uploadedUrl);
         return;
@@ -84,16 +66,17 @@ export function FallbackImage({
     }
 
     setCurrentSrc(FALLBACK_IMAGE);
-  }, [currentSrc, notionUrl, checkImageValidity, isS3Url, uploadImage]);
+  }, [currentSrc, notionUrl, uploadImage, isUploading]);
 
   return (
     <Image
-      src={currentSrc}
+      src={isUploading ? FALLBACK_IMAGE : currentSrc}
       alt={alt}
       className={className}
       onError={handleImageError}
       width={width}
       height={height}
+      onLoad={() => setIsUploading(false)}
     />
   );
 }
