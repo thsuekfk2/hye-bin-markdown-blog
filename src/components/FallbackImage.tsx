@@ -27,7 +27,7 @@ export function FallbackImage({
   height = 300,
 }: FallbackImageProps) {
   const [currentSrc, setCurrentSrc] = useState(src);
-  const [isUploading, setIsUploading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
 
   const uploadImage = useCallback(
     async (notionUrl: string, s3Url: string): Promise<string | null> => {
@@ -57,6 +57,8 @@ export function FallbackImage({
 
   const handleImageError = useCallback(async () => {
     if (notionUrl && !isUploading) {
+      setIsUploading(true);
+
       const uploadedUrl = await uploadImage(notionUrl, currentSrc);
       setIsUploading(false);
       if (uploadedUrl) {
