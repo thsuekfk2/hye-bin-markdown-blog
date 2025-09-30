@@ -32,6 +32,14 @@ export async function generateMetadata({
 // ISR 설정 - 전역 설정 사용
 export const revalidate = ISR_TIME;
 
+// generateStaticParams 추가 - ISR을 위한 정적 경로 생성
+export async function generateStaticParams() {
+  const posts = await getNotionPosts();
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
+}
+
 export default async function PostPage({ params }: PostPageProps) {
   const decodedSlug = decodeURIComponent(params.slug);
   const post = await getNotionPost(decodedSlug);

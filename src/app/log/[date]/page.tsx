@@ -30,6 +30,14 @@ export async function generateMetadata({
 
 export const revalidate = ISR_TIME;
 
+// generateStaticParams 추가 - ISR을 위한 정적 경로 생성
+export async function generateStaticParams() {
+  const logs = await getNotionLogs();
+  return logs.map((log) => ({
+    date: log.slug,
+  }));
+}
+
 export default async function LogPage({ params }: LogPageProps) {
   const log = await getNotionPost(params.date);
 
