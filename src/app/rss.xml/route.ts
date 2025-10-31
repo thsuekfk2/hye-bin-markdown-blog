@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getNotionPosts, getNotionLogs } from "@/lib/notion";
 
 // RSS 피드에 사용될 사이트 기본 정보를 상수로 정의
-const SITE_URL = "https://www.hyebin.me";
+const SITE_URL = "https://www.hyebin.pro";
 const SITE_TITLE = "이혜빈의 개발블로그";
 const SITE_DESCRIPTION = "개발을 기록하는 개발블로그입니다.";
 

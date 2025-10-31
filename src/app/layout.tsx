@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "이혜빈 | 프론트엔드 개발자",
     description: "프론트엔드 개발자의 기술 블로그",
-    url: "https://www.hyebin.me",
+    url: "https://www.hyebin.pro",
     siteName: "HyeBin's Blog",
     locale: "ko_KR",
     type: "website",

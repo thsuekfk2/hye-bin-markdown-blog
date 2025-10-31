@@ -26,12 +26,12 @@ export function ArticleLayout({ article, articles, type }: ArticleLayoutProps) {
     author: {
       "@type": "Person",
       name: "이혜빈",
-      url: "https://www.hyebin.me",
+      url: "https://www.hyebin.pro",
     },
     publisher: {
       "@type": "Person",
       name: "이혜빈",
-      url: "https://www.hyebin.me",
+      url: "https://www.hyebin.pro",
     },
     url: `${process.env.NEXT_PUBLIC_BASE_URL}/${type}/${article.slug}`,
     image: article.thumbnail,

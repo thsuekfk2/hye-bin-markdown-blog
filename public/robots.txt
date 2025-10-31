@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.hyebin.me/sitemap.xml
+Sitemap: https://www.hyebin.pro/sitemap.xml

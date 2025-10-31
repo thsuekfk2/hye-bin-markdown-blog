@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://www.hyebin.me/sitemap.xml",
+    sitemap: "https://www.hyebin.pro/sitemap.xml",
   };
 }

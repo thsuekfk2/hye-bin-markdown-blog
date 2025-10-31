@@ -4,7 +4,7 @@ module.exports = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "www.hyebin.me",
+        hostname: "www.hyebin.pro",
         port: "",
         pathname: "/**",
       },
