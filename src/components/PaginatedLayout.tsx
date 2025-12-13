@@ -27,8 +27,8 @@ export function PaginatedLayout({
           <Calendar filterType={calendarType} />
         </div>
       </div>
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto">{children}</div>
+      <div className="flex-1">
+        <div className="h-full">{children}</div>
       </div>
       <div className="flex h-[80px] flex-shrink-0 items-center justify-center">
         <Pagination

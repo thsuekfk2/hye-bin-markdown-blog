@@ -41,9 +41,9 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={inter.className}>
-        <div className="h-full bg-[#222222] text-[#dbdbdb]">
+        <div className="min-h-screen bg-[#222222] text-[#dbdbdb]">
           <div className="flex h-[8%] justify-center">
-            <header className="ml-2 mr-2 flex w-full max-w-[800px] items-center justify-between">
+            <header className="ml-2 mr-2 flex h-[65px] w-full max-w-[800px] items-center justify-between">
               <Analytics />
               <Link href="/">
                 <div className="flex items-center gap-2">
@@ -75,7 +75,7 @@ export default function RootLayout({
               </div>
             </header>
           </div>
-          <main className="flex h-[92%] justify-center overflow-auto">
+          <main className="flex h-[92%] justify-center">
             <div className="flex w-full max-w-[800px] justify-center">
               {children}
             </div>

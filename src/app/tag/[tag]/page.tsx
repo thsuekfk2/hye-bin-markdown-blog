@@ -51,7 +51,7 @@ export default async function TagPage({ params }: TagPageProps) {
         <h1 className="text-2xl font-bold">#{decodedTag}</h1>
         <span className="text-sm text-gray-400">{posts.length}개의 포스트</span>
       </div>
-      <div className="flex w-full flex-1 flex-col overflow-y-auto">
+      <div className="flex w-full flex-1 flex-col">
         <div className="flex flex-wrap justify-center gap-8 p-4">
           {posts.map((post, index) => (
             <Card
