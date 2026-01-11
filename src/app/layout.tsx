@@ -67,6 +67,12 @@ export default function RootLayout({
                   Post
                 </Link>
                 <Link
+                  href="/books"
+                  className="flex w-[50px] justify-center transition-all delay-75 hover:rounded-full hover:bg-[#444]"
+                >
+                  Book
+                </Link>
+                <Link
                   href="/log"
                   className="flex w-[50px] justify-center transition-all delay-75 hover:rounded-full hover:bg-[#444]"
                 >

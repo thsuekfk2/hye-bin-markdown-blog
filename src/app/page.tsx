@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { getRecentPosts, getRecentLogs, getAllTags } from "@/lib/notion";
 import { Card } from "@/components/Card";

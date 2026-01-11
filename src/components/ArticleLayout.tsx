@@ -10,11 +10,16 @@ import Link from "next/link";
 interface ArticleLayoutProps {
   article: NotionPost;
   articles: NotionPost[];
-  type: "post" | "log";
+  type: "post" | "log" | "book";
 }
 
 export function ArticleLayout({ article, articles, type }: ArticleLayoutProps) {
   const articleIndex = articles.findIndex((a) => a.slug === article.slug);
+
+  const articleUrl =
+    type === "book"
+      ? `${process.env.NEXT_PUBLIC_BASE_URL}/books/${encodeURIComponent(article.bookTitle || "")}/${article.slug}`
+      : `${process.env.NEXT_PUBLIC_BASE_URL}/${type}/${article.slug}`;
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -33,11 +38,11 @@ export function ArticleLayout({ article, articles, type }: ArticleLayoutProps) {
       name: "이혜빈",
       url: "https://www.hyebin.pro",
     },
-    url: `${process.env.NEXT_PUBLIC_BASE_URL}/${type}/${article.slug}`,
+    url: articleUrl,
     image: article.thumbnail,
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${process.env.NEXT_PUBLIC_BASE_URL}/${type}/${article.slug}`,
+      "@id": articleUrl,
     },
     inLanguage: "ko",
   };
@@ -125,7 +130,7 @@ function ArticleHeader({
 interface ArticleNavigationProps {
   articles: NotionPost[];
   currentIndex: number;
-  type: "post" | "log";
+  type: "post" | "log" | "book";
 }
 
 function ArticleNavigation({
@@ -133,15 +138,28 @@ function ArticleNavigation({
   currentIndex,
   type,
 }: ArticleNavigationProps) {
+  const getArticleUrl = (article: NotionPost) => {
+    if (type === "book") {
+      return `/books/${encodeURIComponent(article.bookTitle || "")}/${article.slug}`;
+    }
+    return `/${type}/${article.slug}`;
+  };
+
+  const getTypeLabel = () => {
+    if (type === "post") return "포스트";
+    if (type === "log") return "로그";
+    return "챕터";
+  };
+
   return (
     <div className="my-16 flex flex-col justify-between gap-8 md:flex-row">
       <div>
         {articles[currentIndex - 1] && (
           <Link
-            href={`/${type}/${articles[currentIndex - 1].slug}`}
+            href={getArticleUrl(articles[currentIndex - 1])}
             className="block transition-opacity hover:opacity-80"
           >
-            <p>이전 {type === "post" ? "포스트" : "로그"}</p>
+            <p>이전 {getTypeLabel()}</p>
             <p className="font-bold">{articles[currentIndex - 1].title}</p>
           </Link>
         )}
@@ -149,10 +167,10 @@ function ArticleNavigation({
       <div className="text-right">
         {articles[currentIndex + 1] && (
           <Link
-            href={`/${type}/${articles[currentIndex + 1].slug}`}
+            href={getArticleUrl(articles[currentIndex + 1])}
             className="block transition-opacity hover:opacity-80"
           >
-            <p>다음 {type === "post" ? "포스트" : "로그"}</p>
+            <p>다음 {getTypeLabel()}</p>
             <p className="font-bold">{articles[currentIndex + 1].title}</p>
           </Link>
         )}

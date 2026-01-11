@@ -7,7 +7,8 @@ const notion = new Client({
   auth: process.env.NOTION_TOKEN,
 });
 
-export interface NotionPost {
+// 기본 포스트 타입
+interface BaseNotionPost {
   id: string;
   title: string;
   slug: string;
@@ -16,10 +17,25 @@ export interface NotionPost {
   thumbnail?: string;
   originalThumbnail?: string;
   published: boolean;
-  category?: string;
-  tags?: string[]; // 태그 배열
-  blocks?: any[]; // 블록 데이터는 getNotionPost에서만 사용됨
+  tags?: string[];
+  blocks?: any[];
 }
+
+// 일반 포스트/로그
+interface RegularPost extends BaseNotionPost {
+  category?: "post" | "log";
+  bookTitle?: never;
+  chapterNumber?: never;
+}
+
+// 책 챕터
+interface BookChapter extends BaseNotionPost {
+  category: "book";
+  bookTitle: string;
+  chapterNumber?: number;
+}
+
+export type NotionPost = RegularPost | BookChapter;
 
 async function mapNotionPageToPost(page: any): Promise<NotionPost> {
   const slug = page.properties.Slug?.rich_text?.[0]?.plain_text || "";
@@ -45,6 +61,8 @@ async function mapNotionPageToPost(page: any): Promise<NotionPost> {
     published: page.properties.Status?.select?.name === "발행" || false,
     category: page.properties.Category?.select?.name || "",
     tags: page.properties.Tags?.multi_select?.map((tag: any) => tag.name) || [],
+    bookTitle: page.properties.BookTitle?.select?.name || "",
+    chapterNumber: page.properties.ChapterNumber?.number || undefined,
   };
 }
 
@@ -260,4 +278,192 @@ async function getPageBlocks(pageId: string, slug?: string): Promise<any[]> {
     console.error("Error fetching page blocks:", error);
     return [];
   }
+}
+
+// 모든 책 목록 가져오기
+export async function getBooks(): Promise<string[]> {
+  const allPosts = await queryNotionDatabase();
+
+  const bookMap = new Map<string, string>();
+
+  allPosts
+    .filter(
+      (post) => post.published && post.category === "book" && post.bookTitle,
+    )
+    .forEach((post) => {
+      const currentDate = bookMap.get(post.bookTitle!);
+      if (!currentDate || post.date > currentDate) {
+        bookMap.set(post.bookTitle!, post.date);
+      }
+    });
+
+  // 날짜순으로 정렬 (최신순)
+  return Array.from(bookMap.entries())
+    .sort((a, b) => b[1].localeCompare(a[1]))
+    .map(([bookTitle]) => bookTitle);
+}
+
+// 특정 책의 챕터 목록 가져오기 (챕터 번호순 정렬)
+export async function getBookChapters(bookName: string): Promise<NotionPost[]> {
+  const allPosts = await queryNotionDatabase();
+  const chapters = allPosts.filter(
+    (post) =>
+      post.published &&
+      post.category === "book" &&
+      post.bookTitle === bookName &&
+      post.slug,
+  );
+
+  // 챕터 번호순으로 정렬
+  return chapters.sort(
+    (a, b) => (a.chapterNumber ?? 999) - (b.chapterNumber ?? 999),
+  );
+}
+
+// 특정 책의 특정 챕터의 메타데이터 가져오기
+export async function getBookChapterMetadata(bookName: string, slug: string) {
+  try {
+    const response = await notion.databases.query({
+      database_id: process.env.NOTION_DATABASE_ID!,
+      filter: {
+        and: [
+          {
+            property: "Category",
+            select: {
+              equals: "book",
+            },
+          },
+          {
+            property: "BookTitle",
+            select: {
+              equals: bookName,
+            },
+          },
+          {
+            property: "Slug",
+            rich_text: {
+              equals: slug,
+            },
+          },
+        ],
+      },
+    });
+
+    if (response.results.length === 0) {
+      return null;
+    }
+
+    const page = response.results[0] as any;
+    return await mapNotionPageToPost(page);
+  } catch (error) {
+    console.error("Error fetching book chapter metadata:", {
+      bookName,
+      slug,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return null;
+  }
+}
+
+// 특정 책의 특정 챕터 가져오기
+export async function getBookChapter(bookName: string, slug: string) {
+  try {
+    const response = await notion.databases.query({
+      database_id: process.env.NOTION_DATABASE_ID!,
+      filter: {
+        and: [
+          {
+            property: "Category",
+            select: {
+              equals: "book",
+            },
+          },
+          {
+            property: "BookTitle",
+            select: {
+              equals: bookName,
+            },
+          },
+          {
+            property: "Slug",
+            rich_text: {
+              equals: slug,
+            },
+          },
+        ],
+      },
+    });
+
+    if (response.results.length === 0) {
+      return null;
+    }
+
+    const page = response.results[0] as any;
+    const pageId = page.id;
+    const pageSlug = page.properties.Slug?.rich_text?.[0]?.plain_text || slug;
+
+    // 페이지 블록 가져오기
+    const blocks = await getPageBlocks(pageId, pageSlug);
+
+    const post = await mapNotionPageToPost(page);
+    return {
+      ...post,
+      blocks: blocks,
+    };
+  } catch (error) {
+    console.error("Error fetching book chapter:", {
+      bookName,
+      slug,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return null;
+  }
+}
+
+// 모든 책과 챕터 정보를 한 번에 가져오기
+export async function getBooksWithChapters(): Promise<
+  Array<{
+    name: string;
+    thumbnail: string;
+    description: string;
+    chapterCount: number;
+  }>
+> {
+  const allPosts = await queryNotionDatabase();
+  const bookChapters = new Map<string, NotionPost[]>();
+
+  // 책별로 챕터 그룹핑
+  allPosts
+    .filter(
+      (post) => post.published && post.category === "book" && post.bookTitle,
+    )
+    .forEach((post) => {
+      const chapters = bookChapters.get(post.bookTitle!) || [];
+      chapters.push(post);
+      bookChapters.set(post.bookTitle!, chapters);
+    });
+
+  // 책별 정보 생성 및 정렬
+  return Array.from(bookChapters.entries())
+    .map(([bookName, chapters]) => {
+      const sortedChapters = chapters.sort(
+        (a, b) => (a.chapterNumber ?? 999) - (b.chapterNumber ?? 999),
+      );
+      return {
+        name: bookName,
+        thumbnail: sortedChapters[0]?.thumbnail || "",
+        description: `${chapters.length}개의 챕터`,
+        chapterCount: chapters.length,
+        latestDate: Math.max(
+          ...chapters.map((c) => new Date(c.date).getTime()),
+        ),
+      };
+    })
+    .sort((a, b) => b.latestDate - a.latestDate)
+    .map(({ name, thumbnail, description, chapterCount }) => ({
+      name,
+      thumbnail,
+      description,
+      chapterCount,
+    }));
 }
