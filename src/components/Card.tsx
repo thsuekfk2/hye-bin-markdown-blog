@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { TagGroup } from "./TagGroup";
 
 export const Card = ({
   href,
@@ -66,13 +65,6 @@ export const Card = ({
       <span className="my-1 line-clamp-2 block min-h-[40px] w-full text-sm font-thin transition-colors duration-300 group-hover:text-white">
         {title}
       </span>
-
-      {/* 태그 표시 */}
-      {tags.length > 0 && (
-        <div className="mt-1">
-          <TagGroup tags={tags} expandable={true} initialLimit={3} expandStep={3} />
-        </div>
-      )}
     </div>
   );
 };

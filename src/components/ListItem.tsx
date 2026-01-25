@@ -18,7 +18,7 @@ export const ListItem = ({
   return (
     <Link
       href={`/log/${slug}`}
-      className="animate-slide-up flex min-h-[20px] w-[100%] items-center justify-between break-words rounded-lg px-5 py-3 text-xs font-normal opacity-0 transition duration-300 hover:bg-[#2A2A2A]"
+      className="animate-slide-up flex min-h-[20px] w-[100%] items-center justify-between break-words rounded-lg px-3 py-3 text-xs font-normal opacity-0 transition duration-300 hover:bg-[#2A2A2A]"
       style={{
         animationDelay: `${index * 30 + 100}ms`,
         animationFillMode: "forwards",

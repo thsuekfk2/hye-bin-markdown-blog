@@ -10,13 +10,10 @@ interface ListBlockProps {
 export function ListBlock({ items, type }: ListBlockProps) {
   if (type === "numbered") {
     return (
-      <ol className="mb-4 ml-6" style={{ listStyle: "none" }}>
+      <ol>
         {items.map((block) => (
-          <li
-            key={block.id}
-            className="relative leading-relaxed text-[#dbdbdb]"
-          >
-            <span className="absolute -left-6 font-medium text-[#818cf8]">
+          <li key={block.id} className="relative">
+            <span className="absolute -left-6 font-medium">
               {block.listNumber}.
             </span>
             <RichText text={block.numbered_list_item?.rich_text || []} />
@@ -30,7 +27,7 @@ export function ListBlock({ items, type }: ListBlockProps) {
   return (
     <ul className="mb-4">
       {items.map((block) => (
-        <li key={block.id} className="leading-relaxed text-[#dbdbdb]">
+        <li key={block.id}>
           <RichText text={block.bulleted_list_item?.rich_text || []} />
           {block.children && <NotionRenderer blocks={block.children} />}
         </li>

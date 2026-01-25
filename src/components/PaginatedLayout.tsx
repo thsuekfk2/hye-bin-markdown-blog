@@ -21,7 +21,7 @@ export function PaginatedLayout({
 }: PaginatedLayoutProps) {
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="flex h-[70px] items-center justify-between px-7">
+      <div className="flex h-[70px] items-center justify-between px-3">
         <h1 className="text-2xl font-bold">{title}</h1>
         <div className="r-0 relative">
           <Calendar filterType={calendarType} />

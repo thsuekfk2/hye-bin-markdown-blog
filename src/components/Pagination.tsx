@@ -19,7 +19,7 @@ export const Pagination = ({
             className={`flex h-[32px] w-[32px] items-center justify-center rounded-full text-xs font-bold transition-colors sm:h-[36px] sm:w-[36px] ${
               i + 1 === currentPage
                 ? "text-gray-white border-solid border-stone-50"
-                : "border-2 border-transparent text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-100"
+                : "border-2 border-transparent text-gray-700 dark:text-gray-300"
             }`}
           >
             {i + 1}

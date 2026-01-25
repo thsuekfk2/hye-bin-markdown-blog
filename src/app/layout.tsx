@@ -1,14 +1,14 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Noto_Sans_KR } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { Analytics } from "@/components/Analytics";
 
-const inter = Inter({
+const notoSansKR = Noto_Sans_KR({
   subsets: ["latin"],
+  weight: ["400", "500"],
   display: "swap",
-  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -40,8 +40,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={inter.className}>
-        <div className="min-h-screen bg-[#222222] text-[#dbdbdb]">
+      <body className={notoSansKR.className}>
+        <div className="min-h-screen bg-[#0E0E0E] text-[#e3e3e3]">
           <div className="flex h-[8%] justify-center">
             <header className="ml-2 mr-2 flex h-[65px] w-full max-w-[800px] items-center justify-between">
               <Analytics />
@@ -54,12 +54,12 @@ export default function RootLayout({
                     height={20}
                     priority
                   />
-                  <span className="transition-all delay-75 hover:underline">
+                  <span className="font-catamaran font-bold transition-all delay-75">
                     hyebin
                   </span>
                 </div>
               </Link>
-              <div className="flex gap-4 text-sm">
+              <div className="font-catamaran flex gap-4 text-sm">
                 <Link
                   href="/post"
                   className="flex w-[50px] justify-center transition-all delay-75 hover:rounded-full hover:bg-[#444]"

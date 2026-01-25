@@ -13,10 +13,8 @@ export function Tag({ tag, size = "sm", variant = "default" }: TagProps) {
   };
 
   const variantClasses = {
-    default:
-      "rounded-full bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white",
-    compact:
-      "rounded bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white",
+    default: "rounded-full bg-[#5555]",
+    compact: "rounded bg-[#5555]",
   };
 
   return (

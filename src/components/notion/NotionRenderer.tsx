@@ -157,7 +157,7 @@ function NotionBlockComponent({ block }: { block: NotionBlock }) {
     case "table_of_contents":
       return (
         <div className="mb-6 rounded-lg border border-gray-600 bg-[#333] p-4">
-          <h3 className="mb-2 font-bold text-[#dbdbdb]">목차</h3>
+          <h3 className="mb-2 font-bold">목차</h3>
           <div className="text-sm text-gray-400">
             자동 생성된 목차가 여기에 표시됩니다.
           </div>
@@ -206,9 +206,7 @@ function NotionBlockComponent({ block }: { block: NotionBlock }) {
                       <CellTag
                         key={cellIndex}
                         className={`border px-4 py-2 text-left ${
-                          isHeader
-                            ? "font-bold text-[#818cf8]"
-                            : "text-gray-300"
+                          isHeader ? "font-bold" : "text-gray-300"
                         }`}
                       >
                         <RichText text={cell} />

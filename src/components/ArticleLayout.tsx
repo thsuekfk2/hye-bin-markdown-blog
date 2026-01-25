@@ -67,7 +67,7 @@ export function ArticleLayout({ article, articles, type }: ArticleLayoutProps) {
         />
 
         {/* 노션 콘텐츠 */}
-        <article>
+        <article className="mx-auto max-w-[750px]">
           <div className="relative">
             <NotionToc blocks={article.blocks || []} />
             <NotionRenderer blocks={article.blocks || []} />
@@ -103,15 +103,20 @@ function ArticleHeader({
   originalThumbnail,
 }: ArticleHeaderProps) {
   return (
-    <div className="relative mt-[40px] text-center font-bold">
+    <div className="relative mt-[40px] text-center">
       <FallbackImage
         src={thumbnail}
         alt={title}
         className="z-1 h-[200px] w-full object-cover opacity-20"
         notionUrl={originalThumbnail}
       />
-      <div className="absolute top-0 flex h-[200px] w-full flex-col items-center justify-center">
-        <div className="text-[25px]">{title}</div>
+      <div className="absolute top-0 flex h-[200px] w-full flex-col items-center justify-center font-bold">
+        <div
+          className="text-[25px] text-white"
+          style={{ fontFamily: '"Catamaran", sans-serif' }}
+        >
+          {title}
+        </div>
         <div className="text-sm">
           {date && format(parseISO(date), "LLLL d, yyyy")}
         </div>

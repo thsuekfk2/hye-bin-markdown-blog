@@ -14,7 +14,7 @@ export function ParagraphBlock({ block }: ParagraphBlockProps) {
   }
 
   return (
-    <p className="mb-4 leading-relaxed text-[#dbdbdb]">
+    <p className="mb-4">
       <RichText text={block.paragraph.rich_text} />
     </p>
   );

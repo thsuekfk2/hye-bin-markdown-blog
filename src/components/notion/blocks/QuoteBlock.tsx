@@ -7,7 +7,7 @@ interface QuoteBlockProps {
 
 export function QuoteBlock({ block }: QuoteBlockProps) {
   return (
-    <blockquote className="mb-4 rounded-r border border-l-4 border-blue-400 bg-[#333] py-2 pl-4 text-xs italic text-[#dbdbdb]">
+    <blockquote className="mb-4 rounded-r border border-l-4 border-blue-400 bg-[#333] py-2 pl-4 text-xs italic">
       <RichText text={block.quote?.rich_text || []} />
     </blockquote>
   );

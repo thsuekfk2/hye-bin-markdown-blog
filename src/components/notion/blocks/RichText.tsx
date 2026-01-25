@@ -40,7 +40,7 @@ export function RichText({ text }: RichTextProps) {
           element = (
             <code
               key={index}
-              className="rounded border border-gray-600 bg-[#2a2a2a] px-1 py-0.5 text-xs text-[#ff6b6b]"
+              className="mx-[0.1em] whitespace-normal break-words rounded-[0.3em] bg-[#282a2c] px-[0.3em] py-[0.11em] text-[0.85em] text-[#E3E3E3]"
             >
               {element}
             </code>

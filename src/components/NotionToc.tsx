@@ -62,15 +62,15 @@ export function NotionToc({ blocks }: NotionTocProps) {
   return (
     <div className="fixed right-8 top-[100px] hidden w-64 max-w-[220px] transform xl:block">
       <div className="max-h-[80vh] overflow-auto rounded-lg border border-gray-600 bg-[#2a2a2a] py-1">
-        <ul className="space-y-1">
+        <ul className="space-y-1 pl-3">
           {tocItems.map((item) => (
             <div key={item.id}>
               <button
                 onClick={() => scrollToHeading(item.id)}
-                className={`block w-full text-left text-[12px] transition-colors ${item.level === 1 ? "pl-0" : item.level === 2 ? "pl-3" : "pl-6"} ${
+                className={`block w-full text-left text-[12px] transition-colors ${item.level === 1 ? "pl-0" : item.level === 2 ? "pl-2" : "pl-6"} ${
                   activeId === item.id
                     ? "font-medium text-blue-400"
-                    : "text-gray-400 hover:text-[#dbdbdb]"
+                    : "text-gray-400"
                 } `}
               >
                 {item.text}

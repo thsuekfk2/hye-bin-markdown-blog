@@ -20,7 +20,7 @@ export function TagList({ tags, limit }: TagListProps) {
             <Link
               key={tag}
               href={`/tag/${tag}`}
-              className="rounded-full bg-gray-700 px-2 py-1 text-[11px] text-gray-300 transition-colors hover:bg-gray-600 hover:text-white"
+              className="rounded-full px-2 py-1 text-[11px] hover:bg-[#5555]"
               style={{
                 animationDelay: `${index * 50 + 100}ms`,
                 animationFillMode: "forwards",

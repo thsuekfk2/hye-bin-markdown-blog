@@ -1,4 +1,3 @@
-// 모든 블록 컴포넌트 export
 export { RichText } from "./RichText";
 export { ParagraphBlock } from "./ParagraphBlock";
 export { HeadingBlock } from "./HeadingBlock";
