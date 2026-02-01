@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { ImageBlock as ImageBlockType } from "@/types/notion";
 import { FallbackImage } from "@/components/FallbackImage";
 
@@ -6,6 +9,8 @@ interface ImageBlockProps {
 }
 
 export function ImageBlock({ block }: ImageBlockProps) {
+  const [isWide, setIsWide] = useState(false);
+
   const imageUrl = block.image?.external?.url || block.image?.file?.url;
   const caption = block.image?.caption?.[0]?.plain_text || "";
   const originalImageUrl = (block as any)?.originalImageUrl;
@@ -16,8 +21,9 @@ export function ImageBlock({ block }: ImageBlockProps) {
         <FallbackImage
           src={imageUrl}
           alt={caption || "Image"}
-          className="h-auto w-full max-w-2xl rounded-lg"
+          className={`h-auto rounded-lg ${isWide ? "w-full max-w-2xl" : "max-w-sm"}`}
           notionUrl={originalImageUrl}
+          onRatioCalculated={(ratio) => setIsWide(ratio > 3)}
         />
       )}
       {caption && (

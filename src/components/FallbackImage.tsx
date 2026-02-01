@@ -10,6 +10,7 @@ interface FallbackImageProps {
   notionUrl?: string;
   width?: number;
   height?: number;
+  onRatioCalculated?: (ratio: number) => void;
 }
 
 interface UploadResponse {
@@ -25,6 +26,7 @@ export function FallbackImage({
   notionUrl,
   width = 800,
   height = 300,
+  onRatioCalculated,
 }: FallbackImageProps) {
   const [currentSrc, setCurrentSrc] = useState(src);
   const [isUploading, setIsUploading] = useState(false);
@@ -78,7 +80,13 @@ export function FallbackImage({
       onError={handleImageError}
       width={width}
       height={height}
-      onLoad={() => setIsUploading(false)}
+      onLoad={(e) => {
+        setIsUploading(false);
+        if (onRatioCalculated) {
+          const img = e.currentTarget as HTMLImageElement;
+          onRatioCalculated(img.naturalWidth / img.naturalHeight);
+        }
+      }}
     />
   );
 }
