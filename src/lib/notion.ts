@@ -38,7 +38,7 @@ interface BookChapter extends BaseNotionPost {
 export type NotionPost = RegularPost | BookChapter;
 
 async function mapNotionPageToPost(page: any): Promise<NotionPost> {
-  const slug = page.properties.Slug?.rich_text?.[0]?.plain_text || "";
+  const slug = page.properties.Slug?.rich_text?.map((t: any) => t.plain_text).join("") || "";
   const originalThumbnail =
     page.properties.Thumbnail?.files?.[0]?.external?.url ||
     page.properties.Thumbnail?.files?.[0]?.file?.url ||
@@ -52,10 +52,10 @@ async function mapNotionPageToPost(page: any): Promise<NotionPost> {
 
   return {
     id: page.id,
-    title: page.properties["이름"]?.title?.[0]?.plain_text || "Untitled",
-    slug: page.properties.Slug?.rich_text?.[0]?.plain_text || "",
+    title: page.properties["이름"]?.title?.map((t: any) => t.plain_text).join("") || "Untitled",
+    slug: page.properties.Slug?.rich_text?.map((t: any) => t.plain_text).join("") || "",
     date: page.properties.Date?.date?.start || "",
-    description: page.properties.Description?.rich_text?.[0]?.plain_text || "",
+    description: page.properties.Description?.rich_text?.map((t: any) => t.plain_text).join("") || "",
     thumbnail,
     originalThumbnail,
     published: page.properties.Status?.select?.name === "발행" || false,
@@ -185,7 +185,7 @@ export async function getNotionPost(slug: string) {
 
     const page = response.results[0] as any;
     const pageId = page.id;
-    const pageSlug = page.properties.Slug?.rich_text?.[0]?.plain_text || slug;
+    const pageSlug = page.properties.Slug?.rich_text?.map((t: any) => t.plain_text).join("") || slug;
 
     // 페이지 블록 가져오기
     const blocks = await getPageBlocks(pageId, pageSlug);
@@ -400,7 +400,7 @@ export async function getBookChapter(bookName: string, slug: string) {
 
     const page = response.results[0] as any;
     const pageId = page.id;
-    const pageSlug = page.properties.Slug?.rich_text?.[0]?.plain_text || slug;
+    const pageSlug = page.properties.Slug?.rich_text?.map((t: any) => t.plain_text).join("") || slug;
 
     // 페이지 블록 가져오기
     const blocks = await getPageBlocks(pageId, pageSlug);
