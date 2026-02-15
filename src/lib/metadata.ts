@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { NotionPost } from "./notion";
+import type { NotionPost } from "@/types/post";
 
 interface GenerateMetadataOptions {
   article: NotionPost | null;

@@ -1,7 +1,7 @@
 import { NotionToc } from "@/components/NotionToc";
 import { format, parseISO } from "date-fns";
 import { Giscus } from "@/components/Giscus";
-import { NotionPost } from "@/lib/notion";
+import type { NotionPost } from "@/types/post";
 import { NotionRenderer } from "./notion/NotionRenderer";
 import { TagGroup } from "./TagGroup";
 import { FallbackImage } from "./FallbackImage";
