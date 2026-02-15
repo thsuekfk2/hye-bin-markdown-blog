@@ -1,6 +1,6 @@
 import { Card } from "@/components/Card";
 import { getBooks, getBookChapters } from "@/lib/notion";
-import { ISR_TIME } from "@/lib/config";
+import { ISR_TIME } from "@/lib/constants";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";

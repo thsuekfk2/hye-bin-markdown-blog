@@ -1,7 +1,7 @@
 import { Card } from "@/components/Card";
 import { PaginatedLayout } from "@/components/PaginatedLayout";
 import { getNotionPosts } from "@/lib/notion";
-import { ISR_TIME } from "@/lib/config";
+import { ISR_TIME, PAGINATION } from "@/lib/constants";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -16,14 +16,13 @@ export default async function PostsPage({
 }: {
   searchParams: { page?: string };
 }) {
-  const POSTS_PER_PAGE = 4;
   const currentPage = parseInt(searchParams.page ?? "1", 10);
 
   const posts = await getNotionPosts();
-  const pageCount = Math.ceil(posts.length / POSTS_PER_PAGE);
+  const pageCount = Math.ceil(posts.length / PAGINATION.posts);
   const currentPosts = posts.slice(
-    (currentPage - 1) * POSTS_PER_PAGE,
-    currentPage * POSTS_PER_PAGE,
+    (currentPage - 1) * PAGINATION.posts,
+    currentPage * PAGINATION.posts,
   );
 
   return (

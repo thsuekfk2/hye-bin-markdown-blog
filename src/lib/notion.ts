@@ -1,11 +1,27 @@
 import { Client } from "@notionhq/client";
 import { cache } from "react";
 import { generateS3Url } from "./s3";
+import { IMAGE } from "./constants";
+import type { NotionBlock, ImageBlock } from "@/types/notion";
 
 // Notion 공식 API 클라이언트
 const notion = new Client({
   auth: process.env.NOTION_TOKEN,
 });
+
+// 쿼리 필터 타입
+type SlugFilter = {
+  type: "post" | "log";
+  slug: string;
+};
+
+type BookChapterFilter = {
+  type: "book";
+  bookName: string;
+  slug: string;
+};
+
+type QueryFilter = SlugFilter | BookChapterFilter;
 
 // 기본 포스트 타입
 interface BaseNotionPost {
@@ -18,7 +34,7 @@ interface BaseNotionPost {
   originalThumbnail?: string;
   published: boolean;
   tags?: string[];
-  blocks?: any[];
+  blocks?: NotionBlock[];
 }
 
 // 일반 포스트/로그
@@ -38,7 +54,9 @@ interface BookChapter extends BaseNotionPost {
 export type NotionPost = RegularPost | BookChapter;
 
 async function mapNotionPageToPost(page: any): Promise<NotionPost> {
-  const slug = page.properties.Slug?.rich_text?.map((t: any) => t.plain_text).join("") || "";
+  const slug =
+    page.properties.Slug?.rich_text?.map((t: any) => t.plain_text).join("") ||
+    "";
   const originalThumbnail =
     page.properties.Thumbnail?.files?.[0]?.external?.url ||
     page.properties.Thumbnail?.files?.[0]?.file?.url ||
@@ -52,10 +70,17 @@ async function mapNotionPageToPost(page: any): Promise<NotionPost> {
 
   return {
     id: page.id,
-    title: page.properties["이름"]?.title?.map((t: any) => t.plain_text).join("") || "Untitled",
-    slug: page.properties.Slug?.rich_text?.map((t: any) => t.plain_text).join("") || "",
+    title:
+      page.properties["이름"]?.title?.map((t: any) => t.plain_text).join("") ||
+      "Untitled",
+    slug:
+      page.properties.Slug?.rich_text?.map((t: any) => t.plain_text).join("") ||
+      "",
     date: page.properties.Date?.date?.start || "",
-    description: page.properties.Description?.rich_text?.map((t: any) => t.plain_text).join("") || "",
+    description:
+      page.properties.Description?.rich_text
+        ?.map((t: any) => t.plain_text)
+        .join("") || "",
     thumbnail,
     originalThumbnail,
     published: page.properties.Status?.select?.name === "발행" || false,
@@ -141,110 +166,125 @@ export async function getPostsByTag(tag: string): Promise<NotionPost[]> {
   );
 }
 
-// 메타데이터용 포스트 정보만 가져오기
-export async function getNotionPostMetadata(slug: string) {
+// 필터 타입에 따라 Notion 필터 생성
+function buildQueryFilter(filter: QueryFilter) {
+  if (filter.type === "book") {
+    return {
+      and: [
+        { property: "Category", select: { equals: "book" } },
+        { property: "BookTitle", select: { equals: filter.bookName } },
+        { property: "Slug", rich_text: { equals: filter.slug } },
+      ],
+    };
+  }
+  return { property: "Slug", rich_text: { equals: filter.slug } };
+}
+
+// 단일 페이지 메타데이터 조회
+async function fetchPageMetadata(
+  filter: QueryFilter,
+): Promise<NotionPost | null> {
   try {
     const response = await notion.databases.query({
       database_id: process.env.NOTION_DATABASE_ID!,
-      filter: {
-        property: "Slug",
-        rich_text: {
-          equals: slug,
-        },
-      },
+      filter: buildQueryFilter(filter),
     });
 
-    if (response.results.length === 0) {
-      return null;
-    }
-
-    const page = response.results[0] as any;
-    return await mapNotionPageToPost(page);
+    if (response.results.length === 0) return null;
+    return await mapNotionPageToPost(response.results[0] as any);
   } catch (error) {
-    console.error("Error fetching notion post metadata:", error);
+    console.error("Error fetching page metadata:", { filter, error });
     return null;
   }
+}
+
+// 단일 페이지 + 블록 조회
+async function fetchPageWithBlocks(
+  filter: QueryFilter,
+): Promise<(NotionPost & { blocks: any[] }) | null> {
+  try {
+    const response = await notion.databases.query({
+      database_id: process.env.NOTION_DATABASE_ID!,
+      filter: buildQueryFilter(filter),
+    });
+
+    if (response.results.length === 0) return null;
+
+    const page = response.results[0] as any;
+    const pageSlug =
+      page.properties.Slug?.rich_text?.map((t: any) => t.plain_text).join("") ||
+      filter.slug;
+    const blocks = await getPageBlocks(page.id, pageSlug);
+    const post = await mapNotionPageToPost(page);
+
+    return { ...post, blocks };
+  } catch (error) {
+    console.error("Error fetching page with blocks:", { filter, error });
+    return null;
+  }
+}
+
+// 메타데이터용 포스트 정보만 가져오기
+export async function getNotionPostMetadata(slug: string) {
+  return fetchPageMetadata({ type: "post", slug });
 }
 
 // 특정 포스트 가져오기
 export async function getNotionPost(slug: string) {
-  try {
-    const response = await notion.databases.query({
-      database_id: process.env.NOTION_DATABASE_ID!,
-      filter: {
-        property: "Slug",
-        rich_text: {
-          equals: slug,
-        },
-      },
-    });
+  return fetchPageWithBlocks({ type: "post", slug });
+}
 
-    if (response.results.length === 0) {
-      return null;
-    }
-
-    const page = response.results[0] as any;
-    const pageId = page.id;
-    const pageSlug = page.properties.Slug?.rich_text?.map((t: any) => t.plain_text).join("") || slug;
-
-    // 페이지 블록 가져오기
-    const blocks = await getPageBlocks(pageId, pageSlug);
-
-    const post = await mapNotionPageToPost(page);
-    return {
-      ...post,
-      blocks: blocks,
-    };
-  } catch (error) {
-    console.error("Error fetching notion post:", error);
-    return null;
-  }
+// 이미지 블록인지 확인
+function isImageBlock(block: NotionBlock): block is ImageBlock {
+  return block.type === "image";
 }
 
 // 이미지 블록 처리 함수
-async function processImageBlock(block: any, slug?: string): Promise<any> {
-  if (block.type === "image" && block.image) {
-    const notionUrl = block.image.external?.url || block.image.file?.url;
+function processImageBlock(block: NotionBlock, slug?: string): NotionBlock {
+  if (!isImageBlock(block)) return block;
 
-    if (
-      notionUrl &&
-      (notionUrl.includes("amazonaws.com") || notionUrl.includes("notion.so"))
-    ) {
-      try {
-        // S3 URL 직접 생성
-        const s3Url = generateS3Url(notionUrl, slug);
+  const notionUrl = block.image.external?.url || block.image.file?.url;
 
-        // 원본 URL을 보존
-        (block as any).originalImageUrl = notionUrl;
+  if (
+    notionUrl &&
+    (notionUrl.includes("amazonaws.com") || notionUrl.includes("notion.so"))
+  ) {
+    try {
+      const s3Url = generateS3Url(notionUrl, slug);
+      block.originalImageUrl = notionUrl;
 
-        // S3 URL로 교체
-        if (block.image.external?.url) {
-          block.image.external.url = s3Url;
-        } else if (block.image.file?.url) {
-          delete block.image.file;
-          block.image.external = { url: s3Url };
-        }
-      } catch (error) {
-        console.error("Error processing image block:", error);
-        // fallback 이미지로 교체
-        if (block.image.external?.url) {
-          block.image.external.url = "/jump.webp";
-        } else if (block.image.file?.url) {
-          delete block.image.file;
-          block.image.external = { url: "/jump.webp" };
-        }
+      if (block.image.external?.url) {
+        block.image.external.url = s3Url;
+      } else if (block.image.file?.url) {
+        delete block.image.file;
+        block.image.external = { url: s3Url };
       }
-    } else if (!notionUrl) {
-      block.image.external = { url: "/jump.webp" };
+    } catch (error) {
+      console.error("Error processing image block:", error);
+      if (block.image.external?.url) {
+        block.image.external.url = IMAGE.fallback;
+      } else if (block.image.file?.url) {
+        delete block.image.file;
+        block.image.external = { url: IMAGE.fallback };
+      }
     }
+  } else if (!notionUrl) {
+    block.image.external = { url: IMAGE.fallback };
   }
+
   return block;
 }
 
-// 페이지 블록 가져오기 (재귀적으로 모든 블록)
-async function getPageBlocks(pageId: string, slug?: string): Promise<any[]> {
+// Notion API 블록을 NotionBlock으로 변환
+type NotionApiBlock = NotionBlock & { has_children?: boolean };
+
+// 페이지 블록 가져오기
+async function getPageBlocks(
+  pageId: string,
+  slug?: string,
+): Promise<NotionBlock[]> {
   try {
-    const blocks = [];
+    const blocks: NotionBlock[] = [];
     let cursor: string | undefined;
 
     do {
@@ -255,20 +295,20 @@ async function getPageBlocks(pageId: string, slug?: string): Promise<any[]> {
       });
 
       // 각 블록을 처리
-      const processedBlocks = await Promise.all(
-        response.results.map((block) => processImageBlock(block, slug)),
-      );
+      const processedBlocks = response.results.map((block) =>
+        processImageBlock(block as NotionApiBlock, slug),
+      ) as NotionApiBlock[];
 
       blocks.push(...processedBlocks);
       cursor = response.has_more
         ? response.next_cursor || undefined
         : undefined;
 
-      // 자식 블록이 있는 경우 재귀적으로 가져오기
       for (const block of processedBlocks) {
-        if ((block as any).has_children) {
+        if (block.has_children) {
           const childBlocks = await getPageBlocks(block.id, slug);
-          (block as any).children = childBlocks;
+          (block as NotionBlock & { children?: NotionBlock[] }).children =
+            childBlocks;
         }
       }
     } while (cursor);
@@ -322,102 +362,12 @@ export async function getBookChapters(bookName: string): Promise<NotionPost[]> {
 
 // 특정 책의 특정 챕터의 메타데이터 가져오기
 export async function getBookChapterMetadata(bookName: string, slug: string) {
-  try {
-    const response = await notion.databases.query({
-      database_id: process.env.NOTION_DATABASE_ID!,
-      filter: {
-        and: [
-          {
-            property: "Category",
-            select: {
-              equals: "book",
-            },
-          },
-          {
-            property: "BookTitle",
-            select: {
-              equals: bookName,
-            },
-          },
-          {
-            property: "Slug",
-            rich_text: {
-              equals: slug,
-            },
-          },
-        ],
-      },
-    });
-
-    if (response.results.length === 0) {
-      return null;
-    }
-
-    const page = response.results[0] as any;
-    return await mapNotionPageToPost(page);
-  } catch (error) {
-    console.error("Error fetching book chapter metadata:", {
-      bookName,
-      slug,
-      error: error instanceof Error ? error.message : String(error),
-    });
-    return null;
-  }
+  return fetchPageMetadata({ type: "book", bookName, slug });
 }
 
 // 특정 책의 특정 챕터 가져오기
 export async function getBookChapter(bookName: string, slug: string) {
-  try {
-    const response = await notion.databases.query({
-      database_id: process.env.NOTION_DATABASE_ID!,
-      filter: {
-        and: [
-          {
-            property: "Category",
-            select: {
-              equals: "book",
-            },
-          },
-          {
-            property: "BookTitle",
-            select: {
-              equals: bookName,
-            },
-          },
-          {
-            property: "Slug",
-            rich_text: {
-              equals: slug,
-            },
-          },
-        ],
-      },
-    });
-
-    if (response.results.length === 0) {
-      return null;
-    }
-
-    const page = response.results[0] as any;
-    const pageId = page.id;
-    const pageSlug = page.properties.Slug?.rich_text?.map((t: any) => t.plain_text).join("") || slug;
-
-    // 페이지 블록 가져오기
-    const blocks = await getPageBlocks(pageId, pageSlug);
-
-    const post = await mapNotionPageToPost(page);
-    return {
-      ...post,
-      blocks: blocks,
-    };
-  } catch (error) {
-    console.error("Error fetching book chapter:", {
-      bookName,
-      slug,
-      error: error instanceof Error ? error.message : String(error),
-    });
-    return null;
-  }
+  return fetchPageWithBlocks({ type: "book", bookName, slug });
 }
 
 // 모든 책과 챕터 정보를 한 번에 가져오기

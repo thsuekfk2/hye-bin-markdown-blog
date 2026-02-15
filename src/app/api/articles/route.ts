@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getNotionPosts, getNotionLogs } from "@/lib/notion";
-import { ISR_TIME } from "@/lib/config";
+import { ISR_TIME } from "@/lib/constants";
 
 export const revalidate = ISR_TIME;
 

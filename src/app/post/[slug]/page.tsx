@@ -5,7 +5,7 @@ import {
 } from "@/lib/notion";
 import { ArticleLayout } from "@/components/ArticleLayout";
 import { generateArticleMetadata } from "@/lib/metadata";
-import { ISR_TIME } from "@/lib/config";
+import { ISR_TIME } from "@/lib/constants";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 

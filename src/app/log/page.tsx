@@ -1,7 +1,7 @@
 import { ListItem } from "@/components/ListItem";
 import { PaginatedLayout } from "@/components/PaginatedLayout";
 import { getNotionLogs } from "@/lib/notion";
-import { ISR_TIME } from "@/lib/config";
+import { ISR_TIME, PAGINATION } from "@/lib/constants";
 
 interface LogsPageProps {
   searchParams: { page?: string };
@@ -10,14 +10,13 @@ interface LogsPageProps {
 export const revalidate = ISR_TIME;
 
 export default async function LogsPage({ searchParams }: LogsPageProps) {
-  const LOGS_PER_PAGE = 11;
   const currentPage = parseInt(searchParams.page || "1", 10);
 
   const logs = await getNotionLogs();
-  const pageCount = Math.ceil(logs.length / LOGS_PER_PAGE);
+  const pageCount = Math.ceil(logs.length / PAGINATION.logs);
   const currentLogs = logs.slice(
-    (currentPage - 1) * LOGS_PER_PAGE,
-    currentPage * LOGS_PER_PAGE,
+    (currentPage - 1) * PAGINATION.logs,
+    currentPage * PAGINATION.logs,
   );
 
   return (

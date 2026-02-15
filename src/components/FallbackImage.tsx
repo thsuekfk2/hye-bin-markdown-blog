@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState, useCallback } from "react";
+import { IMAGE } from "@/lib/constants";
 
 interface FallbackImageProps {
   src: string;
@@ -16,8 +17,6 @@ interface FallbackImageProps {
 interface UploadResponse {
   uploadedUrl: string;
 }
-
-const FALLBACK_IMAGE = "/jump.webp";
 
 export function FallbackImage({
   src,
@@ -46,7 +45,7 @@ export function FallbackImage({
         if (!response.ok) return null;
 
         const result: UploadResponse = await response.json();
-        return result.uploadedUrl && result.uploadedUrl !== FALLBACK_IMAGE
+        return result.uploadedUrl && result.uploadedUrl !== IMAGE.fallback
           ? result.uploadedUrl
           : null;
       } catch (error) {
@@ -69,12 +68,12 @@ export function FallbackImage({
       }
     }
 
-    setCurrentSrc(FALLBACK_IMAGE);
+    setCurrentSrc(IMAGE.fallback);
   }, [currentSrc, notionUrl, uploadImage, isUploading]);
 
   return (
     <Image
-      src={isUploading ? FALLBACK_IMAGE : currentSrc}
+      src={isUploading ? IMAGE.fallback : currentSrc}
       alt={alt}
       className={className}
       onError={handleImageError}

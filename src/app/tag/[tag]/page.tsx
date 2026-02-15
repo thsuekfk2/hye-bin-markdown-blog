@@ -2,7 +2,7 @@ import { getPostsByTag, getAllTags } from "@/lib/notion";
 import { Card } from "@/components/Card";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { ISR_TIME } from "@/lib/config";
+import { ISR_TIME } from "@/lib/constants";
 
 interface TagPageProps {
   params: { tag: string };

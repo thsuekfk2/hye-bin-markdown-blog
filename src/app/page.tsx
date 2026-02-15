@@ -3,7 +3,7 @@ import { getRecentPosts, getRecentLogs, getAllTags } from "@/lib/notion";
 import { Card } from "@/components/Card";
 import { ListItem } from "@/components/ListItem";
 import { TagList } from "@/components/TagList";
-import { ISR_TIME } from "@/lib/config";
+import { ISR_TIME } from "@/lib/constants";
 
 export const revalidate = ISR_TIME;
 

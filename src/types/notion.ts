@@ -135,6 +135,7 @@ export interface ImageBlock {
     };
     caption: RichTextContent[];
   };
+  originalImageUrl?: string;
 }
 
 export interface DividerBlock {

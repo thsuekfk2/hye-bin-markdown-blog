@@ -1,6 +1,6 @@
 import { Card } from "@/components/Card";
 import { getBooksWithChapters } from "@/lib/notion";
-import { ISR_TIME } from "@/lib/config";
+import { ISR_TIME } from "@/lib/constants";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
