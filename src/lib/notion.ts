@@ -9,6 +9,8 @@ const notion = new Client({
   auth: process.env.NOTION_TOKEN,
 });
 
+const normalizeSpaces = (str: string): string => str.replace(/\u00A0/g, " ");
+
 // plain text 추출
 const getTextValue = (prop: any): string =>
   prop?.rich_text?.map((t: any) => t.plain_text).join("") || "";
@@ -39,7 +41,7 @@ async function mapNotionPageToPost(page: any): Promise<NotionPost> {
     published: page.properties.Status?.select?.name === "발행",
     category: page.properties.Category?.select?.name || "",
     tags: page.properties.Tags?.multi_select?.map((t: any) => t.name) || [],
-    bookTitle: page.properties.BookTitle?.select?.name || "",
+    bookTitle: normalizeSpaces(page.properties.BookTitle?.select?.name || ""),
     chapterNumber: page.properties.ChapterNumber?.number || undefined,
   };
 }
