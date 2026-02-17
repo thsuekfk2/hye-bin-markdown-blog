@@ -60,12 +60,14 @@ li {
 
 code {
   font-size: 13px;
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
 }
 
 code span {
   font-size: 13px;
-  display: inline-block;
-  text-wrap: wrap !important;
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
 }
 
 p img {
@@ -84,12 +86,14 @@ pre {
   padding: 15px 20px;
   border-radius: 10px;
   background-color: #f9f8f981;
-  overflow: auto;
+  overflow-x: hidden;
   font-size: 14px;
   margin: 40px 0;
   border-width: 1px;
   max-width: 90vw;
   margin: 0 auto;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 figure {

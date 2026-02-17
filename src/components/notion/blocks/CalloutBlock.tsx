@@ -10,7 +10,7 @@ export function CalloutBlock({ block }: CalloutBlockProps) {
   const calloutIcon = block.callout?.icon?.emoji || "💡";
 
   return (
-    <div className="mt-3 border-0 border-l-4 border-solid border-[#888] pb-0 pl-[22px] pr-2 pt-3 font-light">
+    <div className="mb-7 mt-3 border-0 border-l-4 border-solid border-[#888] py-3 pl-[22px] pr-2 text-sm font-light leading-relaxed">
       <div className="flex items-start gap-3">
         <span className="mt-0.5 flex-shrink-0 text-xl">{calloutIcon}</span>
         <div className="flex-1">
