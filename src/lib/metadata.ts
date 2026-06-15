@@ -3,7 +3,7 @@ import type { NotionPost } from "@/types/post";
 
 interface GenerateMetadataOptions {
   article: NotionPost | null;
-  type: "post" | "log" | "book";
+  type: "post" | "log";
   slug: string;
   fallbackTitle?: string;
   fallbackDescription?: string;
@@ -22,10 +22,7 @@ export function generateArticleMetadata({
     };
   }
 
-  const url =
-    type === "book"
-      ? `${process.env.NEXT_PUBLIC_BASE_URL}/books/${encodeURIComponent(article.bookTitle || "")}/${slug}`
-      : `${process.env.NEXT_PUBLIC_BASE_URL}/${type}/${slug}`;
+  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/${type}/${slug}`;
   const description = article.description || fallbackDescription;
 
   return {

@@ -10,16 +10,13 @@ import Link from "next/link";
 interface ArticleLayoutProps {
   article: NotionPost;
   articles: NotionPost[];
-  type: "post" | "log" | "book";
+  type: "post" | "log";
 }
 
 export function ArticleLayout({ article, articles, type }: ArticleLayoutProps) {
   const articleIndex = articles.findIndex((a) => a.slug === article.slug);
 
-  const articleUrl =
-    type === "book"
-      ? `${process.env.NEXT_PUBLIC_BASE_URL}/books/${encodeURIComponent(article.bookTitle || "")}/${article.slug}`
-      : `${process.env.NEXT_PUBLIC_BASE_URL}/${type}/${article.slug}`;
+  const articleUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/${type}/${article.slug}`;
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -135,7 +132,7 @@ function ArticleHeader({
 interface ArticleNavigationProps {
   articles: NotionPost[];
   currentIndex: number;
-  type: "post" | "log" | "book";
+  type: "post" | "log";
 }
 
 function ArticleNavigation({
@@ -143,18 +140,9 @@ function ArticleNavigation({
   currentIndex,
   type,
 }: ArticleNavigationProps) {
-  const getArticleUrl = (article: NotionPost) => {
-    if (type === "book") {
-      return `/books/${encodeURIComponent(article.bookTitle || "")}/${article.slug}`;
-    }
-    return `/${type}/${article.slug}`;
-  };
+  const getArticleUrl = (article: NotionPost) => `/${type}/${article.slug}`;
 
-  const getTypeLabel = () => {
-    if (type === "post") return "포스트";
-    if (type === "log") return "로그";
-    return "챕터";
-  };
+  const getTypeLabel = () => (type === "post" ? "포스트" : "로그");
 
   return (
     <div className="my-16 flex flex-col justify-between gap-8 md:flex-row">

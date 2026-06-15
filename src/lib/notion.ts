@@ -3,21 +3,14 @@ import { cache } from "react";
 import { generateS3Url } from "./s3";
 import { processImageBlock } from "./notion-image";
 import type { NotionBlock } from "@/types/notion";
-import type { NotionPost, QueryFilter, BookInfo } from "@/types/post";
+import type { NotionPost, QueryFilter } from "@/types/post";
 
 const notion = new Client({
   auth: process.env.NOTION_TOKEN,
 });
 
-const normalizeSpaces = (str: string): string => str.replace(/\u00A0/g, " ");
-
-// plain text 추출
 const getTextValue = (prop: any): string =>
   prop?.rich_text?.map((t: any) => t.plain_text).join("") || "";
-
-// 발행된 책 챕터인지 확인
-const isPublishedBookChapter = (p: NotionPost): boolean =>
-  p.published && p.category === "book" && !!p.bookTitle;
 
 async function mapNotionPageToPost(page: any): Promise<NotionPost> {
   const slug = getTextValue(page.properties.Slug);
@@ -41,8 +34,6 @@ async function mapNotionPageToPost(page: any): Promise<NotionPost> {
     published: page.properties.Status?.select?.name === "발행",
     category: page.properties.Category?.select?.name || "",
     tags: page.properties.Tags?.multi_select?.map((t: any) => t.name) || [],
-    bookTitle: normalizeSpaces(page.properties.BookTitle?.select?.name || ""),
-    chapterNumber: page.properties.ChapterNumber?.number || undefined,
   };
 }
 
@@ -128,19 +119,6 @@ export async function getPostsByTag(tag: string): Promise<NotionPost[]> {
   return posts.filter((p) => p.published && p.slug && p.tags?.includes(tag));
 }
 
-function buildQueryFilter(filter: QueryFilter) {
-  if (filter.type === "book") {
-    return {
-      and: [
-        { property: "Category", select: { equals: "book" } },
-        { property: "BookTitle", select: { equals: filter.bookName } },
-        { property: "Slug", rich_text: { equals: filter.slug } },
-      ],
-    };
-  }
-  return { property: "Slug", rich_text: { equals: filter.slug } };
-}
-
 async function fetchPage(
   filter: QueryFilter,
   withBlocks: boolean,
@@ -148,7 +126,7 @@ async function fetchPage(
   try {
     const response = await notion.databases.query({
       database_id: process.env.NOTION_DATABASE_ID!,
-      filter: buildQueryFilter(filter),
+      filter: { property: "Slug", rich_text: { equals: filter.slug } },
     });
 
     if (response.results.length === 0) return null;
@@ -173,58 +151,3 @@ export const getNotionPost = (slug: string) =>
 
 export const getNotionPostMetadata = (slug: string) =>
   fetchPage({ type: "post", slug }, false);
-
-export const getBookChapter = (bookName: string, slug: string) =>
-  fetchPage({ type: "book", bookName, slug }, true);
-
-export const getBookChapterMetadata = (bookName: string, slug: string) =>
-  fetchPage({ type: "book", bookName, slug }, false);
-
-export async function getBookChapters(bookName: string): Promise<NotionPost[]> {
-  const posts = await queryNotionDatabase();
-  return posts
-    .filter(
-      (p) => isPublishedBookChapter(p) && p.bookTitle === bookName && p.slug,
-    )
-    .sort((a, b) => (a.chapterNumber ?? 999) - (b.chapterNumber ?? 999));
-}
-
-export async function getBooksWithChapters(): Promise<BookInfo[]> {
-  const posts = await queryNotionDatabase();
-  const bookMap = new Map<string, NotionPost[]>();
-
-  posts.filter(isPublishedBookChapter).forEach((p) => {
-    const chapters = bookMap.get(p.bookTitle!) || [];
-    chapters.push(p);
-    bookMap.set(p.bookTitle!, chapters);
-  });
-
-  return Array.from(bookMap.entries())
-    .map(([name, chapters]) => {
-      const sorted = chapters.sort(
-        (a: NotionPost, b: NotionPost) =>
-          (a.chapterNumber ?? 999) - (b.chapterNumber ?? 999),
-      );
-      return {
-        name,
-        thumbnail: sorted[0]?.thumbnail || "",
-        description: `${chapters.length}개의 챕터`,
-        chapterCount: chapters.length,
-        latestDate: Math.max(
-          ...chapters.map((c: NotionPost) => new Date(c.date).getTime()),
-        ),
-      };
-    })
-    .sort((a, b) => b.latestDate - a.latestDate)
-    .map(({ name, thumbnail, description, chapterCount }) => ({
-      name,
-      thumbnail,
-      description,
-      chapterCount,
-    }));
-}
-
-export async function getBooks(): Promise<string[]> {
-  const books = await getBooksWithChapters();
-  return books.map((b) => b.name);
-}
