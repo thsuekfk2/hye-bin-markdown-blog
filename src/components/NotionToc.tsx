@@ -1,81 +1,60 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { TocItem } from "@/types/post";
 
 interface NotionTocProps {
-  blocks: any[];
+  headings: TocItem[];
 }
 
-interface TocItem {
-  id: string;
-  text: string;
-  level: number;
-}
-
-export function NotionToc({ blocks }: NotionTocProps) {
-  const [tocItems, setTocItems] = useState<TocItem[]>([]);
+export function NotionToc({ headings }: NotionTocProps) {
   const [activeId, setActiveId] = useState<string>("");
 
   useEffect(() => {
-    // 헤딩 블록들 추출
-    const headings = blocks
-      .filter((block) =>
-        ["heading_1", "heading_2", "heading_3"].includes(block.type),
-      )
-      .map((block) => ({
-        id: block.id,
-        text: block[block.type]?.rich_text?.[0]?.plain_text || "",
-        level: parseInt(block.type.split("_")[1]),
-      }))
-      .filter((item) => item.text); // 빈 헤딩 제외
+    if (headings.length === 0) return;
 
-    setTocItems(headings);
-
-    // 스크롤 이벤트로 현재 활성 헤딩 추적
     const handleScroll = () => {
-      const headingElements = headings
-        .map((item) => document.getElementById(item.id))
-        .filter(Boolean);
-
-      for (let i = headingElements.length - 1; i >= 0; i--) {
-        const element = headingElements[i];
-        if (element && element.getBoundingClientRect().top <= 100) {
-          setActiveId(headings[i].id);
-          break;
+      for (let i = headings.length - 1; i >= 0; i--) {
+        const el = document.getElementById(headings[i].slug);
+        if (el && el.getBoundingClientRect().top <= 100) {
+          setActiveId(headings[i].slug);
+          return;
         }
       }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [blocks]);
+  }, [headings]);
 
-  if (tocItems.length === 0) return null;
+  if (headings.length === 0) return null;
 
-  const scrollToHeading = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
+  const minLevel = Math.min(...headings.map((h) => h.level));
+  const indentClass = ["pl-0", "pl-2", "pl-6"];
 
   return (
-    <div className="fixed right-8 top-[100px] hidden w-64 max-w-[220px] transform xl:block">
+    <div className="fixed right-8 top-[100px] hidden w-64 max-w-[220px] xl:block">
       <div className="max-h-[80vh] overflow-auto rounded-lg border border-gray-600 bg-[#2a2a2a] py-1">
-        <ul className="space-y-1 pl-3">
-          {tocItems.map((item) => (
-            <div key={item.id}>
+        <ul className="list-none space-y-1 pl-3">
+          {headings.map((item) => (
+            <li key={item.slug}>
               <button
-                onClick={() => scrollToHeading(item.id)}
-                className={`block w-full text-left text-[12px] transition-colors ${item.level === 1 ? "pl-0" : item.level === 2 ? "pl-2" : "pl-6"} ${
-                  activeId === item.id
+                onClick={() => {
+                  document
+                    .getElementById(item.slug)
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+                className={`block w-full text-left text-[12px] transition-colors ${
+                  indentClass[item.level - minLevel] ?? "pl-6"
+                } ${
+                  activeId === item.slug
                     ? "font-medium text-blue-400"
                     : "text-gray-400"
-                } `}
+                }`}
               >
                 {item.text}
               </button>
-            </div>
+            </li>
           ))}
         </ul>
       </div>

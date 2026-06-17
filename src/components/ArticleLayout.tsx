@@ -2,7 +2,7 @@ import { NotionToc } from "@/components/NotionToc";
 import { format, parseISO } from "date-fns";
 import { Giscus } from "@/components/Giscus";
 import type { NotionPost } from "@/types/post";
-import { NotionRenderer } from "./notion/NotionRenderer";
+import { NotionMarkdown } from "./notion/NotionMarkdown";
 import { TagGroup } from "./TagGroup";
 import { FallbackImage } from "./FallbackImage";
 import Link from "next/link";
@@ -66,8 +66,8 @@ export function ArticleLayout({ article, articles, type }: ArticleLayoutProps) {
         {/* 노션 콘텐츠 */}
         <article className="mx-auto max-w-[750px]">
           <div className="relative">
-            <NotionToc blocks={article.blocks || []} />
-            <NotionRenderer blocks={article.blocks || []} />
+            <NotionToc headings={article.headings || []} />
+            <NotionMarkdown markdown={article.markdown || ""} />
           </div>
         </article>
 

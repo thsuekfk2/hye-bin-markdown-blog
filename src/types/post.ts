@@ -1,4 +1,8 @@
-import type { NotionBlock } from "./notion";
+export interface TocItem {
+  text: string;
+  level: number;
+  slug: string;
+}
 
 export interface NotionPost {
   id: string;
@@ -11,7 +15,8 @@ export interface NotionPost {
   published: boolean;
   category?: string;
   tags?: string[];
-  blocks?: NotionBlock[];
+  markdown?: string;
+  headings?: TocItem[];
 }
 
 export type QueryFilter = { type: "post" | "log"; slug: string };
