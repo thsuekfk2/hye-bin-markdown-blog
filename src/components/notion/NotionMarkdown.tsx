@@ -15,13 +15,17 @@ interface NotionMarkdownProps {
 
 function ArticleImage({ src, alt }: { src: string; alt: string }) {
   const [isWide, setIsWide] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   return (
     <figure className="mb-6 flex flex-col items-center">
       <FallbackImage
         src={src}
         alt={alt || "Image"}
-        className={`h-auto rounded-lg ${isWide ? "w-full max-w-2xl" : "max-w-sm"}`}
-        onRatioCalculated={(ratio) => setIsWide(ratio > 3)}
+        className={`h-auto rounded-lg transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"} ${isWide ? "w-full max-w-2xl" : "max-w-[min(24rem,100%)]"}`}
+        onRatioCalculated={(ratio) => {
+          setIsWide(ratio > 3);
+          setLoaded(true);
+        }}
       />
       {alt && (
         <figcaption className="mt-2 text-center text-xs text-gray-300">
