@@ -3,7 +3,7 @@ import { NotionToMarkdown } from "notion-to-md";
 import { cache } from "react";
 import GithubSlugger from "github-slugger";
 import { codeToHtml } from "shiki";
-import { generateS3Url } from "./s3";
+import { generateS3Url, uploadNotionImageToS3 } from "./s3";
 import { IMAGE } from "./constants";
 import type { NotionPost, QueryFilter, TocItem } from "@/types/post";
 
@@ -62,7 +62,7 @@ async function getPageMarkdown(
     if (!notionUrl) return `![](${IMAGE.fallback})`;
     const needsS3 =
       notionUrl.includes("amazonaws.com") || notionUrl.includes("notion.so");
-    const url = needsS3 ? generateS3Url(notionUrl, slug) : notionUrl;
+    const url = needsS3 ? await uploadNotionImageToS3(notionUrl, slug) : notionUrl;
     const caption = toPlainText(block.image?.caption);
     return `![${caption}](${url})`;
   });
