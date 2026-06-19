@@ -1,6 +1,13 @@
 @tailwind components;
 @tailwind utilities;
 @import url("../styles/calendar.css");
+@import url("https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css");
+
+:root {
+  --font-mono: "SF Mono", "Google Sans Code Variable", ui-monospace,
+    SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+}
 
 html,
 body {
@@ -10,6 +17,8 @@ body {
   font-size: 18px;
   height: 100%;
   font-weight: 400;
+  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
 }
 
 * {
@@ -64,6 +73,7 @@ code {
   font-size: 13px;
   white-space: pre-wrap;
   word-break: break-word;
+  font-family: var(--font-mono);
 }
 
 p img {

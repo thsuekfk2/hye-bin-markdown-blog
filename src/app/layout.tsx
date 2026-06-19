@@ -1,15 +1,8 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Noto_Sans_KR } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { Analytics } from "@/components/Analytics";
-
-const notoSansKR = Noto_Sans_KR({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "이혜빈 | 프론트엔드 개발자",
@@ -40,7 +33,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={notoSansKR.className}>
+      <body>
         <div className="min-h-screen bg-[#0E0E0E] text-[#e3e3e3]">
           <div className="flex h-[8%] justify-center">
             <header className="ml-2 mr-2 flex h-[65px] w-full max-w-[800px] items-center justify-between">
@@ -54,12 +47,12 @@ export default function RootLayout({
                     height={20}
                     priority
                   />
-                  <span className="font-catamaran font-bold transition-all delay-75">
+                  <span className="font-bold transition-all delay-75">
                     hyebin
                   </span>
                 </div>
               </Link>
-              <div className="font-catamaran flex gap-4 text-sm">
+              <div className="flex gap-4 text-sm">
                 <Link
                   href="/post"
                   className="flex w-[50px] justify-center transition-all delay-75 hover:rounded-full hover:bg-[#444]"

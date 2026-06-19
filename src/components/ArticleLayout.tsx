@@ -110,7 +110,6 @@ function ArticleHeader({
       <div className="absolute top-0 flex h-[200px] w-full flex-col items-center justify-center font-bold">
         <div
           className="text-[25px] text-white"
-          style={{ fontFamily: '"Catamaran", sans-serif' }}
         >
           {title}
         </div>
