@@ -5,19 +5,22 @@ import GithubSlugger from "github-slugger";
 import { codeToHtml } from "shiki";
 import { generateS3Url, uploadNotionImageToS3 } from "./s3";
 import { IMAGE } from "./constants";
-import type { NotionPost, QueryFilter, TocItem } from "@/types/post";
+import type { NotionPost, TocItem } from "@/types/post";
 
 const notion = new Client({
   auth: process.env.NOTION_TOKEN,
 });
 
+const LANG_MAP: Record<string, string> = {
+  "plain text": "text",
+  shell: "bash",
+};
+
 const toPlainText = (richText: any[] | undefined): string =>
   (richText ?? []).map((t: any) => t.plain_text).join("");
 
-const getTextValue = (prop: any): string => toPlainText(prop?.rich_text);
-
 async function mapNotionPageToPost(page: any): Promise<NotionPost> {
-  const slug = getTextValue(page.properties.Slug);
+  const slug = toPlainText(page.properties.Slug?.rich_text);
   const originalThumbnail =
     page.properties.Thumbnail?.files?.[0]?.external?.url ||
     page.properties.Thumbnail?.files?.[0]?.file?.url ||
@@ -25,12 +28,10 @@ async function mapNotionPageToPost(page: any): Promise<NotionPost> {
 
   return {
     id: page.id,
-    title:
-      page.properties["이름"]?.title?.map((t: any) => t.plain_text).join("") ||
-      "Untitled",
+    title: toPlainText(page.properties["이름"]?.title) || "Untitled",
     slug,
     date: page.properties.Date?.date?.start || "",
-    description: getTextValue(page.properties.Description),
+    description: toPlainText(page.properties.Description?.rich_text),
     thumbnail: originalThumbnail.includes("amazonaws.com")
       ? generateS3Url(originalThumbnail, slug)
       : originalThumbnail,
@@ -51,6 +52,19 @@ function stripMarkdownFormatting(text: string): string {
     .trim();
 }
 
+async function codeBlockToHtml(block: any): Promise<string> {
+  const code = toPlainText(block.code?.rich_text);
+  const lang =
+    LANG_MAP[block.code?.language?.toLowerCase()] ??
+    block.code?.language?.toLowerCase() ??
+    "text";
+  try {
+    return await codeToHtml(code, { lang, theme: "dark-plus" });
+  } catch {
+    return await codeToHtml(code, { lang: "text", theme: "dark-plus" });
+  }
+}
+
 async function getPageMarkdown(
   pageId: string,
   slug: string,
@@ -62,7 +76,9 @@ async function getPageMarkdown(
     if (!notionUrl) return `![](${IMAGE.fallback})`;
     const needsS3 =
       notionUrl.includes("amazonaws.com") || notionUrl.includes("notion.so");
-    const url = needsS3 ? await uploadNotionImageToS3(notionUrl, slug) : notionUrl;
+    const url = needsS3
+      ? await uploadNotionImageToS3(notionUrl, slug)
+      : notionUrl;
     const caption = toPlainText(block.image?.caption);
     return `![${caption}](${url})`;
   });
@@ -88,20 +104,7 @@ async function getPageMarkdown(
     return `> [!${icon}]\n>\n${quotedContent}`;
   });
 
-  n2m.setCustomTransformer("code", async (block: any) => {
-    const code = toPlainText(block.code?.rich_text);
-    const rawLang = block.code?.language || "text";
-    const langMap: Record<string, string> = {
-      "plain text": "text",
-      shell: "bash",
-    };
-    const lang = langMap[rawLang.toLowerCase()] ?? rawLang.toLowerCase();
-    try {
-      return await codeToHtml(code, { lang, theme: "dark-plus" });
-    } catch {
-      return await codeToHtml(code, { lang: "text", theme: "dark-plus" });
-    }
-  });
+  n2m.setCustomTransformer("code", codeBlockToHtml);
 
   n2m.setCustomTransformer("table_of_contents", async () => "");
 
@@ -183,37 +186,36 @@ export async function getPostsByTag(tag: string): Promise<NotionPost[]> {
   return posts.filter((p) => p.published && p.slug && p.tags?.includes(tag));
 }
 
+const fetchPageData = cache(async (slug: string) => {
+  const response = await notion.databases.query({
+    database_id: process.env.NOTION_DATABASE_ID!,
+    filter: { property: "Slug", rich_text: { equals: slug } },
+  });
+  if (response.results.length === 0) return null;
+  const page = response.results[0] as any;
+  return { page, post: await mapNotionPageToPost(page) };
+});
+
 async function fetchPage(
-  filter: QueryFilter,
+  slug: string,
   withContent: boolean,
 ): Promise<NotionPost | null> {
   try {
-    const response = await notion.databases.query({
-      database_id: process.env.NOTION_DATABASE_ID!,
-      filter: { property: "Slug", rich_text: { equals: filter.slug } },
-    });
-
-    if (response.results.length === 0) return null;
-
-    const page = response.results[0] as any;
-    const post = await mapNotionPageToPost(page);
-
-    if (!withContent) return post;
+    const data = await fetchPageData(slug);
+    if (!data) return null;
+    if (!withContent) return data.post;
 
     const { markdown, headings } = await getPageMarkdown(
-      page.id,
-      post.slug || filter.slug,
+      data.page.id,
+      data.post.slug || slug,
     );
-
-    return { ...post, markdown, headings };
+    return { ...data.post, markdown, headings };
   } catch (error) {
-    console.error("Error fetching page:", { filter, error });
+    console.error("Error fetching page:", { slug, error });
     return null;
   }
 }
 
-export const getNotionPost = (slug: string) =>
-  fetchPage({ type: "post", slug }, true);
+export const getNotionPost = (slug: string) => fetchPage(slug, true);
 
-export const getNotionPostMetadata = (slug: string) =>
-  fetchPage({ type: "post", slug }, false);
+export const getNotionPostMetadata = (slug: string) => fetchPage(slug, false);

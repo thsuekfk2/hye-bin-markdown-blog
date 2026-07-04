@@ -18,5 +18,3 @@ export interface NotionPost {
   markdown?: string;
   headings?: TocItem[];
 }
-
-export type QueryFilter = { type: "post" | "log"; slug: string };
