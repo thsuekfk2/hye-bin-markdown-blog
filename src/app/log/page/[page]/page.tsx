@@ -2,18 +2,40 @@ import { ListItem } from "@/components/ListItem";
 import { PaginatedLayout } from "@/components/PaginatedLayout";
 import { getNotionLogs } from "@/lib/notion";
 import { ISR_TIME, PAGINATION } from "@/lib/constants";
+import { notFound } from "next/navigation";
+
+interface LogsPageProps {
+  params: { page: string };
+}
 
 export const revalidate = ISR_TIME;
 
-export default async function LogsPage() {
+export async function generateStaticParams() {
   const logs = await getNotionLogs();
   const pageCount = Math.ceil(logs.length / PAGINATION.logs);
-  const currentLogs = logs.slice(0, PAGINATION.logs);
+  return Array.from({ length: pageCount - 1 }, (_, i) => ({
+    page: String(i + 2),
+  }));
+}
+
+export default async function LogsPage({ params }: LogsPageProps) {
+  const currentPage = parseInt(params.page, 10);
+  const logs = await getNotionLogs();
+  const pageCount = Math.ceil(logs.length / PAGINATION.logs);
+
+  if (isNaN(currentPage) || currentPage < 2 || currentPage > pageCount) {
+    notFound();
+  }
+
+  const currentLogs = logs.slice(
+    (currentPage - 1) * PAGINATION.logs,
+    currentPage * PAGINATION.logs,
+  );
 
   return (
     <PaginatedLayout
       title="TIL"
-      currentPage={1}
+      currentPage={currentPage}
       pageCount={pageCount}
       route="log"
       calendarType="log"
