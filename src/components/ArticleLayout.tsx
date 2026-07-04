@@ -2,7 +2,7 @@ import { NotionToc } from "@/components/NotionToc";
 import { format, parseISO } from "date-fns";
 import { Giscus } from "@/components/Giscus";
 import type { NotionPost } from "@/types/post";
-import { NotionMarkdown } from "./notion/NotionMarkdown";
+import { NotionMarkdown } from "./NotionMarkdown";
 import { TagGroup } from "./TagGroup";
 import { FallbackImage } from "./FallbackImage";
 import Link from "next/link";
@@ -108,11 +108,7 @@ function ArticleHeader({
         notionUrl={originalThumbnail}
       />
       <div className="absolute top-0 flex h-[200px] w-full flex-col items-center justify-center font-bold">
-        <div
-          className="text-[25px] text-white"
-        >
-          {title}
-        </div>
+        <div className="text-[25px] text-white">{title}</div>
         <div className="text-sm">
           {date && format(parseISO(date), "LLLL d, yyyy")}
         </div>
