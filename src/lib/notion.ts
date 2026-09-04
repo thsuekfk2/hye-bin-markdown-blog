@@ -145,16 +145,11 @@ async function getPageMarkdown(
 }
 
 const queryNotionDatabase = cache(async (): Promise<NotionPost[]> => {
-  try {
-    const response = await notion.databases.query({
-      database_id: process.env.NOTION_DATABASE_ID!,
-      sorts: [{ property: "Date", direction: "descending" }],
-    });
-    return Promise.all(response.results.map(mapNotionPageToPost));
-  } catch (error) {
-    console.error("Error querying notion database:", error);
-    return [];
-  }
+  const response = await notion.databases.query({
+    database_id: process.env.NOTION_DATABASE_ID!,
+    sorts: [{ property: "Date", direction: "descending" }],
+  });
+  return Promise.all(response.results.map(mapNotionPageToPost));
 });
 
 export async function getArticles(
