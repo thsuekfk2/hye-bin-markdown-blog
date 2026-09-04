@@ -10,20 +10,21 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 interface PostPageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 // 메타데이터 생성
 export async function generateMetadata({
   params,
 }: PostPageProps): Promise<Metadata> {
-  const decodedSlug = decodeURIComponent(params.slug);
+  const { slug } = await params;
+  const decodedSlug = decodeURIComponent(slug);
   const post = await getNotionPostMetadata(decodedSlug);
 
   return generateArticleMetadata({
     article: post,
     type: "post",
-    slug: params.slug,
+    slug,
     fallbackTitle: "Post Not Found",
     fallbackDescription: "이혜빈의 개발블로그",
   });
@@ -41,7 +42,8 @@ export async function generateStaticParams() {
 }
 
 export default async function PostPage({ params }: PostPageProps) {
-  const decodedSlug = decodeURIComponent(params.slug);
+  const { slug } = await params;
+  const decodedSlug = decodeURIComponent(slug);
   const post = await getNotionPost(decodedSlug);
 
   if (!post) {

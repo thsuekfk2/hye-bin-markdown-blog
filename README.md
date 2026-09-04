@@ -1,7 +1,7 @@
 # 혜빈 마크다운 블로그 🚀
 
 **Notion을 CMS로 쓰는** 개인 블로그입니다.
-Next.js 13(App Router)이 요청 시점에 Notion API를 직접 호출해 ISR로 렌더링하며, AWS S3로 이미지를 캐싱합니다.
+Next.js 16(App Router)이 요청 시점에 Notion API를 직접 호출해 ISR로 렌더링하며, AWS S3로 이미지를 캐싱합니다.
 
 ## 주요 기능
 
@@ -15,8 +15,8 @@ Next.js 13(App Router)이 요청 시점에 Notion API를 직접 호출해 ISR로
 
 ### Frontend
 
-- **Next.js 13** with App Router
-- **React 18** with TypeScript
+- **Next.js 16** with App Router (Turbopack)
+- **React 19** with TypeScript
 - **Tailwind CSS**
 
 ### External Integrations

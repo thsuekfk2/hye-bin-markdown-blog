@@ -75,7 +75,7 @@ export function NotionMarkdown({ markdown }: NotionMarkdownProps) {
             return <blockquote>{children}</blockquote>;
           },
           img({ src, alt, ...props }) {
-            if (!src) return null;
+            if (!src || typeof src !== "string") return null;
             if ((props as any)["data-column"]) {
               return (
                 <img

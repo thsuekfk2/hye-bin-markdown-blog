@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useRef } from "react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
-export const Giscus = (): JSX.Element => {
+export const Giscus = () => {
   const ref = useRef<HTMLDivElement>(null);
   const theme = "dark";
 

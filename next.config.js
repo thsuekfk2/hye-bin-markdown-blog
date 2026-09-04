@@ -1,5 +1,4 @@
 module.exports = {
-  swcMinify: true,
   images: {
     remotePatterns: [
       {
@@ -30,7 +29,7 @@ module.exports = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   experimental: {
-    optimizePackageImports: ["date-fns", "react-datepicker"],
+    optimizePackageImports: ["date-fns"],
   },
   compress: true,
 };

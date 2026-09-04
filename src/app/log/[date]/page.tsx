@@ -10,19 +10,20 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 interface LogPageProps {
-  params: { date: string };
+  params: Promise<{ date: string }>;
 }
 
 // 메타데이터 생성
 export async function generateMetadata({
   params,
 }: LogPageProps): Promise<Metadata> {
-  const log = await getNotionPostMetadata(params.date);
+  const { date } = await params;
+  const log = await getNotionPostMetadata(date);
 
   return generateArticleMetadata({
     article: log,
     type: "log",
-    slug: params.date,
+    slug: date,
     fallbackTitle: "Log Not Found",
     fallbackDescription: "이혜빈의 개발 로그",
   });
@@ -39,7 +40,8 @@ export async function generateStaticParams() {
 }
 
 export default async function LogPage({ params }: LogPageProps) {
-  const log = await getNotionPost(params.date);
+  const { date } = await params;
+  const log = await getNotionPost(date);
 
   if (!log) {
     notFound();

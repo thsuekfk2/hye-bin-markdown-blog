@@ -5,14 +5,15 @@ import { Metadata } from "next";
 import { ISR_TIME } from "@/lib/constants";
 
 interface TagPageProps {
-  params: { tag: string };
+  params: Promise<{ tag: string }>;
 }
 
 // 메타데이터 생성
 export async function generateMetadata({
   params,
 }: TagPageProps): Promise<Metadata> {
-  const decodedTag = decodeURIComponent(params.tag);
+  const { tag } = await params;
+  const decodedTag = decodeURIComponent(tag);
 
   return {
     title: `${decodedTag} 태그 포스트 - 이혜빈의 개발블로그`,
@@ -38,7 +39,8 @@ export async function generateStaticParams() {
 }
 
 export default async function TagPage({ params }: TagPageProps) {
-  const decodedTag = decodeURIComponent(params.tag);
+  const { tag } = await params;
+  const decodedTag = decodeURIComponent(tag);
   const posts = await getPostsByTag(decodedTag);
 
   if (posts.length === 0) {

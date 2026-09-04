@@ -40,6 +40,7 @@ export const Card = ({
             height={250}
             alt="loading"
             src="/jump.webp"
+            unoptimized
             className="absolute h-[170px] w-full object-cover transition-transform duration-500"
           />
           {/* 실제 썸네일 이미지 */}
@@ -50,6 +51,7 @@ export const Card = ({
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBABbWyZJf74GZgAAAABJRU5ErkJggg=="
             src={thumbnail || "/jump.webp"}
+            unoptimized={!thumbnail}
             className="relative z-10 h-[170px] w-full object-cover opacity-0 transition-all duration-500"
             onLoad={(e) => {
               const target = e.target as HTMLImageElement;

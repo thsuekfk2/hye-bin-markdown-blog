@@ -74,6 +74,7 @@ export function FallbackImage({
   return (
     <Image
       src={isUploading ? IMAGE.fallback : currentSrc}
+      unoptimized={isUploading || currentSrc === IMAGE.fallback}
       alt={alt}
       className={className}
       onError={handleImageError}
