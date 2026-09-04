@@ -7,9 +7,18 @@ import { generateS3Url, uploadNotionImageToS3 } from "./s3";
 import { IMAGE } from "./constants";
 import type { NotionPost, TocItem } from "@/types/post";
 
-const notion = new Client({
-  auth: process.env.NOTION_TOKEN,
-});
+// ponytail: process.env.X!로 넘기면 값이 비어도 조용히 undefined가 들어가고,
+// 한참 뒤 Notion API 호출 시점에야 알아보기 힘든 에러로 터진다. 부팅 시점에
+// 바로 알 수 있게 필수 값만 여기서 검증한다.
+const NOTION_TOKEN = process.env.NOTION_TOKEN;
+const NOTION_DATABASE_ID = process.env.NOTION_DATABASE_ID;
+if (!NOTION_TOKEN || !NOTION_DATABASE_ID) {
+  throw new Error(
+    "Missing required env var: NOTION_TOKEN and/or NOTION_DATABASE_ID",
+  );
+}
+
+const notion = new Client({ auth: NOTION_TOKEN });
 
 const LANG_MAP: Record<string, string> = {
   "plain text": "text",
@@ -146,7 +155,7 @@ async function getPageMarkdown(
 
 const queryNotionDatabase = cache(async (): Promise<NotionPost[]> => {
   const response = await notion.databases.query({
-    database_id: process.env.NOTION_DATABASE_ID!,
+    database_id: NOTION_DATABASE_ID,
     sorts: [{ property: "Date", direction: "descending" }],
   });
   return Promise.all(response.results.map(mapNotionPageToPost));
@@ -183,7 +192,7 @@ export async function getPostsByTag(tag: string): Promise<NotionPost[]> {
 
 const fetchPageData = cache(async (slug: string) => {
   const response = await notion.databases.query({
-    database_id: process.env.NOTION_DATABASE_ID!,
+    database_id: NOTION_DATABASE_ID,
     filter: { property: "Slug", rich_text: { equals: slug } },
   });
   if (response.results.length === 0) return null;

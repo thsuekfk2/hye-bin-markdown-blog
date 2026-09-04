@@ -5,8 +5,10 @@ import {
 } from "@aws-sdk/client-s3";
 import crypto from "crypto";
 
+const AWS_REGION = process.env.AWS_REGION || "ap-northeast-2";
+
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION || "ap-northeast-2",
+  region: AWS_REGION,
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
@@ -73,6 +75,10 @@ async function fileExists(key: string): Promise<boolean> {
     );
     return true;
   } catch (error) {
+    const code = (error as { name?: string })?.name;
+    if (code && code !== "NotFound") {
+      console.warn(`S3 HeadObject failed unexpectedly (${code}) for ${key}`);
+    }
     return false;
   }
 }
@@ -87,7 +93,7 @@ export function generateS3Url(notionUrl: string, slug?: string): string {
   }
 
   const fileName = generateFileName(notionUrl, slug);
-  return `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+  return `https://${BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${fileName}`;
 }
 
 export async function uploadNotionImageToS3(
@@ -144,13 +150,8 @@ export async function uploadNotionImageToS3(
 
     return generateS3Url(notionImageUrl, slug);
   } catch (error) {
-    console.error("Error uploading image to S3:", error);
-
-    // 네트워크 에러나 기타 실패 시에도 fallback 이미지 사용
-    if (error instanceof Error && error.message.includes("403")) {
-      return "/jump.webp";
-    }
-
-    return "/jump.webp"; // 모든 실패 시 fallback 이미지
+    const detail = error instanceof Error ? error.name : String(error);
+    console.error(`S3 upload failed (${detail}) for ${notionImageUrl}:`, error);
+    return "/jump.webp";
   }
 }
