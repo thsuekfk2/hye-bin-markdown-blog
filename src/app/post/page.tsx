@@ -1,7 +1,7 @@
 import { Card } from "@/components/Card";
 import { PaginatedLayout } from "@/components/PaginatedLayout";
 import { getNotionPosts } from "@/lib/notion";
-import { ISR_TIME, PAGINATION } from "@/lib/constants";
+import { PAGINATION } from "@/lib/constants";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "노션에서 직접 불러온 최신 포스트들",
 };
 
-export const revalidate = ISR_TIME;
+export const revalidate = 3600;
 
 export default async function PostsPage() {
   const posts = await getNotionPosts();

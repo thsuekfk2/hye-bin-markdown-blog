@@ -3,9 +3,8 @@ import { getRecentPosts, getRecentLogs, getAllTags } from "@/lib/notion";
 import { Card } from "@/components/Card";
 import { ListItem } from "@/components/ListItem";
 import { TagList } from "@/components/TagList";
-import { ISR_TIME } from "@/lib/constants";
 
-export const revalidate = ISR_TIME;
+export const revalidate = 3600;
 
 export default async function Home() {
   const [recentPosts, recentLogs, allTags] = await Promise.all([

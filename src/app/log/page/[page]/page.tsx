@@ -1,14 +1,14 @@
 import { ListItem } from "@/components/ListItem";
 import { PaginatedLayout } from "@/components/PaginatedLayout";
 import { getNotionLogs } from "@/lib/notion";
-import { ISR_TIME, PAGINATION } from "@/lib/constants";
+import { PAGINATION } from "@/lib/constants";
 import { notFound } from "next/navigation";
 
 interface LogsPageProps {
   params: Promise<{ page: string }>;
 }
 
-export const revalidate = ISR_TIME;
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const logs = await getNotionLogs();

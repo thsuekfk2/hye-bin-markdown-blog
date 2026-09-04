@@ -1,14 +1,14 @@
 import { Card } from "@/components/Card";
 import { PaginatedLayout } from "@/components/PaginatedLayout";
 import { getNotionPosts } from "@/lib/notion";
-import { ISR_TIME, PAGINATION } from "@/lib/constants";
+import { PAGINATION } from "@/lib/constants";
 import { notFound } from "next/navigation";
 
 interface PostsPageProps {
   params: Promise<{ page: string }>;
 }
 
-export const revalidate = ISR_TIME;
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const posts = await getNotionPosts();

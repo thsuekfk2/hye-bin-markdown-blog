@@ -2,7 +2,6 @@ import { getPostsByTag, getAllTags } from "@/lib/notion";
 import { Card } from "@/components/Card";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { ISR_TIME } from "@/lib/constants";
 
 interface TagPageProps {
   params: Promise<{ tag: string }>;
@@ -28,7 +27,7 @@ export async function generateMetadata({
 }
 
 // ISR 설정 추가
-export const revalidate = ISR_TIME;
+export const revalidate = 3600;
 
 // generateStaticParams 추가 - ISR을 위한 정적 경로 생성
 export async function generateStaticParams() {

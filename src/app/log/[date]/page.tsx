@@ -5,7 +5,6 @@ import {
 } from "@/lib/notion";
 import { ArticleLayout } from "@/components/ArticleLayout";
 import { generateArticleMetadata } from "@/lib/metadata";
-import { ISR_TIME } from "@/lib/constants";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -29,7 +28,7 @@ export async function generateMetadata({
   });
 }
 
-export const revalidate = ISR_TIME;
+export const revalidate = 3600;
 
 // generateStaticParams 추가 - ISR을 위한 정적 경로 생성
 export async function generateStaticParams() {

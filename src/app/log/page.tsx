@@ -1,9 +1,9 @@
 import { ListItem } from "@/components/ListItem";
 import { PaginatedLayout } from "@/components/PaginatedLayout";
 import { getNotionLogs } from "@/lib/notion";
-import { ISR_TIME, PAGINATION } from "@/lib/constants";
+import { PAGINATION } from "@/lib/constants";
 
-export const revalidate = ISR_TIME;
+export const revalidate = 3600;
 
 export default async function LogsPage() {
   const logs = await getNotionLogs();
