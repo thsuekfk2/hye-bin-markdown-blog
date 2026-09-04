@@ -1,15 +1,13 @@
 import { Client } from "@notionhq/client";
 import { NotionToMarkdown } from "notion-to-md";
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import GithubSlugger from "github-slugger";
 import { codeToHtml } from "shiki";
 import { generateS3Url, uploadNotionImageToS3 } from "./s3";
 import { IMAGE } from "./constants";
 import type { NotionPost, TocItem } from "@/types/post";
 
-// ponytail: process.env.X!로 넘기면 값이 비어도 조용히 undefined가 들어가고,
-// 한참 뒤 Notion API 호출 시점에야 알아보기 힘든 에러로 터진다. 부팅 시점에
-// 바로 알 수 있게 필수 값만 여기서 검증한다.
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
 const NOTION_DATABASE_ID = process.env.NOTION_DATABASE_ID;
 if (!NOTION_TOKEN || !NOTION_DATABASE_ID) {
@@ -19,6 +17,25 @@ if (!NOTION_TOKEN || !NOTION_DATABASE_ID) {
 }
 
 const notion = new Client({ auth: NOTION_TOKEN });
+
+async function withNotionRetry<T>(
+  fn: () => Promise<T>,
+  retries = 4,
+): Promise<T> {
+  try {
+    return await fn();
+  } catch (error) {
+    const isRateLimited = (error as { code?: string })?.code === "rate_limited";
+    if (!isRateLimited || retries <= 0) throw error;
+    const retryAfter = Number(
+      (error as { headers?: Headers })?.headers?.get?.("retry-after"),
+    );
+    const waitSeconds =
+      Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : 2;
+    await new Promise((resolve) => setTimeout(resolve, waitSeconds * 1000));
+    return withNotionRetry(fn, retries - 1);
+  }
+}
 
 const LANG_MAP: Record<string, string> = {
   "plain text": "text",
@@ -131,7 +148,7 @@ async function getPageMarkdown(
     return `<div style="display:flex;gap:24px;margin-bottom:24px;align-items:flex-start">${parts.join("")}</div>`;
   });
 
-  const mdBlocks = await n2m.pageToMarkdown(pageId);
+  const mdBlocks = await withNotionRetry(() => n2m.pageToMarkdown(pageId));
 
   const slugger = new GithubSlugger();
   const headings: TocItem[] = mdBlocks
@@ -153,13 +170,19 @@ async function getPageMarkdown(
   return { markdown, headings };
 }
 
-const queryNotionDatabase = cache(async (): Promise<NotionPost[]> => {
-  const response = await notion.databases.query({
-    database_id: NOTION_DATABASE_ID,
-    sorts: [{ property: "Date", direction: "descending" }],
-  });
-  return Promise.all(response.results.map(mapNotionPageToPost));
-});
+const queryNotionDatabase = unstable_cache(
+  async (): Promise<NotionPost[]> => {
+    const response = await withNotionRetry(() =>
+      notion.databases.query({
+        database_id: NOTION_DATABASE_ID,
+        sorts: [{ property: "Date", direction: "descending" }],
+      }),
+    );
+    return Promise.all(response.results.map(mapNotionPageToPost));
+  },
+  ["notion-database"],
+  { revalidate: 3600 },
+);
 
 export async function getArticles(
   category: "post" | "log",
@@ -191,10 +214,12 @@ export async function getPostsByTag(tag: string): Promise<NotionPost[]> {
 }
 
 const fetchPageData = cache(async (slug: string) => {
-  const response = await notion.databases.query({
-    database_id: NOTION_DATABASE_ID,
-    filter: { property: "Slug", rich_text: { equals: slug } },
-  });
+  const response = await withNotionRetry(() =>
+    notion.databases.query({
+      database_id: NOTION_DATABASE_ID,
+      filter: { property: "Slug", rich_text: { equals: slug } },
+    }),
+  );
   if (response.results.length === 0) return null;
   const page = response.results[0] as any;
   return { page, post: await mapNotionPageToPost(page) };
