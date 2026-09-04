@@ -5,7 +5,7 @@ import { ISR_TIME, PAGINATION } from "@/lib/constants";
 import { notFound } from "next/navigation";
 
 interface LogsPageProps {
-  params: { page: string };
+  params: Promise<{ page: string }>;
 }
 
 export const revalidate = ISR_TIME;
@@ -19,7 +19,8 @@ export async function generateStaticParams() {
 }
 
 export default async function LogsPage({ params }: LogsPageProps) {
-  const currentPage = parseInt(params.page, 10);
+  const { page } = await params;
+  const currentPage = parseInt(page, 10);
   const logs = await getNotionLogs();
   const pageCount = Math.ceil(logs.length / PAGINATION.logs);
 
@@ -38,7 +39,6 @@ export default async function LogsPage({ params }: LogsPageProps) {
       currentPage={currentPage}
       pageCount={pageCount}
       route="log"
-      calendarType="log"
     >
       <div className="flex flex-col px-4 py-2">
         {currentLogs.map((log, idx) => (

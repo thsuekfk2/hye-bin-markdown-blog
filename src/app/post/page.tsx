@@ -22,7 +22,6 @@ export default async function PostsPage() {
       currentPage={1}
       pageCount={pageCount}
       route="post"
-      calendarType="post"
     >
       <div className="flex flex-1 flex-wrap content-start justify-center gap-6 p-4">
         {currentPosts.map((post, key) => (

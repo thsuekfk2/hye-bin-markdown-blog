@@ -5,7 +5,7 @@ import { ISR_TIME, PAGINATION } from "@/lib/constants";
 import { notFound } from "next/navigation";
 
 interface PostsPageProps {
-  params: { page: string };
+  params: Promise<{ page: string }>;
 }
 
 export const revalidate = ISR_TIME;
@@ -19,7 +19,8 @@ export async function generateStaticParams() {
 }
 
 export default async function PostsPage({ params }: PostsPageProps) {
-  const currentPage = parseInt(params.page, 10);
+  const { page } = await params;
+  const currentPage = parseInt(page, 10);
   const posts = await getNotionPosts();
   const pageCount = Math.ceil(posts.length / PAGINATION.posts);
 
@@ -38,7 +39,6 @@ export default async function PostsPage({ params }: PostsPageProps) {
       currentPage={currentPage}
       pageCount={pageCount}
       route="post"
-      calendarType="post"
     >
       <div className="flex flex-1 flex-wrap content-start justify-center gap-6 p-4">
         {currentPosts.map((post, key) => (

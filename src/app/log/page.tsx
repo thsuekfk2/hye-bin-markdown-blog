@@ -16,7 +16,6 @@ export default async function LogsPage() {
       currentPage={1}
       pageCount={pageCount}
       route="log"
-      calendarType="log"
     >
       <div className="flex flex-col px-4 py-2">
         {currentLogs.map((log, idx) => (
