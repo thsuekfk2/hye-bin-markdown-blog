@@ -1,12 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { uploadNotionImageToS3 } from "@/lib/s3";
 
+const BUCKET_NAME = process.env.S3_BUCKET_NAME;
+
+function isAllowedImageUrl(value: unknown): value is string {
+  if (typeof value !== "string") return false;
+  try {
+    const { protocol, hostname } = new URL(value);
+    if (protocol !== "https:") return false;
+    if (/\.notion\.so$/.test(hostname)) return true;
+    return (
+      !!BUCKET_NAME &&
+      hostname.startsWith(`${BUCKET_NAME}.s3.`) &&
+      hostname.endsWith(".amazonaws.com")
+    );
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { notionUrl, s3Url } = await request.json();
 
-    if (!notionUrl) {
-      return NextResponse.json({ error: "Missing notionUrl" }, { status: 400 });
+    if (!isAllowedImageUrl(notionUrl)) {
+      return NextResponse.json(
+        {
+          error: "notionUrl must be an https URL on notion.so or our S3 bucket",
+        },
+        { status: 400 },
+      );
     }
 
     console.log(`Uploading missing image: ${notionUrl} -> ${s3Url}`);
